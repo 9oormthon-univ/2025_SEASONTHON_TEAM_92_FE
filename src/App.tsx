@@ -1,3 +1,4 @@
+import HowItWorks from './components/HowItWorks';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
@@ -68,19 +69,19 @@ function App() {
     if (showAdminLogin) {
       return (
         <div className="min-h-screen bg-gray-50">
-          <AdminLogin 
-            onAdminLogin={handleAdminAuthSuccess} 
+          <AdminLogin
+            onAdminLogin={handleAdminAuthSuccess}
             onBack={handleBackToMain}
           />
           <Toaster position="top-right" />
         </div>
       );
     }
-    
+
     return (
       <div className="min-h-screen bg-gray-50">
-        <AuthForm 
-          onAuthSuccess={handleAuthSuccess} 
+        <AuthForm
+          onAuthSuccess={handleAuthSuccess}
           onAdminLogin={handleAdminLogin}
         />
         <Toaster position="top-right" />
@@ -89,17 +90,15 @@ function App() {
   }
 
   // 관리자 대시보드
-  if (currentUser.role === 'admin') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <AdminDashboard 
-          admin={currentUser} 
-          onLogout={handleLogout}
-        />
-        <Toaster position="top-right" />
-      </div>
-    );
-  }
+if ((currentUser as any).role === 'admin') {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AdminDashboard admin={currentUser} onLogout={handleLogout} />
+      <Toaster position="top-right" />
+    </div>
+  );
+}
+
 
   return (
     <Router>
@@ -116,7 +115,7 @@ function App() {
                 <span className="text-sm text-gray-600">
                   안녕하세요, {currentUser.nickname}님 ({getRoleDisplayName(currentUser.role as any)})
                 </span>
-                
+
                 {hasPermission(currentUser.role as any, 'canSubmitRentInfo') && (
                   <Link
                     to="/"
@@ -125,7 +124,7 @@ function App() {
                     정보 입력
                   </Link>
                 )}
-                
+
                 {hasPermission(currentUser.role as any, 'canViewGroups') && (
                   <Link
                     to="/groups"
@@ -134,14 +133,14 @@ function App() {
                     그룹 보기
                   </Link>
                 )}
-                
+
                 <Link
                   to="/reports"
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   익명 신고
                 </Link>
-                
+
                 {hasPermission(currentUser.role as any, 'canViewNegotiationGuide') && (
                   <Link
                     to="/guide"
@@ -150,7 +149,7 @@ function App() {
                     협상 가이드
                   </Link>
                 )}
-                
+
                 {hasPermission(currentUser.role as any, 'canVote') && (
                   <Link
                     to="/voting"
@@ -159,7 +158,7 @@ function App() {
                     투표 참여
                   </Link>
                 )}
-                
+
                 <button
                   onClick={handleLogout}
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -171,14 +170,17 @@ function App() {
           </div>
         </nav>
 
+        {/* 🔽 로그인 후, 네비게이션 밑에 안내 섹션 */}
+        <HowItWorks />
+
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                      <Routes>
-              <Route path="/" element={<TenantForm currentUser={currentUser} />} />
-              <Route path="/groups" element={<GroupsPage currentUser={currentUser} />} />
-              <Route path="/reports" element={<AnonymousReport />} />
-              <Route path="/guide" element={<NegotiationGuide />} />
-              <Route path="/voting" element={<TenantVoting currentUser={currentUser} />} />
-            </Routes>
+          <Routes>
+            <Route path="/" element={<TenantForm currentUser={currentUser} />} />
+            <Route path="/groups" element={<GroupsPage currentUser={currentUser} />} />
+            <Route path="/reports" element={<AnonymousReport />} />
+            <Route path="/guide" element={<NegotiationGuide />} />
+            <Route path="/voting" element={<TenantVoting currentUser={currentUser} />} />
+          </Routes>
         </main>
 
         <Toaster position="top-right" />
