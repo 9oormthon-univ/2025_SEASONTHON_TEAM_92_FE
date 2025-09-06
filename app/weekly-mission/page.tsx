@@ -6,11 +6,32 @@ import { useRouter } from 'next/navigation';
 import { missionApi } from '../../lib/api';
 import toast from 'react-hot-toast';
 
+// 타입 정의
+interface Question {
+  questionId: number;
+  questionText: string;
+  questionType: string;
+  options: string[];
+  orderNumber: number;
+}
+
+interface Mission {
+  missionId: number;
+  title: string;
+  category: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  participationCount: number;
+  userParticipated: boolean;
+  questions: Question[];
+}
+
 export default function WeeklyMissionPage() {
   const router = useRouter();
   const [responses, setResponses] = useState<{[key: string]: number | string | string[]}>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [mission, setMission] = useState<any>(null);
+  const [mission, setMission] = useState<Mission | null>(null);
   const [error, setError] = useState('');
 
   // API에서 현재 미션 데이터 가져오기
@@ -51,7 +72,7 @@ export default function WeeklyMissionPage() {
 
   const isFormComplete = () => {
     if (!mission || !mission.questions) return false;
-    return mission.questions.every((q: any) => {
+    return mission.questions.every((q: Question) => {
       const response = responses[q.questionId];
       return response !== undefined && response !== '';
     });
@@ -65,7 +86,7 @@ export default function WeeklyMissionPage() {
     
     try {
       // API 형식에 맞게 응답 데이터 변환
-      const apiResponses = mission.questions.map((q: any) => ({
+      const apiResponses = mission.questions.map((q: Question) => ({
         questionId: q.questionId,
         answer: responses[q.questionId]?.toString() || '',
         score: typeof responses[q.questionId] === 'number' ? responses[q.questionId] : 1
@@ -99,6 +120,31 @@ export default function WeeklyMissionPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">미션을 불러올 수 없습니다</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Link href="/" className="text-blue-600 hover:text-blue-800">메인으로 돌아가기</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!mission) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">미션을 불러오는 중...</h2>
+          <p className="text-gray-600">잠시만 기다려주세요</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -109,9 +155,9 @@ export default function WeeklyMissionPage() {
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <div className="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
             <i className="ri-calendar-check-line mr-2"></i>
-            {mission.week} 주간 미션
+            주간 미션
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{mission.theme}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{mission.title}</h2>
           <p className="text-gray-600">{mission.description}</p>
         </div>
 
@@ -119,111 +165,51 @@ export default function WeeklyMissionPage() {
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-6">
             <div className="flex items-center text-white">
               <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                <i className={`${mission.icon} text-2xl`}></i>
+                <i className="ri-task-line text-2xl"></i>
               </div>
               <div>
                 <h3 className="text-lg font-bold">미션 완료 보상</h3>
-                <p className="text-green-100 text-sm">{mission.reward}</p>
+                <p className="text-green-100 text-sm">우리 건물 vs 우리 동네 비교 분석</p>
               </div>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8">
             <div className="space-y-8">
-              {mission.questions.map((question, index) => (
-                <div key={question.id} className="space-y-4">
+              {mission.questions.map((question: Question, index: number) => (
+                <div key={question.questionId} className="space-y-4">
                   <div>
                     <h4 className="text-lg font-semibold text-gray-800 mb-4">
-                      {index + 1}. {question.text}
+                      {index + 1}. {question.questionText}
                     </h4>
                   </div>
 
-                  {question.type === 'scale' && (
+                  {question.questionType === 'MULTIPLE_CHOICE' && (
                     <div className="space-y-3">
-                      {question.options.map((option) => (
+                      {question.options.map((option: string, optionIndex: number) => (
                         <button
-                          key={option.value}
+                          key={optionIndex}
                           type="button"
-                          onClick={() => handleScaleResponse(question.id, option.value)}
+                          onClick={() => handleScaleResponse(question.questionId.toString(), optionIndex + 1)}
                           className={`w-full p-4 text-left rounded-lg border-2 transition-all cursor-pointer ${
-                            responses[question.id] === option.value
+                            responses[question.questionId] === optionIndex + 1
                               ? 'border-green-500 bg-green-50 text-green-700'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                           }`}
                         >
                           <div className="flex items-center">
                             <div className={`w-4 h-4 rounded-full mr-3 ${
-                              responses[question.id] === option.value
+                              responses[question.questionId] === optionIndex + 1
                                 ? 'bg-green-500'
                                 : 'bg-gray-300'
                             }`}></div>
-                            <span className="font-medium">{option.label}</span>
+                            <span className="font-medium">{option}</span>
                           </div>
                         </button>
                       ))}
                     </div>
                   )}
 
-                  {question.type === 'choice' && (
-                    <div className="space-y-3">
-                      {question.options.map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => handleChoiceResponse(question.id, option.value)}
-                          className={`w-full p-4 text-left rounded-lg border-2 transition-all cursor-pointer ${
-                            responses[question.id] === option.value
-                              ? 'border-green-500 bg-green-50 text-green-700'
-                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <div className={`w-4 h-4 rounded-full mr-3 ${
-                              responses[question.id] === option.value
-                                ? 'bg-green-500'
-                                : 'bg-gray-300'
-                            }`}></div>
-                            <span className="font-medium">{option.label}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {question.type === 'multiple' && (
-                    <div className="space-y-3">
-                      {question.options.map((option) => {
-                        const selectedOptions = responses[question.id] as string[] || [];
-                        const isSelected = selectedOptions.includes(String(option.value));
-                        
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => handleMultipleResponse(question.id, option.value)}
-                            className={`w-full p-4 text-left rounded-lg border-2 transition-all cursor-pointer ${
-                              isSelected
-                                ? 'border-green-500 bg-green-50 text-green-700'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center">
-                              <div className={`w-4 h-4 rounded-sm mr-3 flex items-center justify-center ${
-                                isSelected
-                                  ? 'bg-green-500'
-                                  : 'bg-gray-300'
-                              }`}>
-                                {isSelected && (
-                                  <i className="ri-check-line text-xs text-white"></i>
-                                )}
-                              </div>
-                              <span className="font-medium">{option.label}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
