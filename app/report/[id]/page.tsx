@@ -1,170 +1,120 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { reportApi } from '../../../lib/api';
-import toast from 'react-hot-toast';
+// import { reportApi } from '@/lib/api';
+import { ReportResponse } from '@/types';
 
 interface ReportPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function ReportDetailPage({ params }: ReportPageProps) {
-  const [reportData, setReportData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const router = useRouter();
+export default function ReportPage({ params }: ReportPageProps) {
+  const [reportId, setReportId] = useState<string | null>(null);
+  const [report, setReport] = useState<ReportResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadReport();
-  }, [params.id]);
+    const getParams = async () => {
+      const resolvedParams = await params;
+      const id = resolvedParams.id;
+      
+        if (id) {
+          const fetchReport = async () => {
+            try {
+              setLoading(true);
+              // const response = await reportApi.getReport(Number(id));
+              // Temporarily use mock data for testing
+              const mockReport: ReportResponse = {
+                primaryNegotiationCard: "안녕하세요, 임대인님. 저희가 현재 거주 중인 공간에 대해 협의하고자 합니다.",
+                secondaryNegotiationCard: "추가로, 현재 수압과 난방이 양호함을 고려할 때...",
+                step1: "1단계: 초기 접근 및 협상 준비 단계...",
+                step2: "2단계: 본격적인 협상 및 후속 조치 단계..."
+              };
+              setReport(mockReport);
+            } catch (err: any) {
+              console.error('Failed to fetch report:', err);
+              setError(err.message || 'Failed to load report.');
+            } finally {
+              setLoading(false);
+            }
+          };
+          fetchReport();
+        }
+      };
+      
+      getParams();
+  }, [params]);
 
-  const loadReport = async () => {
-    try {
-      const reportId = parseInt(params.id);
-      if (isNaN(reportId)) {
-        setError('유효하지 않은 리포트 ID입니다.');
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await reportApi.getReport(reportId);
-      if (response) {
-        setReportData({
-          ...response,
-          reportId: reportId,
-          reportUrl: `${window.location.origin}/report/${reportId}`
-        });
-      } else {
-        setError('리포트를 찾을 수 없습니다.');
-      }
-    } catch (err: any) {
-      console.error('Report load error:', err);
-      setError('리포트를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-4 mx-auto mb-4 border-blue-200 border-t-blue-600"></div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">리포트를 불러오는 중...</h2>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-700">리포트를 불러오는 중입니다...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !reportData) {
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">리포트를 불러올 수 없습니다</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={() => router.push('/report')}
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-          >
-            새 리포트 생성하기
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center p-6 rounded-lg shadow-md bg-white">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">오류 발생</h2>
+          <p className="text-gray-700">{error}</p>
+          <p className="text-gray-500 mt-2">리포트를 불러오지 못했습니다. 다시 시도해주세요.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!report) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center p-6 rounded-lg shadow-md bg-white">
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">리포트 없음</h2>
+          <p className="text-gray-600">요청하신 리포트를 찾을 수 없습니다.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">협상 리포트</h1>
-          <p className="text-gray-600">리포트 ID: {reportData.reportId}</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 space-y-8">
+        <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-8">맞춤형 재계약 협상 리포트</h1>
 
-        <div className="space-y-6">
-          {/* 리포트 URL 표시 */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">리포트 URL</h2>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-2">이 리포트를 공유하거나 나중에 다시 보려면 아래 URL을 사용하세요:</p>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={reportData.reportUrl}
-                  readOnly
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-mono"
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(reportData.reportUrl);
-                    toast.success('URL이 클립보드에 복사되었습니다!');
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-                >
-                  복사
-                </button>
-              </div>
-            </div>
+        {/* Primary Negotiation Card */}
+        <section className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6 shadow-md">
+          <h2 className="text-2xl font-bold text-blue-800 mb-3">주요 협상 카드</h2>
+          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{report.primaryNegotiationCard}</p>
+        </section>
+
+        {/* Secondary Negotiation Card */}
+        <section className="bg-indigo-50 border-l-4 border-indigo-500 rounded-lg p-6 shadow-md">
+          <h2 className="text-2xl font-bold text-indigo-800 mb-3">보조 협상 카드</h2>
+          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{report.secondaryNegotiationCard}</p>
+        </section>
+
+        {/* Negotiation Steps */}
+        <section className="space-y-6">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-6">협상 전략 단계</h2>
+          
+          <div className="bg-gray-50 rounded-lg p-6 shadow-md">
+            <h3 className="text-xl font-bold text-gray-800 mb-3">1단계</h3>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{report.step1}</p>
           </div>
 
-          {/* 월세 조정 요청 카드 */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">월세 조정 요청 카드</h2>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-gray-800 whitespace-pre-line">
-                {reportData.primaryNegotiationCard || '월세 조정 요청 카드가 생성되지 않았습니다.'}
-              </p>
-            </div>
+          <div className="bg-gray-50 rounded-lg p-6 shadow-md">
+            <h3 className="text-xl font-bold text-gray-800 mb-3">2단계</h3>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{report.step2}</p>
           </div>
+        </section>
 
-          {/* 하자 수리 요청 카드 */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">하자 수리 요청 카드</h2>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-gray-800 whitespace-pre-line">
-                {reportData.secondaryNegotiationCard || '하자 수리 요청 카드가 생성되지 않았습니다.'}
-              </p>
-            </div>
-          </div>
-
-          {/* 협상 단계별 가이드 */}
-          {(reportData.step1 || reportData.step2) && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">협상 단계별 가이드</h2>
-              <div className="space-y-4">
-                {reportData.step1 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">1단계</h3>
-                    <p className="text-gray-800 whitespace-pre-line">{reportData.step1}</p>
-                  </div>
-                )}
-                {reportData.step2 && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">2단계</h3>
-                    <p className="text-gray-800 whitespace-pre-line">{reportData.step2}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="flex space-x-4">
-            <button
-              onClick={() => router.push('/report')}
-              className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              새로운 리포트 생성
-            </button>
-            <button
-              onClick={() => router.push('/')}
-              className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              홈으로 돌아가기
-            </button>
-          </div>
+        <div className="text-center mt-10">
+          <p className="text-gray-500 text-sm">본 리포트는 LLM을 통해 생성되었으며, 참고 자료로 활용하시기 바랍니다.</p>
         </div>
       </div>
     </div>

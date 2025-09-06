@@ -9,11 +9,12 @@ export default function DashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('report');
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [reportGenerated, setReportGenerated] = useState(false);
-  const [reportUrl, setReportUrl] = useState('');
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [generatedReport, setGeneratedReport] = useState<any>(null);
 
-  // Mock user data
+  // Mock user data (replace with actual data fetching)
   const userData = {
+    id: 'user123', // Placeholder for actual user ID
     name: '김지원',
     building: '래미안 아파트 101동',
     location: '강남구 개포동',
@@ -23,7 +24,7 @@ export default function DashboardPage() {
     neighborhoodAverage: 71
   };
 
-  // Mock analysis data
+  // Mock analysis data (replace with actual data fetching)
   const analysisData = {
     lowScoreItems: [
       { 
@@ -83,42 +84,50 @@ export default function DashboardPage() {
   const handleGenerateReport = async () => {
     console.log('리포트 생성 버튼 클릭됨');
     setIsGeneratingReport(true);
-    setReportGenerated(false);
+    setShowReportModal(true);
+    setGeneratedReport(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const generatedUrl = `${window.location.origin}/report/share/${Date.now()}`;
-      setReportUrl(generatedUrl);
-      setReportGenerated(true);
-    } catch (error) {
+      // Call the new API route for report generation
+      const jwtToken = localStorage.getItem('jwtToken'); // Get token from localStorage
+      if (!jwtToken) {
+        throw new Error('JWT Token not found. Please log in.');
+      }
+
+      const response = await fetch('/api/report/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: userData.id, jwtToken }), // Pass user ID and token to the API route
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to generate report');
+      }
+
+      const data = await response.json();
+      const reportId = data.reportId;
+      const reportContent = data.reportContent;
+
+      console.log('API 응답 데이터:', data);
+      console.log('리포트 ID:', reportId);
+      console.log('리포트 내용:', reportContent);
+
+      if (reportId && reportContent) {
+        // Show report in modal instead of redirecting
+        setGeneratedReport(reportContent);
+        setShowReportModal(true);
+      } else {
+        throw new Error('Report ID or content not received.');
+      }
+
+    } catch (error: any) {
       console.error('리포트 생성 실패:', error);
-      alert('리포트 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+      alert(`리포트 생성 중 오류가 발생했습니다: ${error.message}. 다시 시도해주세요.`);
     } finally {
       setIsGeneratingReport(false);
-    }
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(reportUrl);
-      // 시각적 피드백 제공
-      const button = document.getElementById('share-button');
-      if (button) {
-        const originalText = button.innerHTML;
-        button.innerHTML = '<div class="flex items-center"><i class="ri-check-line mr-2"></i>복사 완료!</div>';
-        setTimeout(() => {
-          button.innerHTML = originalText;
-        }, 2000);
-      }
-    } catch (error) {
-      // fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = reportUrl;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      alert('링크가 클립보드에 복사되었습니다!');
     }
   };
 
@@ -210,52 +219,24 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        {!reportGenerated ? (
-                          <button
-                            onClick={handleGenerateReport}
-                            disabled={isGeneratingReport}
-                            className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
-                            type="button"
-                          >
-                            {isGeneratingReport ? (
-                              <div className="flex items-center">
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-2"></div>
-                                생성 중...
-                              </div>
-                            ) : (
-                              <div className="flex items-center">
-                                <i className="ri-file-add-line mr-2"></i>
-                                리포트 생성하기
-                              </div>
-                            )}
-                          </button>
-                        ) : (
-                          <div className="space-y-3">
-                            <div className="flex items-center text-green-200 text-sm">
-                              <i className="ri-check-circle-fill mr-2"></i>
-                              리포트 생성 완료!
+                        <button
+                          onClick={handleGenerateReport}
+                          disabled={isGeneratingReport}
+                          className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+                          type="button"
+                        >
+                          {isGeneratingReport ? (
+                            <div className="flex items-center">
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-2"></div>
+                              생성 중...
                             </div>
-                            <div className="bg-white/10 rounded-lg p-3 mb-3">
-                              <div className="text-xs text-blue-200 mb-2">공유 링크</div>
-                              <div className="text-sm text-white break-all bg-black/20 rounded p-2 mb-2">
-                                {reportUrl}
-                              </div>
-                              <div className="text-xs text-blue-200">
-                                임대인은 회원가입 없이 리포트를 확인할 수 있습니다
-                              </div>
+                          ) : (
+                            <div className="flex items-center">
+                              <i className="ri-file-add-line mr-2"></i>
+                              리포트 생성하기
                             </div>
-                            <button
-                              id="share-button"
-                              onClick={handleCopyLink}
-                              className="w-full bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors cursor-pointer whitespace-nowrap"
-                            >
-                              <div className="flex items-center justify-center">
-                                <i className="ri-file-copy-line mr-2"></i>
-                                링크 복사하고 공유하기
-                              </div>
-                            </button>
-                          </div>
-                        )}
+                          )}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -355,33 +336,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* 활용 가이드 */}
-                    {reportGenerated && (
-                      <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
-                        <h4 className="text-xl font-bold text-green-800 mb-4">📱 리포트 활용 가이드</h4>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div className="bg-white rounded-lg p-4">
-                            <div className="flex items-center mb-3">
-                              <i className="ri-chat-1-line text-green-600 text-xl mr-2"></i>
-                              <h5 className="font-bold text-gray-900">카카오톡 공유</h5>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                              복사한 링크를 카톡으로 임대인에게 전송하세요. 
-                              "재계약 관련해서 이웃들과 비교한 데이터가 있어서 공유드립니다" 라고 말하며 자연스럽게 전달하세요.
-                            </p>
-                          </div>
-                          <div className="bg-white rounded-lg p-4">
-                            <div className="flex items-center mb-3">
-                              <i className="ri-message-2-line text-green-600 text-xl mr-2"></i>
-                              <h5 className="font-bold text-gray-900">문자 메시지</h5>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                              문자로 링크를 전송할 때는 "거주환경 진단 결과를 공유드립니다. 
-                              재계약 시 참고해주시면 감사하겠습니다" 라는 정중한 메시지와 함께 보내세요.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               )}
@@ -643,6 +598,137 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">맞춤형 협상 리포트</h2>
+              <button
+                onClick={() => {
+                  setShowReportModal(false);
+                  setGeneratedReport(null);
+                  setIsGeneratingReport(false);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <i className="ri-close-line text-2xl"></i>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isGeneratingReport ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">리포트 생성 중...</h3>
+                  <p className="text-gray-600 text-center">
+                    AI가 당신만의 맞춤형 협상 가이드를 생성하고 있습니다.<br />
+                    잠시만 기다려주세요.
+                  </p>
+                </div>
+              ) : generatedReport ? (
+                <div className="space-y-6">
+                {/* Primary Negotiation Card */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center">
+                    <i className="ri-file-text-line mr-2"></i>
+                    주요 협상 카드
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-blue-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.primaryNegotiationCard}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Secondary Negotiation Card */}
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-green-800 mb-3 flex items-center">
+                    <i className="ri-file-list-line mr-2"></i>
+                    보조 협상 카드
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-green-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.secondaryNegotiationCard}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 1 */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-yellow-800 mb-3 flex items-center">
+                    <i className="ri-play-circle-line mr-2"></i>
+                    {generatedReport.step1.split(':')[0]}
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-yellow-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.step1.split(':').slice(1).join(':').trim()}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center">
+                    <i className="ri-checkbox-circle-line mr-2"></i>
+                    {generatedReport.step2.split(':')[0]}
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-purple-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.step2.split(':').slice(1).join(':').trim()}
+                    </p>
+                  </div>
+                </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-center">
+                    <i className="ri-error-warning-line text-4xl mb-4"></i>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">리포트 생성 실패</h3>
+                    <p className="text-gray-600">리포트를 생성하는 중 오류가 발생했습니다.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+              <div className="text-sm text-gray-600">
+                <i className="ri-information-line mr-1"></i>
+                이 리포트는 AI가 생성한 맞춤형 협상 가이드입니다.
+              </div>
+              <div className="flex space-x-3">
+                {generatedReport && (
+                  <button
+                    onClick={() => {
+                      const fullReport = `주요 협상 카드:\n\n${generatedReport.primaryNegotiationCard}\n\n보조 협상 카드:\n\n${generatedReport.secondaryNegotiationCard}\n\n${generatedReport.step1}\n\n${generatedReport.step2}`;
+                      navigator.clipboard.writeText(fullReport);
+                      alert('리포트가 클립보드에 복사되었습니다!');
+                    }}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center"
+                  >
+                    <i className="ri-file-copy-line mr-2"></i>
+                    전문 복사
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setGeneratedReport(null);
+                    setIsGeneratingReport(false);
+                  }}
+                  className="bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
+                >
+                  {isGeneratingReport ? '취소' : '닫기'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

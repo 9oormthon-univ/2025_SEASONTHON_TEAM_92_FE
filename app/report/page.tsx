@@ -24,28 +24,48 @@ export default function ReportPage() {
     setError('');
 
     try {
-      const response = await reportApi.createReport({
-        reportContent: reportContent
-      });
+      // JWT 토큰 가져오기
+      const jwtToken = localStorage.getItem('jwtToken');
+      const userId = localStorage.getItem('userId');
       
-      if (response && typeof response === 'number') {
-        // 리포트 생성 성공
-        toast.success('리포트가 생성되었습니다!');
+      if (!jwtToken || !userId) {
+        setError('로그인이 필요합니다.');
+        router.push('/auth/login');
+        return;
+      }
+
+      // OpenAI API를 활용한 리포트 생성
+      const response = await fetch('/api/report/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          jwtToken: jwtToken,
+          reportContent: reportContent
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success && result.reportId) {
+        toast.success('AI가 맞춤형 리포트를 생성했습니다!');
         
         // 생성된 리포트 조회
-        const reportResponse = await reportApi.getReport(response);
+        const reportResponse = await reportApi.getReport(result.reportId);
         setReportData({
           ...reportResponse,
-          reportId: response,
-          reportUrl: `${window.location.origin}/report/${response}`
+          reportId: result.reportId,
+          reportUrl: `${window.location.origin}/report/${result.reportId}`
         });
       } else {
-        setError('리포트 생성에 실패했습니다.');
+        setError(result.message || '리포트 생성에 실패했습니다.');
       }
       
     } catch (err: any) {
       console.error('Report creation error:', err);
-      setError(err.response?.data?.message || '리포트 생성 중 오류가 발생했습니다.');
+      setError(err.message || '리포트 생성 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -55,8 +75,11 @@ export default function ReportPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">협상 리포트 생성</h1>
-          <p className="text-gray-600">AI가 당신을 위한 맞춤형 협상 카드를 생성해드립니다</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">AI 협상 리포트 생성</h1>
+          <p className="text-gray-600 mb-2">당신의 진단 결과와 요구사항을 바탕으로 AI가 맞춤형 협상 전략을 생성합니다</p>
+          <p className="text-sm text-gray-500">• 진단 점수 기반 협상 포인트 분석</p>
+          <p className="text-sm text-gray-500">• 개인화된 협상 카드 생성</p>
+          <p className="text-sm text-gray-500">• 단계별 협상 가이드 제공</p>
         </div>
 
         {!reportData ? (
@@ -87,7 +110,14 @@ export default function ReportPage() {
                 disabled={isLoading}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? '리포트 생성 중...' : '리포트 생성하기'}
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    AI가 맞춤형 리포트를 생성 중...
+                  </div>
+                ) : (
+                  'AI 리포트 생성하기'
+                )}
               </button>
             </form>
           </div>

@@ -27,7 +27,7 @@ interface CurrentMission {
 
 export default function WeeklyMissionPage() {
   const [currentMission, setCurrentMission] = useState<CurrentMission | null>(null);
-  const [responses, setResponses] = useState<{[key: number]: number}>({});
+  const [responses, setResponses] = useState<{[key: number]: {answer: string, score: number}}>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResult, setIsLoadingResult] = useState(false);

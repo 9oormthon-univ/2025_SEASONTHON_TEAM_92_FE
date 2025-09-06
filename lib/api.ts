@@ -20,21 +20,29 @@ api.interceptors.request.use((config) => {
   console.log('🚀 API 요청 시작:', config.method?.toUpperCase(), config.url);
   console.log('📤 요청 데이터:', config.data);
   console.log('🌐 Base URL:', config.baseURL);
-  
-  const token = localStorage.getItem('jwtToken');
-  
+
+  // Check if Authorization header is already set (e.g., from server-side explicit setting)
+  if (!config.headers.Authorization) {
+    // Only try to get from localStorage if it's available (client-side)
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const token = localStorage.getItem('jwtToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔑 JWT 토큰이 localStorage에서 요청 헤더에 추가됨:', config.url);
+      }
+    }
+  } else {
+    console.log('🔑 JWT 토큰이 요청 헤더에 이미 존재함:', config.url);
+  }
+
   // JWT 토큰이 필요하지 않은 엔드포인트들 (team_backend 기준)
   const noAuthEndpoints = ['/member/create', '/member/doLogin', '/api/location/health', '/api/location/preview'];
   const needsAuth = !noAuthEndpoints.some(endpoint => config.url?.includes(endpoint));
-  
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-    if (needsAuth) {
-      console.log('🔑 JWT 토큰이 요청 헤더에 추가됨:', config.url);
-    }
-  } else if (needsAuth) {
-    console.log('❌ JWT 토큰이 없음:', config.url);
+
+  if (needsAuth && !config.headers.Authorization) {
+    console.log('❌ JWT 토큰이 없음 (인증 필요 엔드포인트):', config.url);
   }
+
   return config;
 });
 
@@ -91,8 +99,9 @@ export const authApi = {
   //   return response.data;
   // },
   
-  getCurrentUser: async (): Promise<any> => { // Promise<any>로 변경
-    const response = await api.get('/member/profile');
+  getCurrentUser: async (token?: string): Promise<any> => {
+    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+    const response = await api.get('/member/profile', config);
     return response.data; // MemberProfileDto
   },
 
@@ -139,39 +148,173 @@ export const locationApi = {
 // 진단 API (API 명세 기반)
 export const diagnosisApi = {
   getDiagnosisQuestions: async (): Promise<any> => {
-    const response = await api.get('/diagnosis/questions');
-    return response.data; // ApiResponse<DiagnosisQuestions>
+    try {
+      const response = await api.get('/diagnosis/questions');
+      return response.data; // ApiResponse<DiagnosisQuestions>
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          success: true,
+          message: "진단 질문을 조회했습니다.",
+          data: {
+            scoreOptions: [
+              {"score": "1", "label": "매우 나쁨"},
+              {"score": "2", "label": "나쁨"},
+              {"score": "3", "label": "보통"},
+              {"score": "4", "label": "좋음"},
+              {"score": "5", "label": "매우 좋음"}
+            ],
+            categories: [
+              {
+                categoryId: 1,
+                sortOrder: 1,
+                questions: [
+                  {
+                    questionId: 1,
+                    questionText: "옆집/윗집 생활소음이 어느 정도인가요?",
+                    subText: "이웃 소음 - 대화 소리등"
+                  },
+                  {
+                    questionId: 2,
+                    questionText: "외부 소음(교통, 공사 등)은 어떤가요?",
+                    subText: "외부 소음 - 교통 소음등"
+                  }
+                ]
+              }
+            ]
+          }
+        };
+      }
+      throw error;
+    }
   },
   
   submitDiagnosis: async (diagnosisData: any): Promise<any> => {
-    const response = await api.post('/diagnosis/responses', diagnosisData);
-    return response.data; // ApiResponse<DiagnosisSubmission>
+    try {
+      const response = await api.post('/diagnosis/responses', diagnosisData);
+      return response.data; // ApiResponse<DiagnosisSubmission>
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          success: true,
+          message: "진단 응답이 저장되었습니다.",
+          data: {
+            totalScore: 73,
+            maxScore: 100,
+            responseCount: 20,
+            submittedAt: new Date().toISOString()
+          }
+        };
+      }
+      throw error;
+    }
   },
   
-  getDiagnosisResult: async (): Promise<any> => {
-    const response = await api.get('/diagnosis/result');
-    return response.data; // ApiResponse<DiagnosisResult>
+  getDiagnosisResult: async (token?: string): Promise<any> => {
+    try {
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await api.get('/diagnosis/result', config);
+      return response.data; // ApiResponse<DiagnosisResult>
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          success: true,
+          message: "진단 결과를 조회했습니다.",
+          data: {
+            summary: {
+              totalScore: 73,
+              grade: "양호",
+              buildingAverage: 68,
+              neighborhoodAverage: 71,
+            },
+            categoryDetails: [
+              {
+                categoryId: 1,
+                myScore: 7,
+                buildingAverage: 6.8,
+                neighborhoodAverage: 7.0
+              },
+              {
+                categoryId: 2,
+                myScore: 8,
+                buildingAverage: 7.2,
+                neighborhoodAverage: 7.5
+              },
+              {
+                categoryId: 3,
+                myScore: 4,
+                buildingAverage: 6.5,
+                neighborhoodAverage: 6.8
+              }
+            ],
+            analysis: {
+              strengths: [
+                {"categoryId": 2, "score": 90},
+                {"categoryId": 5, "score": 85}
+              ],
+              improvements: [
+                {"categoryId": 3, "score": 40}
+              ]
+            },
+            statistics: {
+              participantCount: 8,
+              responseCount: 156,
+              buildingResidents: 8,
+              neighborhoodResidents: 6
+            }
+          }
+        };
+      }
+      throw error;
+    }
   },
 };
 
 // 리포트 API (API 명세 기반)
 export const reportApi = {
   createReport: async (reportData: any): Promise<any> => {
-    const response = await api.post('/report/create', reportData);
-    return response.data; // { reportId: number }
+    try {
+      const response = await api.post('/report/create', reportData);
+      return response.data; // { reportId: number }
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          reportId: Math.floor(Math.random() * 1000) + 1
+        };
+      }
+      throw error;
+    }
   },
   
   getReport: async (reportId: number): Promise<any> => {
-    const response = await api.get(`/report/${reportId}`);
-    return response.data; // { primaryNegotiationCard, secondaryNegotiationCard, step1, step2 }
+    try {
+      const response = await api.get(`/report/${reportId}`);
+      return response.data; // { primaryNegotiationCard, secondaryNegotiationCard, step1, step2 }
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          primaryNegotiationCard: "안녕하세요. 현재 거주하고 있는 집의 월세를 조정해드리고 싶어서 연락드립니다. 최근 시장 상황과 주변 임대료를 조사해본 결과, 현재 월세가 시장가보다 높은 것으로 확인되었습니다. 협의를 통해 합리적인 수준으로 조정해주시면 감사하겠습니다.",
+          secondaryNegotiationCard: "거주 중 발견된 하자들에 대해 수리 요청드립니다. 화장실 배수구 막힘, 베란다 문 고장, 벽지 벗겨짐 등의 문제가 있어 일상생활에 불편을 겪고 있습니다. 빠른 시일 내에 수리해주시면 감사하겠습니다.",
+          step1: "1단계: 관리사무소나 임대인에게 연락하여 월세 조정 및 하자 수리에 대한 협의를 요청합니다. 서면으로 요청사항을 정리하여 전달하는 것이 좋습니다.",
+          step2: "2단계: 협의가 원활하지 않을 경우, 임대차분쟁조정위원회에 신청하거나 법적 조치를 고려할 수 있습니다. 관련 서류와 증거를 미리 준비해두세요."
+        };
+      }
+      throw error;
+    }
   },
 };
 
 // 주간 미션 API (API 명세 기반)
 export const missionApi = {
-  getCurrentMission: async (): Promise<any> => {
+  getCurrentMission: async (token?: string): Promise<any> => {
+    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
     try {
-      const response = await api.get('/missions/current');
+      const response = await api.get('/missions/current', config);
       return response.data; // ApiResponse<CurrentMission>
     } catch (error: any) {
       // 백엔드가 구현되지 않은 경우 목업 데이터 반환
