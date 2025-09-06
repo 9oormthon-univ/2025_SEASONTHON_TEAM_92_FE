@@ -48,12 +48,13 @@ export default function RegisterPage() {
         password: formData.password
       });
       
-      if (response.success && response.data) {
+      // Backend returns just the user ID directly (number)
+      if (response && typeof response === 'number') {
         // 회원가입 성공 처리
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
         localStorage.setItem('userNickname', formData.nickname);
-        localStorage.setItem('userId', response.data.data.toString());
+        localStorage.setItem('userId', response.toString());
         localStorage.setItem('onboarding_completed', 'true');
         
         toast.success('회원가입 성공!');
@@ -61,7 +62,7 @@ export default function RegisterPage() {
         // 온보딩 페이지로 이동
         router.push('/onboarding/location');
       } else {
-        setError(response.data.message || '회원가입에 실패했습니다.');
+        setError('회원가입에 실패했습니다.');
       }
       
     } catch (err: any) {

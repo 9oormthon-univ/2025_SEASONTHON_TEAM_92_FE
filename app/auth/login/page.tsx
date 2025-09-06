@@ -37,12 +37,13 @@ export default function LoginPage() {
       // 실제 API 호출
       const response = await authApi.login(formData);
       
-      if (response.success && response.data) {
+      // Backend returns { id: number, token: string } directly
+      if (response && response.id && response.token) {
         // 로그인 성공 처리
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
-        localStorage.setItem('userId', response.data.data.id.toString());
-        localStorage.setItem('jwtToken', response.data.data.token);
+        localStorage.setItem('userId', response.id.toString());
+        localStorage.setItem('jwtToken', response.token);
         localStorage.setItem('just_logged_in', 'true');
         
         toast.success('로그인 성공!');
@@ -50,7 +51,7 @@ export default function LoginPage() {
         // Next.js router를 사용한 페이지 이동
         router.push('/');
       } else {
-        setError(response.data.message || '로그인에 실패했습니다.');
+        setError('로그인에 실패했습니다.');
       }
       
     } catch (err: any) {

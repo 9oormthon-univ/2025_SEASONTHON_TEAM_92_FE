@@ -624,7 +624,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
               <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-6 bg-blue-100">
                 <i className="ri-bar-chart-line text-2xl text-blue-600"></i>
@@ -659,6 +659,60 @@ export default function HomePage() {
               <p className="leading-relaxed text-gray-600">
                 협상에 필요한 각종 서류와 템플릿을 자동으로 생성해드립니다
               </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-file-list-3-line text-2xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                AI 리포트 생성
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                AI가 당신을 위한 맞춤형 협상 카드와 단계별 가이드를 생성합니다
+              </p>
+              <Link 
+                href="/report"
+                className="inline-block mt-4 text-green-600 font-medium hover:text-green-700 transition-colors"
+              >
+                리포트 생성하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-trophy-line text-2xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                주간 미션
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                매주 새로운 미션에 참여하여 건물 환경을 개선하고 점수를 획득하세요
+              </p>
+              <Link 
+                href="/weekly-mission"
+                className="inline-block mt-4 text-purple-600 font-medium hover:text-purple-700 transition-colors"
+              >
+                미션 참여하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-stethoscope-line text-2xl text-orange-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                건물 진단
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                현재 거주하고 있는 건물의 상태를 체계적으로 진단하고 개선점을 찾아보세요
+              </p>
+              <Link 
+                href="/diagnosis"
+                className="inline-block mt-4 text-orange-600 font-medium hover:text-orange-700 transition-colors"
+              >
+                진단 시작하기 →
+              </Link>
             </div>
           </div>
         </div>

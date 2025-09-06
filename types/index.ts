@@ -14,9 +14,43 @@ export interface User {
 
 // API 응답 타입 정의
 export interface ApiResponse<T = any> {
-  ok: boolean;
+  success: boolean;
   data: T | null;
   message: string;
+}
+
+// 회원가입/로그인 타입 정의
+export interface RegisterRequest {
+  email: string;
+  name: string;
+  password: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  id: number;
+  token: string;
+}
+
+// 사용자 프로필 설정 타입 정의
+export interface ProfileSettingRequest {
+  dong: string;
+  detailAddress: string;
+  building: string;
+  buildingType: string;
+  contractType: string;
+  security: string;
+}
+
+export interface UserProfile {
+  profileName: string;
+  profileDong: string;
+  profileBuilding: string;
+  profileEmail: string;
 }
 
 // 그룹 타입 정의
@@ -38,52 +72,153 @@ export interface Group {
   };
 }
 
-// 진단 결과 타입 정의
-export interface ComprehensiveDiagnosis {
-  overallScore: number;
-  categoryScores: {
-    [key: string]: number;
+// 진단 관련 타입 정의
+export interface DiagnosisQuestion {
+  questionId: number;
+  questionText: string;
+  subText: string;
+}
+
+export interface DiagnosisCategory {
+  categoryId: number;
+  sortOrder: number;
+  questions: DiagnosisQuestion[];
+}
+
+export interface DiagnosisQuestionsResponse {
+  scoreOptions: Array<{
+    score: string;
+    label: string;
+  }>;
+  categories: DiagnosisCategory[];
+}
+
+export interface DiagnosisResponse {
+  questionId: number;
+  score: string;
+}
+
+export interface DiagnosisSubmissionRequest {
+  responses: DiagnosisResponse[];
+}
+
+export interface DiagnosisSubmissionResponse {
+  totalScore: number;
+  maxScore: number;
+  responseCount: number;
+  submittedAt: string;
+}
+
+export interface CategoryDetail {
+  categoryId: number;
+  myScore: number;
+  buildingAverage: number;
+  neighborhoodAverage: number;
+}
+
+export interface Analysis {
+  strengths: Array<{
+    categoryId: number;
+    score: number;
+  }>;
+  improvements: Array<{
+    categoryId: number;
+    score: number;
+  }>;
+}
+
+export interface Statistics {
+  participantCount: number;
+  responseCount: number;
+  buildingResidents: number;
+  neighborhoodResidents: number;
+}
+
+export interface DiagnosisResult {
+  summary: {
+    totalScore: number;
+    grade: string;
+    buildingAverage: number;
+    neighborhoodAverage: number;
   };
-  recommendations: string[];
-  comparisonData: {
-    building: {
-      average: number;
-      totalResponses: number;
-    };
-    neighborhood: {
-      average: number;
-      totalResponses: number;
-    };
-  };
+  categoryDetails: CategoryDetail[];
+  analysis: Analysis;
+  statistics: Statistics;
 }
 
 // 주간 미션 타입 정의
-export interface WeeklyMission {
-  id: string;
-  week: string;
-  theme: string;
-  description: string;
-  questions: MissionQuestion[];
-  reward: string;
+export interface MissionQuestion {
+  question_id: number;
+  question_text: string;
+  question_type: string;
+  options: string[];
+  order_number: number;
 }
 
-export interface MissionQuestion {
-  id: string;
-  type: 'scale' | 'choice' | 'multiple';
-  text: string;
-  options: {
-    value: string | number;
-    label: string;
-  }[];
+export interface CurrentMission {
+  mission_id: number;
+  category: string;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  questions: MissionQuestion[];
+  participation_count: number;
+  user_participated: boolean;
+}
+
+export interface MissionParticipationRequest {
+  responses: Array<{
+    question_id: number;
+    answer: string;
+    score: number;
+  }>;
+}
+
+export interface MissionParticipationResponse {
+  response_id: number;
+  total_score: number;
+  message: string;
+  next_step: string;
+}
+
+export interface BuildingComparison {
+  building_average: number;
+  user_rank: number;
+  total_participants: number;
+  comparison_text: string;
+}
+
+export interface NeighborhoodComparison {
+  neighborhood_average: number;
+  user_rank: number;
+  total_participants: number;
+  comparison_text: string;
+}
+
+export interface MissionResult {
+  user_score: number;
+  max_score: number;
+  category: string;
+  building_comparison: BuildingComparison;
+  neighborhood_comparison: NeighborhoodComparison;
+  insights: string[];
 }
 
 // 리포트 타입 정의
-export interface Report {
-  id: string;
-  title: string;
-  content: string;
-  generatedAt: string;
-  shareToken?: string;
+export interface ReportCreateRequest {
+  reportContent: string;
+}
+
+export interface ReportCreateResponse {
+  reportId: number;
+}
+
+export interface ReportResponse {
+  primaryNegotiationCard: string;
+  secondaryNegotiationCard: string;
+  step1: string;
+  step2: string;
 }
 
 // 알림 타입 정의
