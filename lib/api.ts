@@ -49,7 +49,7 @@ api.interceptors.response.use(
 
 // API 응답 타입 정의
 export interface ApiResponse<T = any> {
-  ok: boolean;
+  success: boolean;
   data: T | null;
   message: string;
 }
