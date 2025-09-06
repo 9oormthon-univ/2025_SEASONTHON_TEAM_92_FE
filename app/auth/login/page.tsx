@@ -41,8 +41,8 @@ export default function LoginPage() {
         // 로그인 성공 처리
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
-        localStorage.setItem('userId', response.data.id.toString());
-        localStorage.setItem('jwtToken', response.data.token);
+        localStorage.setItem('userId', response.data.data.id.toString());
+        localStorage.setItem('jwtToken', response.data.data.token);
         localStorage.setItem('just_logged_in', 'true');
         
         toast.success('로그인 성공!');
@@ -50,7 +50,7 @@ export default function LoginPage() {
         // Next.js router를 사용한 페이지 이동
         router.push('/');
       } else {
-        setError(response.message || '로그인에 실패했습니다.');
+        setError(response.data.message || '로그인에 실패했습니다.');
       }
       
     } catch (err: any) {
