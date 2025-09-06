@@ -1,57 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { missionApi } from '../../lib/api';
+import toast from 'react-hot-toast';
 
 export default function WeeklyMissionPage() {
   const router = useRouter();
   const [responses, setResponses] = useState<{[key: string]: number | string | string[]}>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [mission, setMission] = useState<any>(null);
+  const [error, setError] = useState('');
 
-  // Mock weekly mission data
-  const mission = {
-    week: '2024년 1주차',
-    theme: '방음 상태 점검',
-    icon: 'ri-volume-down-line',
-    description: '이번 주는 우리 집의 방음 상태를 점검해보세요',
-    reward: '우리 건물 vs 우리 동네 방음 비교 분석',
-    questions: [
-      {
-        id: 'neighbor_noise_frequency',
-        type: 'scale',
-        text: '옆집 생활 소음이 들리는 편인가요?',
-        options: [
-          { value: 1, label: '전혀 안 들림' },
-          { value: 2, label: '거의 안 들림' },
-          { value: 3, label: '가끔 들림' },
-          { value: 4, label: '자주 들림' },
-          { value: 5, label: '항상 들림' }
-        ]
-      },
-      {
-        id: 'floor_noise_experience',
-        type: 'choice',
-        text: '최근 1달 내 층간소음으로 불편을 겪은 적이 있나요?',
-        options: [
-          { value: 'none', label: '없음' },
-          { value: 'once_twice', label: '1~2번' },
-          { value: 'multiple', label: '3번 이상' }
-        ]
-      },
-      {
-        id: 'noise_time',
-        type: 'multiple',
-        text: '소음이 주로 발생하는 시간대는 언제인가요? (복수선택 가능)',
-        options: [
-          { value: 'morning', label: '오전 (6-12시)' },
-          { value: 'afternoon', label: '오후 (12-18시)' },
-          { value: 'evening', label: '저녁 (18-22시)' },
-          { value: 'night', label: '밤 (22-6시)' }
-        ]
+  // API에서 현재 미션 데이터 가져오기
+  useEffect(() => {
+    const fetchCurrentMission = async () => {
+      try {
+        const response = await missionApi.getCurrentMission();
+        if (response.success && response.data) {
+          setMission(response.data);
+        } else {
+          setError('미션을 불러올 수 없습니다.');
+        }
+      } catch (err) {
+        console.error('미션 조회 실패:', err);
+        setError('미션을 불러오는 중 오류가 발생했습니다.');
       }
-    ]
-  };
+    };
+
+    fetchCurrentMission();
+  }, []);
 
   const handleScaleResponse = (questionId: string, value: number | string) => {
     setResponses({...responses, [questionId]: value});
@@ -71,26 +50,38 @@ export default function WeeklyMissionPage() {
   };
 
   const isFormComplete = () => {
-    return mission.questions.every(q => {
-      const response = responses[q.id];
-      if (q.type === 'multiple') {
-        return Array.isArray(response) && response.length > 0;
-      }
+    if (!mission || !mission.questions) return false;
+    return mission.questions.every((q: any) => {
+      const response = responses[q.questionId];
       return response !== undefined && response !== '';
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormComplete()) return;
+    if (!isFormComplete() || !mission) return;
 
     setIsLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      router.push('/weekly-mission/results');
+      // API 형식에 맞게 응답 데이터 변환
+      const apiResponses = mission.questions.map((q: any) => ({
+        questionId: q.questionId,
+        answer: responses[q.questionId]?.toString() || '',
+        score: typeof responses[q.questionId] === 'number' ? responses[q.questionId] : 1
+      }));
+
+      const response = await missionApi.participateInMission(mission.missionId, apiResponses);
+      
+      if (response.success) {
+        toast.success('미션 참여가 완료되었습니다!');
+        router.push(`/weekly-mission/results?missionId=${mission.missionId}`);
+      } else {
+        toast.error(response.message || '미션 참여에 실패했습니다.');
+      }
     } catch (error) {
       console.error('미션 결과 저장 실패:', error);
+      toast.error('미션 참여 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }

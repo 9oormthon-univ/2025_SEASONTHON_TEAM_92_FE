@@ -37,11 +37,11 @@ export default function LoginPage() {
       // 실제 API 호출
       const response = await authApi.login(formData);
       
-      if (response.ok && response.data) {
+      if (response.success && response.data) {
         // 로그인 성공 처리
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
-        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+        localStorage.setItem('userId', response.data.id.toString());
         localStorage.setItem('jwtToken', response.data.token);
         localStorage.setItem('just_logged_in', 'true');
         

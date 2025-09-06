@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API 기본 URL 설정
-const API_BASE_URL = 'https://2025seasonthonteam92be-production.up.railway.app'; // Railway 배포된 백엔드 서버
+const API_BASE_URL = 'https://www.jinwook.shop'; // SeasonToneBackend API 서버
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -68,32 +68,42 @@ export interface User {
   onboardingCompleted?: boolean;
 }
 
-// 인증 API (2025_SEASONTHON_TEAM_92_BE와 일치)
+// 인증 API (SeasonToneBackend와 일치)
 export const authApi = {
-  register: async (userData: any): Promise<ApiResponse<User>> => {
-    const response = await api.post('/api/auth/register', userData);
+  register: async (userData: { name: string; email: string; password: string }): Promise<ApiResponse<number>> => {
+    const response = await api.post('/member/create', userData);
     return response.data;
   },
   
-  login: async (credentials: any): Promise<ApiResponse<{ user: User; token: string }>> => {
-    const response = await api.post('/api/auth/login', credentials);
+  login: async (credentials: { email: string; password: string }): Promise<ApiResponse<{ id: number; token: string }>> => {
+    const response = await api.post('/member/doLogin', credentials);
     return response.data;
   },
   
-  updateUser: async (userData: any): Promise<ApiResponse<User>> => {
-    const response = await api.put('/api/auth/update', userData);
+  getProfile: async (): Promise<ApiResponse<{ profileName: string; profileEmail: string; profileBuilding: string; profileDong: string }>> => {
+    const response = await api.get('/member/profile');
     return response.data;
   },
   
-  getCurrentUser: async (): Promise<ApiResponse<User>> => {
-    const response = await api.get('/api/auth/me');
+  updateProfile: async (profileData: { building: string; dong: string; detailAddress: string; buildingType: string; contractType: string; security: number }): Promise<ApiResponse<any>> => {
+    const response = await api.post('/member/profile/setting', profileData);
     return response.data;
   },
 };
 
-// 위치 API (2025_SEASONTHON_TEAM_92_BE와 일치)
+// 위치 API (SeasonToneBackend와 일치)
 export const locationApi = {
-  verifyLocation: async (payload: any): Promise<ApiResponse<any>> => {
+  healthCheck: async (): Promise<ApiResponse<any>> => {
+    const response = await api.get('/api/location/health');
+    return response.data;
+  },
+  
+  getAddressPreview: async (longitude: number, latitude: number): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/location/preview?longitude=${longitude}&latitude=${latitude}`);
+    return response.data;
+  },
+  
+  verifyLocation: async (payload: { latitude: number; longitude: number; buildingName: string }): Promise<ApiResponse<any>> => {
     const response = await api.post('/api/location/verify', payload);
     return response.data;
   },
@@ -117,17 +127,20 @@ export const locationApi = {
 //   },
 // };
 
-// 진단 API (2025_SEASONTHON_TEAM_92_BE 경로에 맞춤)
-export const diagnosisApi = {
-  submitDiagnosis: async (diagnosisData: any): Promise<ApiResponse<any>> => {
-    const response = await api.post('/api/diagnoses', diagnosisData); // /api/diagnosis -> /api/diagnoses
+// 오피스텔 API (SeasonToneBackend와 일치)
+export const officetelApi = {
+  getRentData: async (lawdCd: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/officetel/rent-data?lawdCd=${lawdCd}`);
     return response.data;
   },
   
-  getDiagnosisResult: async (): Promise<ApiResponse<any>> => {
-    // /api/diagnosis/result -> /api/diagnoses/comparison/{userId}
-    // 프론트엔드 호출부에서 userId를 전달하도록 수정 필요
-    const response = await api.get('/api/diagnoses/comparison/YOUR_USER_ID_HERE'); 
+  getJeonseMarket: async (lawdCd: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/officetel/jeonse-market?lawdCd=${lawdCd}`);
+    return response.data;
+  },
+  
+  getMonthlyRentMarket: async (lawdCd: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/officetel/monthly-rent-market?lawdCd=${lawdCd}`);
     return response.data;
   },
 };
@@ -150,24 +163,20 @@ export const diagnosisApi = {
 //   },
 // };
 
-// 주간 미션 API (2025_SEASONTHON_TEAM_92_BE 경로에 맞춤)
+// 주간 미션 API (SeasonToneBackend와 일치)
 export const missionApi = {
-  getWeeklyMission: async (): Promise<ApiResponse<any>> => {
-    const response = await api.get('/api/missions/current'); // /api/missions/weekly -> /api/missions/current
+  getCurrentMission: async (): Promise<ApiResponse<any>> => {
+    const response = await api.get('/mission/weekly/current');
     return response.data;
   },
   
-  submitMissionResponse: async (missionData: any): Promise<ApiResponse<any>> => {
-    // /api/missions/submit -> /api/missions/participate
-    // 백엔드 경로에 missionId가 필요하여 프론트엔드 호출부 수정 필요
-    const response = await api.post('/api/missions/participate', missionData); 
+  participateInMission: async (missionId: number, responses: Array<{ questionId: number; answer: string; score: number }>): Promise<ApiResponse<any>> => {
+    const response = await api.post(`/mission/weekly/${missionId}/participate`, { responses });
     return response.data;
   },
   
-  getMissionResults: async (): Promise<ApiResponse<any>> => {
-    // /api/missions/results -> /api/missions/v2/{missionId}/result
-    // 백엔드 경로에 missionId가 필요하여 프론트엔드 호출부 수정 필요
-    const response = await api.get('/api/missions/v2/YOUR_MISSION_ID_HERE/result'); 
+  getMissionResult: async (missionId: number): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/mission/weekly/${missionId}/result`);
     return response.data;
   },
 };

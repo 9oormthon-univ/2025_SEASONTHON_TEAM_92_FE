@@ -43,18 +43,17 @@ export default function RegisterPage() {
     try {
       // 실제 API 호출
       const response = await authApi.register({
+        name: formData.nickname,
         email: formData.email,
-        nickname: formData.nickname,
-        password: formData.password,
-        role: 'tenant'
+        password: formData.password
       });
       
-      if (response.ok && response.data) {
+      if (response.success && response.data) {
         // 회원가입 성공 처리
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
         localStorage.setItem('userNickname', formData.nickname);
-        localStorage.setItem('currentUser', JSON.stringify(response.data));
+        localStorage.setItem('userId', response.data.toString());
         localStorage.setItem('onboarding_completed', 'true');
         
         toast.success('회원가입 성공!');
