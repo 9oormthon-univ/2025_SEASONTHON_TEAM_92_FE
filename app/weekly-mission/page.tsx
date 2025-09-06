@@ -86,11 +86,22 @@ export default function WeeklyMissionPage() {
     
     try {
       // API 형식에 맞게 응답 데이터 변환
-      const apiResponses = mission.questions.map((q: Question) => ({
-        questionId: q.questionId,
-        answer: responses[q.questionId]?.toString() || '',
-        score: typeof responses[q.questionId] === 'number' ? responses[q.questionId] : 1
-      }));
+      const apiResponses = mission.questions.map((q: Question) => {
+        const response = responses[q.questionId];
+        let score = 1;
+        
+        if (typeof response === 'number') {
+          score = response;
+        } else if (typeof response === 'string') {
+          score = parseInt(response) || 1;
+        }
+        
+        return {
+          questionId: q.questionId,
+          answer: response?.toString() || '',
+          score: score
+        };
+      });
 
       const response = await missionApi.participateInMission(mission.missionId, apiResponses);
       
