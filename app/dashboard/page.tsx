@@ -1,0 +1,734 @@
+
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+export default function DashboardPage() {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState('report');
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [generatedReport, setGeneratedReport] = useState<any>(null);
+
+  // Mock user data (replace with actual data fetching)
+  const userData = {
+    id: 'user123', // Placeholder for actual user ID
+    name: '김지원',
+    building: '래미안 아파트 101동',
+    location: '강남구 개포동',
+    monthsLived: 14,
+    overallScore: 73,
+    buildingAverage: 68,
+    neighborhoodAverage: 71
+  };
+
+  // Mock analysis data (replace with actual data fetching)
+  const analysisData = {
+    lowScoreItems: [
+      { 
+        category: '수압', 
+        myScore: 45, 
+        buildingAvg: 72, 
+        neighborhoodAvg: 68, 
+        type: 'facility',
+        priority: 1,
+        description: '샤워할 때 수압이 매우 약해서(45점) 건물 평균(72점)보다 27점이나 낮아 일상생활에 큰 불편을 겪고 있습니다.',
+        suggestion: '수압 펌프 점검 또는 수전 교체 요구',
+        legalBasis: '주택임대차보호법 제20조 수선의무'
+      },
+      { 
+        category: '곰팡이/습도', 
+        myScore: 38, 
+        buildingAvg: 65, 
+        neighborhoodAvg: 62, 
+        type: 'facility',
+        priority: 1,
+        description: '습도 조절이 매우 어려워(38점) 건물 평균(65점)보다 27점 낮아 곰팡이 발생으로 건강에 영향을 받고 있습니다.',
+        suggestion: '벽지 교체 및 환기시설 개선 요구',
+        legalBasis: '주택임대차보호법 제20조 수선의무'
+      },
+      { 
+        category: '주차', 
+        myScore: 52, 
+        buildingAvg: 68, 
+        neighborhoodAvg: 71, 
+        type: 'structural',
+        priority: 2,
+        description: '주차공간 확보가 어려워(52점) 동네 평균(71점)보다 19점 낮아 매일 주차 스트레스를 받고 있습니다.',
+        suggestion: '월세 인상률 조정 근거로 활용',
+        reasoning: '해결이 어려운 구조적 문제를 근거로 월세 협상'
+      },
+      { 
+        category: '방음', 
+        myScore: 58, 
+        buildingAvg: 72, 
+        neighborhoodAvg: 75, 
+        type: 'structural',
+        priority: 2,
+        description: '층간소음이 자주 들려(58점) 동네 평균(75점)보다 17점 낮아 수면과 휴식에 방해를 받고 있습니다.',
+        suggestion: '월세 동결 또는 최소 인상 요구',
+        reasoning: '건물 구조상 개선이 어려운 문제로 인상률 조정 요구'
+      }
+    ],
+    marketData: {
+      avgRent: 85,
+      avgDeposit: 5000,
+      recentIncreaseRate: 3.2,
+      recommendedIncreaseRate: 1.5,
+      participantCount: 87
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    console.log('리포트 생성 버튼 클릭됨');
+    setIsGeneratingReport(true);
+    setShowReportModal(true);
+    setGeneratedReport(null);
+    
+    try {
+      // Call the new API route for report generation
+      const jwtToken = localStorage.getItem('jwtToken'); // Get token from localStorage
+      if (!jwtToken) {
+        throw new Error('JWT Token not found. Please log in.');
+      }
+
+      const response = await fetch('/api/report/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: userData.id, jwtToken }), // Pass user ID and token to the API route
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to generate report');
+      }
+
+      const data = await response.json();
+      const reportId = data.reportId;
+      const reportContent = data.reportContent;
+
+      console.log('API 응답 데이터:', data);
+      console.log('리포트 ID:', reportId);
+      console.log('리포트 내용:', reportContent);
+
+      if (reportId && reportContent) {
+        // Show report in modal instead of redirecting
+        setGeneratedReport(reportContent);
+        setShowReportModal(true);
+      } else {
+        throw new Error('Report ID or content not received.');
+      }
+
+    } catch (error: any) {
+      console.error('리포트 생성 실패:', error);
+      alert(`리포트 생성 중 오류가 발생했습니다: ${error.message}. 다시 시도해주세요.`);
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  const facilityIssues = analysisData.lowScoreItems.filter(item => item.type === 'facility');
+  const structuralIssues = analysisData.lowScoreItems.filter(item => item.type === 'structural');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/">
+            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1>
+          </Link>
+          <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+                <div className="text-left">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">안녕하세요, {userData.name}님!</h2>
+                  <p className="text-gray-600">{userData.building} • {userData.location}</p>
+                  <p className="text-sm text-gray-500 mt-1">거주 기간: {userData.monthsLived}개월</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
+                    <span className="text-2xl font-bold text-white">{userData.overallScore}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">종합 만족도</p>
+                </div>
+              </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+            <div className="flex border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab('report')}
+                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors cursor-pointer ${
+                  activeTab === 'report'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center justify-center">
+                  <i className="ri-file-text-line mr-2"></i>
+                  맞춤형 협상 리포트
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('market')}
+                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors cursor-pointer ${
+                  activeTab === 'market'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center justify-center">
+                  <i className="ri-bar-chart-line mr-2"></i>
+                  우리 동네 시세
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('support')}
+                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors cursor-pointer ${
+                  activeTab === 'support'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center justify-center">
+                  <i className="ri-information-line mr-2"></i>
+                  정책 정보
+                </div>
+              </button>
+            </div>
+
+            <div className="p-8">
+              {/* 맞춤형 협상 리포트 탭 */}
+              {activeTab === 'report' && (
+                <div className="space-y-8">
+                  {/* 리포트 생성 섹션 */}
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold mb-2">맞춤형 협상 리포트</h3>
+                        <p className="text-blue-100 mb-2">수집된 데이터를 바탕으로 실질적인 협상 자료를 생성합니다</p>
+                        <div className="text-xs text-blue-200 flex items-center">
+                          <i className="ri-group-line mr-1"></i>
+                          최소 87명 참여 데이터 기반
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <button
+                          onClick={handleGenerateReport}
+                          disabled={isGeneratingReport}
+                          className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+                          type="button"
+                        >
+                          {isGeneratingReport ? (
+                            <div className="flex items-center">
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-2"></div>
+                              생성 중...
+                            </div>
+                          ) : (
+                            <div className="flex items-center">
+                              <i className="ri-file-add-line mr-2"></i>
+                              리포트 생성하기
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 협상 전략 제안 */}
+                  <div className="space-y-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">📋 재계약 협상 전략 제안</h3>
+                    
+                    {/* 데이터 신뢰도 표시 */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-center text-blue-800">
+                        <i className="ri-shield-check-line mr-2"></i>
+                        <span className="font-medium">
+                          이 분석은 {analysisData.marketData.participantCount}명의 이웃 데이터를 기반으로 합니다
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* 1순위: 시설 개선 요구 */}
+                    {facilityIssues.length > 0 && (
+                      <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                            1
+                          </div>
+                          <h4 className="text-xl font-bold text-red-800">최우선 협상 카드: 시설 개선 요구</h4>
+                        </div>
+                        
+                        <div className="bg-red-100 border border-red-300 rounded-lg p-4 mb-4">
+                          <p className="text-red-700 text-sm">
+                            <strong>법적 수선 의무에 해당하는 항목들입니다.</strong> 
+                            월세 인하가 어렵다면, 이 데이터를 근거로 명확한 시설 개선을 최우선으로 요구하세요.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 border border-red-200">
+                          <p className="text-sm leading-relaxed text-gray-700">
+                            샤워할 때 수압이 매우 약해서(45점) 건물 평균(72점)보다 27점이나 낮아 일상생활에 큰 불편을 겪고 있습니다. 습도 조절이 매우 어려워(38점) 건물 평균(65점)보다 27점 낮아 곰팡이 발생으로 건강에 영향을 받고 있습니다.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2순위: 월세 조정 요구 */}
+                    {structuralIssues.length > 0 && (
+                      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                            2
+                          </div>
+                          <h4 className="text-xl font-bold text-yellow-800">차선 협상 카드: 월세 조정 요구</h4>
+                        </div>
+                        
+                        <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-4">
+                          <p className="text-yellow-700 text-sm">
+                            <strong>구조적 문제로 해결이 어려운 항목들입니다.</strong> 
+                            이를 근거로 월세 인상률을 동네 평균({analysisData.marketData.recentIncreaseRate}%)보다 
+                            낮은 {analysisData.marketData.recommendedIncreaseRate}%로 조정 요구하세요.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                          <p className="text-sm leading-relaxed text-gray-700">
+                            주차공간 확보가 어려워(52점) 동네 평균(71점)보다 19점 낮아 매일 주차 스트레스를 받고 있습니다. 층간소음이 자주 들려(58점) 동네 평균(75점)보다 17점 낮아 수면과 휴식에 방해를 받고 있습니다.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 종합 협상 가이드 */}
+                    <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                      <h4 className="text-xl font-bold text-blue-800 mb-4">💡 종합 협상 가이드라인</h4>
+                      <div className="space-y-4">
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-bold text-gray-900 mb-2">
+                            1단계: {facilityIssues.map(item => item.category).join(', ')}
+                          </h5>
+                          <p className="text-gray-700 text-sm">
+                            법적 수선 의무 해당 항목들을 최우선으로 개선 요구
+                          </p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-bold text-gray-900 mb-2">
+                            2단계: {structuralIssues.map(item => item.category).join(', ')}
+                          </h5>
+                          <p className="text-gray-700 text-sm">
+                            구조적 문제 해결이 어려울 경우 월세 인상률 조정 요구
+                          </p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <h5 className="font-bold text-gray-900 mb-2">3단계: 데이터 근거 제시</h5>
+                          <p className="text-gray-700 text-sm">
+                            "이웃 {analysisData.marketData.participantCount}명의 비교 데이터에 따르면..." 으로 객관적 근거 제시
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 활용 가이드 */}
+                    
+                  </div>
+                </div>
+              )}
+
+              {/* 우리 동네 시세 탭 */}
+              {activeTab === 'market' && (
+                <div className="space-y-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">📊 {userData.location} 시세 리포트</h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i className="ri-home-line text-xl text-blue-600"></i>
+                        </div>
+                        <h4 className="font-bold text-gray-900 mb-2">평균 월세</h4>
+                        <div className="text-2xl font-bold text-blue-600 mb-1">{analysisData.marketData.avgRent}만원</div>
+                        <p className="text-sm text-gray-500">아파트 기준</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i className="ri-bank-line text-xl text-green-600"></i>
+                        </div>
+                        <h4 className="font-bold text-gray-900 mb-2">평균 보증금</h4>
+                        <div className="text-2xl font-bold text-green-600 mb-1">{analysisData.marketData.avgDeposit}만원</div>
+                        <p className="text-sm text-gray-500">아파트 기준</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i className="ri-arrow-up-line text-xl text-orange-600"></i>
+                        </div>
+                        <h4 className="font-bold text-gray-900 mb-2">평균 인상률</h4>
+                        <div className="text-2xl font-bold text-orange-600 mb-1">{analysisData.marketData.recentIncreaseRate}%</div>
+                        <p className="text-sm text-gray-500">최근 6개월</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h4 className="font-bold text-gray-900 mb-4">건물 유형별 시세 비교</h4>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                        <span className="font-medium text-gray-900">아파트</span>
+                        <div className="text-right">
+                          <div className="font-bold text-blue-600">85-95만원</div>
+                          <div className="text-sm text-gray-500">월세 범위</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                        <span className="font-medium text-gray-900">빌라/연립</span>
+                        <div className="text-right">
+                          <div className="font-bold text-blue-600">70-80만원</div>
+                          <div className="text-sm text-gray-500">월세 범위</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                        <span className="font-medium text-gray-900">원룸/투룸</span>
+                        <div className="text-right">
+                          <div className="font-bold text-blue-600">55-70만원</div>
+                          <div className="text-sm text-gray-500">월세 범위</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 rounded-xl p-6">
+                    <h4 className="font-bold text-blue-800 mb-3">💡 내 계약 조건 분석</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">현재 월세 수준</span>
+                        <span className="font-semibold text-green-600">시세 대비 적정</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">예상 인상률</span>
+                        <span className="font-semibold text-orange-600">{analysisData.marketData.recentIncreaseRate}% (동네 평균)</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">권장 협상 목표</span>
+                        <span className="font-semibold text-blue-600">{analysisData.marketData.recommendedIncreaseRate}% 이하</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 정책 정보 탭 */}
+              {activeTab === 'support' && (
+                <div className="space-y-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">🏛️ 맞춤형 정책 정보</h3>
+                  
+                  {/* 청년 지원 정책 */}
+                  <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+                    <h4 className="text-xl font-bold text-green-800 mb-4">청년 월세 지원 정책</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-white rounded-lg p-4">
+                        <h5 className="font-bold text-gray-900 mb-2">청년 월세 한시 특별지원</h5>
+                        <p className="text-sm text-gray-600 mb-3">만 19~34세 청년에게 월 20만원씩 12개월 지원</p>
+                        <a 
+                          href="https://www.gov.kr" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-green-600 text-sm font-medium hover:text-green-700 cursor-pointer"
+                        >
+                          자세히 보기 <i className="ri-external-link-line ml-1"></i>
+                        </a>
+                      </div>
+                      <div className="bg-white rounded-lg p-4">
+                        <h5 className="font-bold text-gray-900 mb-2">청년 전월세 보증금 대출</h5>
+                        <p className="text-sm text-gray-600 mb-3">최대 2억원까지 연 1.8% 금리로 지원</p>
+                        <a 
+                          href="https://www.hug.or.kr" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-green-600 text-sm font-medium hover:text-green-700 cursor-pointer"
+                        >
+                          자세히 보기 <i className="ri-external-link-line ml-1"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 분쟁 해결 정보 */}
+                  <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
+                    <h4 className="text-xl font-bold text-orange-800 mb-4">임대차 분쟁 해결 기관</h4>
+                    <div className="space-y-4">
+                      <div className="bg-white rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h5 className="font-bold text-gray-900">임대차분쟁조정위원회</h5>
+                            <p className="text-sm text-gray-600">임대차 관련 분쟁의 조정 및 중재</p>
+                          </div>
+                          <a 
+                            href="https://www.scourt.go.kr" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-orange-600 hover:text-orange-700 cursor-pointer"
+                          >
+                            <i className="ri-external-link-line text-xl"></i>
+                          </a>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h5 className="font-bold text-gray-900">한국소비자원</h5>
+                            <p className="text-sm text-gray-600">소비자 피해 구제 및 상담</p>
+                          </div>
+                          <a 
+                            href="https://www.kca.go.kr" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-orange-600 hover:text-orange-700 cursor-pointer"
+                          >
+                            <i className="ri-external-link-line text-xl"></i>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 법률 정보 */}
+                  <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
+                    <h4 className="text-xl font-bold text-purple-800 mb-4">주요 임대차보호법 조항</h4>
+                    <div className="space-y-4">
+                      <div className="bg-white rounded-lg p-4">
+                        <h5 className="font-bold text-gray-900 mb-2">수선 의무 (제20조)</h5>
+                        <p className="text-sm text-gray-600">
+                          임대인은 임대목적물을 임차인이 사용·수익하기에 필요한 상태를 유지하도록 할 의무가 있습니다.
+                        </p>
+                        <div className="mt-2 text-xs text-purple-600">
+                          해당 항목: 누수, 수압, 곰팡이, 도어락, 보일러 등
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4">
+                        <h5 className="font-bold text-gray-900 mb-2">차임 증액 제한 (제7조)</h5>
+                        <p className="text-sm text-gray-600">
+                          임대인은 차임 등을 임차권 존속기간 중 증액할 수 없으며, 약정한 차임 등의 20분의 1을 초과하여 증액할 수 없습니다.
+                        </p>
+                        <div className="mt-2 text-xs text-purple-600">
+                          연간 최대 5% 이내 인상 가능
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid md:grid-cols-2 gap-6 mt-8">
+            <Link href="/diagnosis">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow cursor-pointer">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-refresh-line text-xl text-blue-600"></i>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-1">진단 다시 받기</h4>
+                    <p className="text-sm text-gray-600">최신 상태로 다시 진단받아보세요</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            <Link href="/weekly-mission">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow cursor-pointer">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-task-line text-xl text-green-600"></i>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-1">주간 미션 참여</h4>
+                    <p className="text-sm text-gray-600">이웃들과 함께 데이터를 개선해보세요</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* 알림 설정 */}
+          <div className="mt-8 bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">🔔 알림 설정</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-gray-900">새로운 설문 알림</h4>
+                  <p className="text-sm text-gray-600">우리 동네에 새로운 설문이 시작되면 알려드려요</p>
+                </div>
+                <div className="flex items-center">
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-gray-900">참여 현황 알림</h4>
+                  <p className="text-sm text-gray-600">내가 참여한 설문에 새로운 응답이 있으면 알려드려요</p>
+                </div>
+                <div className="flex items-center">
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-gray-900">시세 업데이트 알림</h4>
+                  <p className="text-sm text-gray-600">우리 동네 월세 리포트가 업데이트되면 알려드려요</p>
+                </div>
+                <div className="flex items-center">
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">맞춤형 협상 리포트</h2>
+              <button
+                onClick={() => {
+                  setShowReportModal(false);
+                  setGeneratedReport(null);
+                  setIsGeneratingReport(false);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <i className="ri-close-line text-2xl"></i>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isGeneratingReport ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">리포트 생성 중...</h3>
+                  <p className="text-gray-600 text-center">
+                    AI가 당신만의 맞춤형 협상 가이드를 생성하고 있습니다.<br />
+                    잠시만 기다려주세요.
+                  </p>
+                </div>
+              ) : generatedReport ? (
+                <div className="space-y-6">
+                {/* Primary Negotiation Card */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center">
+                    <i className="ri-file-text-line mr-2"></i>
+                    주요 협상 카드
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-blue-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.primaryNegotiationCard}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Secondary Negotiation Card */}
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-green-800 mb-3 flex items-center">
+                    <i className="ri-file-list-line mr-2"></i>
+                    보조 협상 카드
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-green-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.secondaryNegotiationCard}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 1 */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-yellow-800 mb-3 flex items-center">
+                    <i className="ri-play-circle-line mr-2"></i>
+                    {generatedReport.step1.split(':')[0]}
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-yellow-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.step1.split(':').slice(1).join(':').trim()}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center">
+                    <i className="ri-checkbox-circle-line mr-2"></i>
+                    {generatedReport.step2.split(':')[0]}
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-purple-100">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {generatedReport.step2.split(':').slice(1).join(':').trim()}
+                    </p>
+                  </div>
+                </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-center">
+                    <i className="ri-error-warning-line text-4xl mb-4"></i>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">리포트 생성 실패</h3>
+                    <p className="text-gray-600">리포트를 생성하는 중 오류가 발생했습니다.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+              <div className="text-sm text-gray-600">
+                <i className="ri-information-line mr-1"></i>
+                이 리포트는 AI가 생성한 맞춤형 협상 가이드입니다.
+              </div>
+              <div className="flex space-x-3">
+                {generatedReport && (
+                  <button
+                    onClick={() => {
+                      const fullReport = `주요 협상 카드:\n\n${generatedReport.primaryNegotiationCard}\n\n보조 협상 카드:\n\n${generatedReport.secondaryNegotiationCard}\n\n${generatedReport.step1}\n\n${generatedReport.step2}`;
+                      navigator.clipboard.writeText(fullReport);
+                      alert('리포트가 클립보드에 복사되었습니다!');
+                    }}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center"
+                  >
+                    <i className="ri-file-copy-line mr-2"></i>
+                    전문 복사
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setGeneratedReport(null);
+                    setIsGeneratingReport(false);
+                  }}
+                  className="bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
+                >
+                  {isGeneratingReport ? '취소' : '닫기'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
