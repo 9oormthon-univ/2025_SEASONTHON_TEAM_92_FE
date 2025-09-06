@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API 기본 URL 설정
-const API_BASE_URL = 'http://localhost:8891'; // 2025_SEASONTHON_TEAM_92_BE의 기본 포트
+const API_BASE_URL = 'https://2025seasonthonteam92be-production.up.railway.app'; // Railway 배포된 백엔드 서버
 
 const api = axios.create({
   baseURL: API_BASE_URL,
