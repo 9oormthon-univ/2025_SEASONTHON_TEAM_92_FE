@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API 기본 URL 설정
-const API_BASE_URL = 'https://www.jinwook.shop'; // 사용자 제공 명세서 Base URL
+const API_BASE_URL = 'https://jinwook.shop'; // team_backend의 기본 포트
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
   
   const token = localStorage.getItem('jwtToken');
   
-  // JWT 토큰이 필요하지 않은 엔드포인트들 (제공된 명세서 기준)
+  // JWT 토큰이 필요하지 않은 엔드포인트들 (team_backend 기준)
   const noAuthEndpoints = ['/member/create', '/member/doLogin', '/api/location/health', '/api/location/preview'];
   const needsAuth = !noAuthEndpoints.some(endpoint => config.url?.includes(endpoint));
   
@@ -47,7 +47,8 @@ api.interceptors.response.use(
   }
 );
 
-// API 응답 타입 정의 (제공된 명세서의 공통 응답 형식에 맞춤)
+// API 응답 타입 정의 (team_backend의 공통 응답 형식에 맞춤)
+// Member API는 이 형식을 따르지 않으므로, 해당 API는 별도로 처리해야 합니다.
 export interface ApiResponse<T = any> {
   success: boolean;
   data: T | null;
@@ -68,37 +69,37 @@ export interface User {
   onboardingCompleted?: boolean;
 }
 
-// 인증 API (명세서 기준)
+// 인증 API (team_backend 코드 기반)
+// 응답 형식이 ApiResponse<T>를 따르지 않으므로, 호출하는 곳에서 raw 응답을 처리해야 합니다.
 export const authApi = {
-  register: async (userData: any): Promise<ApiResponse<number>> => { // 응답 데이터 타입 변경 (ID)
+  register: async (userData: any): Promise<any> => { // Promise<any>로 변경
     const response = await api.post('/member/create', userData);
-    return response.data;
+    return response.data; // { id: number }
   },
   
-  login: async (credentials: any): Promise<ApiResponse<{ id: number; token: string }>> => { // 응답 데이터 타입 변경 (id, token)
+  login: async (credentials: any): Promise<any> => { // Promise<any>로 변경
     const response = await api.post('/member/doLogin', credentials);
-    return response.data;
+    return response.data; // { id: number, token: string }
   },
   
-  // updateUser: 명세서에 없음 (이전 프론트엔드에 있었으나 team_backend 명세에 없음)
-  // async (userData: any): Promise<ApiResponse<User>> => {
+  // updateUser: team_backend에 없음
+  // async (userData: any): Promise<any> => {
   //   const response = await api.put('/api/auth/update', userData);
   //   return response.data;
   // },
   
-  getCurrentUser: async (): Promise<ApiResponse<{ profileName: string; profileEmail: string; profileBuilding: string; profileDong: string; }>> => { // 응답 데이터 타입 변경
+  getCurrentUser: async (): Promise<any> => { // Promise<any>로 변경
     const response = await api.get('/member/profile');
-    return response.data;
+    return response.data; // MemberProfileDto
   },
 
-  // 거주지 정보 설정 (명세서 기준)
-  setProfileSetting: async (settingData: any): Promise<ApiResponse<any>> => {
+  setProfileSetting: async (settingData: any): Promise<any> => { // Promise<any>로 변경
     const response = await api.post('/member/profile/setting', settingData);
-    return response.data;
+    return response.data; // { success: boolean, message: string }
   },
 };
 
-// 위치 API (명세서 기준)
+// 위치 API (team_backend 코드 기반)
 export const locationApi = {
   healthCheck: async (): Promise<ApiResponse<any>> => {
     const response = await api.get('/api/location/health');
@@ -114,7 +115,7 @@ export const locationApi = {
   },
 };
 
-// // 그룹 API (명세서에 없음)
+// // 그룹 API (team_backend에 없음)
 // export const groupApi = {
 //   getGroups: async (scope: 'building' | 'neighborhood'): Promise<ApiResponse<any[]>> => {
 //     const response = await api.get(`/api/groups?scope=${scope}`);
@@ -132,20 +133,20 @@ export const locationApi = {
 //   },
 // };
 
-// // 진단 API (명세서에 없음)
-// export const diagnosisApi = {
-//   submitDiagnosis: async (diagnosisData: any): Promise<ApiResponse<any>> => {
-//     const response = await api.post('/api/diagnosis', diagnosisData);
-//     return response.data;
-//   },
-//   
-//   getDiagnosisResult: async (): Promise<ApiResponse<any>> => {
-//     const response = await api.get('/api/diagnosis/result');
-//     return response.data;
-//   },
-// };
+// 진단 API (team_backend 코드 기반)
+export const diagnosisApi = {
+  submitDiagnosis: async (diagnosisData: any): Promise<ApiResponse<any>> => {
+    const response = await api.post('/api/v1/diagnosis/responses', diagnosisData);
+    return response.data;
+  },
+  
+  getDiagnosisResult: async (): Promise<ApiResponse<any>> => {
+    const response = await api.get('/api/v1/diagnosis/result');
+    return response.data;
+  },
+};
 
-// // 리포트 API (명세서에 없음)
+// // 리포트 API (team_backend에 없음)
 // export const reportApi = {
 //   generateReport: async (): Promise<ApiResponse<any>> => {
 //     const response = await api.post('/api/reports/generate');
@@ -163,25 +164,25 @@ export const locationApi = {
 //   },
 // };
 
-// 주간 미션 API (명세서 기준)
+// 주간 미션 API (team_backend 코드 기반)
 export const missionApi = {
-  getCurrentMission: async (): Promise<ApiResponse<any>> => { // 응답 데이터 타입 변경
+  getCurrentMission: async (): Promise<ApiResponse<any>> => {
     const response = await api.get('/mission/weekly/current');
     return response.data;
   },
   
-  participateInMission: async (missionId: number, responses: any): Promise<ApiResponse<any>> => { // missionId 추가
+  participateInMission: async (missionId: number, responses: any): Promise<ApiResponse<any>> => {
     const response = await api.post(`/mission/weekly/${missionId}/participate`, { responses });
     return response.data;
   },
   
-  getMissionResults: async (missionId: number): Promise<ApiResponse<any>> => { // missionId 추가
+  getMissionResults: async (missionId: number): Promise<ApiResponse<any>> => {
     const response = await api.get(`/mission/weekly/${missionId}/result`);
     return response.data;
   },
 };
 
-// 오피스텔 API (명세서 기준 - 새로 추가)
+// 오피스텔 API (team_backend 코드 기반)
 export const officetelApi = {
   getRentData: async (lawdCd: string): Promise<ApiResponse<any>> => {
     const response = await api.get(`/api/officetel/rent-data?lawdCd=${lawdCd}`);
