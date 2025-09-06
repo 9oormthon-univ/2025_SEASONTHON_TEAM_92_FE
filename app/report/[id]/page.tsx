@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-// import { reportApi } from '@/lib/api';
+import { reportApi } from '@/lib/api';
 import { ReportResponse } from '@/types';
 
 interface ReportPageProps {
@@ -24,15 +24,14 @@ export default function ReportPage({ params }: ReportPageProps) {
           const fetchReport = async () => {
             try {
               setLoading(true);
-              // const response = await reportApi.getReport(Number(id));
-              // Temporarily use mock data for testing
-              const mockReport: ReportResponse = {
-                primaryNegotiationCard: "안녕하세요, 임대인님. 저희가 현재 거주 중인 공간에 대해 협의하고자 합니다.",
-                secondaryNegotiationCard: "추가로, 현재 수압과 난방이 양호함을 고려할 때...",
-                step1: "1단계: 초기 접근 및 협상 준비 단계...",
-                step2: "2단계: 본격적인 협상 및 후속 조치 단계..."
-              };
-              setReport(mockReport);
+              const response = await reportApi.getReport(Number(id));
+              if (response && response.data && response.data.reportContent) {
+                // Assuming reportContent is a stringified ReportResponse
+                const parsedReport: ReportResponse = JSON.parse(response.data.reportContent);
+                setReport(parsedReport);
+              } else {
+                setError('Report data not found.');
+              }
             } catch (err: any) {
               console.error('Failed to fetch report:', err);
               setError(err.message || 'Failed to load report.');

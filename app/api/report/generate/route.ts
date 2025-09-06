@@ -151,7 +151,7 @@ export async function POST(request: Request) {
     console.log('리포트 저장 중...');
     const createReportResponse = await reportApi.createReport({
       reportContent: JSON.stringify(generatedReport)
-    });
+    }, jwtToken);
 
     if (!createReportResponse.reportId) {
       throw new Error('리포트 저장에 실패했습니다.');

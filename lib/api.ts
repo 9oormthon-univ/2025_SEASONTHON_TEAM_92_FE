@@ -275,9 +275,14 @@ export const diagnosisApi = {
 
 // 리포트 API (API 명세 기반)
 export const reportApi = {
-  createReport: async (reportData: any): Promise<any> => {
+  createReport: async (reportData: any, jwtToken?: string): Promise<any> => {
     try {
-      const response = await api.post('/report/create', reportData);
+      const config = jwtToken ? {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`
+        }
+      } : {};
+      const response = await api.post('/report/create', reportData, config);
       return response.data; // { reportId: number }
     } catch (error: any) {
       if (USE_MOCK_DATA || error.response?.status === 404) {
