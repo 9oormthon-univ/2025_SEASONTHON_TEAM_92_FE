@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { authApi, diagnosisApi, missionApi } from '@/lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -11,21 +12,83 @@ export default function DashboardPage() {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  
+  // User data state
+  const [userData, setUserData] = useState({
+    id: '',
+    name: '',
+    building: '',
+    location: '',
+    monthsLived: 0,
+    overallScore: 0,
+    buildingAverage: 0,
+    neighborhoodAverage: 0
+  });
+  const [isLoadingUserData, setIsLoadingUserData] = useState(true);
+  
+  // Load user data on component mount
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+          router.push('/auth/login');
+          return;
+        }
 
-  // Mock user data (replace with actual data fetching)
-  const userData = {
-    id: 'user123', // Placeholder for actual user ID
-    name: '김지원',
-    building: '래미안 아파트 101동',
-    location: '강남구 개포동',
-    monthsLived: 14,
-    overallScore: 73,
-    buildingAverage: 68,
-    neighborhoodAverage: 71
-  };
+        // Get JWT token
+        const jwtToken = localStorage.getItem('jwtToken');
+        if (!jwtToken) {
+          router.push('/auth/login');
+          return;
+        }
 
-  // Mock analysis data (replace with actual data fetching)
-  const analysisData = {
+        // Fetch user profile from API
+        const userProfile = await authApi.getCurrentUser(jwtToken);
+        console.log('사용자 프로필 데이터:', userProfile);
+
+        // Map API response to userData state
+        setUserData({
+          id: userProfile.id?.toString() || '',
+          name: userProfile.nickname || userProfile.email?.split('@')[0] || '사용자',
+          building: userProfile.buildingName || '건물명',
+          location: userProfile.neighborhood || userProfile.address || '위치',
+          monthsLived: userProfile.monthsLived || 0,
+          overallScore: userProfile.overallScore || 0,
+          buildingAverage: userProfile.buildingAverage || 0,
+          neighborhoodAverage: userProfile.neighborhoodAverage || 0
+        });
+
+      } catch (error) {
+        console.error('사용자 데이터 로드 실패:', error);
+        // Fallback to localStorage data if API fails
+        const email = localStorage.getItem('userEmail') || '';
+        const nickname = localStorage.getItem('userNickname') || email.split('@')[0];
+        const buildingName = localStorage.getItem('userBuildingName') || '건물명';
+        const location = localStorage.getItem('userLocation') || '위치';
+        const monthsLived = parseInt(localStorage.getItem('userMonthsLived') || '0');
+
+        setUserData({
+          id: localStorage.getItem('userId') || '',
+          name: nickname,
+          building: buildingName,
+          location: location,
+          monthsLived: monthsLived,
+          overallScore: 0,
+          buildingAverage: 0,
+          neighborhoodAverage: 0
+        });
+      } finally {
+        setIsLoadingUserData(false);
+      }
+    };
+
+    loadUserData();
+  }, [router]);
+  
+  // Analysis data state
+  const [analysisData, setAnalysisData] = useState({
     lowScoreItems: [
       { 
         category: '수압', 
@@ -79,7 +142,7 @@ export default function DashboardPage() {
       recommendedIncreaseRate: 1.5,
       participantCount: 87
     }
-  };
+  });
 
   const handleGenerateReport = async () => {
     console.log('리포트 생성 버튼 클릭됨');
@@ -88,40 +151,81 @@ export default function DashboardPage() {
     setGeneratedReport(null);
     
     try {
-      // Call the new API route for report generation
-      const jwtToken = localStorage.getItem('jwtToken'); // Get token from localStorage
+      const jwtToken = localStorage.getItem('jwtToken');
       if (!jwtToken) {
         throw new Error('JWT Token not found. Please log in.');
       }
 
-      const response = await fetch('/api/report/generate', {
+      // 1단계: 백엔드에 리포트 작성 요청 (POST)
+      const reportContent = `사용자 ${userData.name}님의 거주지 ${userData.building}에서 겪고 있는 문제점들을 바탕으로 협상 리포트를 생성해주세요.`;
+      
+      const createResponse = await fetch('https://www.jinwook.shop/report/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`
         },
-        body: JSON.stringify({ userId: userData.id, jwtToken }), // Pass user ID and token to the API route
+        body: JSON.stringify({ reportContent })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to generate report');
+      console.log('HTTP 상태 코드:', createResponse.status);
+      console.log('응답 헤더:', createResponse.headers);
+
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json();
+        console.error('에러 응답:', errorData);
+        throw new Error(errorData.message || 'Failed to create report');
       }
 
-      const data = await response.json();
-      const reportId = data.reportId;
-      const reportContent = data.reportContent;
-
-      console.log('API 응답 데이터:', data);
-      console.log('리포트 ID:', reportId);
-      console.log('리포트 내용:', reportContent);
-
-      if (reportId && reportContent) {
-        // Show report in modal instead of redirecting
-        setGeneratedReport(reportContent);
-        setShowReportModal(true);
+      const createData = await createResponse.json();
+      console.log('백엔드 응답 데이터:', createData);
+      console.log('응답 타입:', typeof createData);
+      console.log('응답이 배열인가?', Array.isArray(createData));
+      
+      // 백엔드에서 반환하는 ID 처리
+      let reportId;
+      
+      if (typeof createData === 'number') {
+        // 백엔드에서 숫자로 직접 반환하는 경우
+        reportId = createData;
+        console.log('숫자로 반환된 ID:', reportId);
+      } else if (Array.isArray(createData) && createData.length > 0) {
+        // 배열인 경우 첫 번째 요소에서 ID 추출
+        reportId = createData[0].reportId || createData[0].id || createData[0].report_id;
+        console.log('배열에서 추출한 ID:', reportId);
+      } else if (typeof createData === 'object' && createData !== null) {
+        // 객체인 경우
+        reportId = createData.reportId || createData.id || createData.report_id;
+        console.log('객체에서 추출한 ID:', reportId);
       } else {
-        throw new Error('Report ID or content not received.');
+        // 다른 타입인 경우
+        console.log('예상치 못한 응답 타입:', createData);
       }
+
+      if (!reportId) {
+        console.error('사용 가능한 ID 필드가 없습니다. 전체 응답:', createData);
+        throw new Error('백엔드에서 reportId를 반환하지 않았습니다.');
+      }
+
+      // 2단계: 백엔드에서 작성한 리포트 불러오기 (GET)
+      const getResponse = await fetch(`https://www.jinwook.shop/report/${reportId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        }
+      });
+
+      if (!getResponse.ok) {
+        const errorData = await getResponse.json();
+        throw new Error(errorData.message || 'Failed to fetch report');
+      }
+
+      const reportData = await getResponse.json();
+      console.log('리포트 데이터:', reportData);
+
+      // Show report in modal
+      setGeneratedReport(reportData);
+      setShowReportModal(true);
 
     } catch (error: any) {
       console.error('리포트 생성 실패:', error);
@@ -144,7 +248,13 @@ export default function DashboardPage() {
           </Link>
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
+            {isLoadingUserData ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mr-3"></div>
+                <span className="text-gray-600">사용자 정보를 불러오는 중...</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
                 <div className="text-left">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">안녕하세요, {userData.name}님!</h2>
                   <p className="text-gray-600">{userData.building} • {userData.location}</p>
@@ -157,6 +267,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">종합 만족도</p>
                 </div>
               </div>
+            )}
           </div>
 
           {/* Tab Navigation */}
@@ -305,35 +416,6 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     )}
-
-                    {/* 종합 협상 가이드 */}
-                    <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
-                      <h4 className="text-xl font-bold text-blue-800 mb-4">💡 종합 협상 가이드라인</h4>
-                      <div className="space-y-4">
-                        <div className="bg-white rounded-lg p-4">
-                          <h5 className="font-bold text-gray-900 mb-2">
-                            1단계: {facilityIssues.map(item => item.category).join(', ')}
-                          </h5>
-                          <p className="text-gray-700 text-sm">
-                            법적 수선 의무 해당 항목들을 최우선으로 개선 요구
-                          </p>
-                        </div>
-                        <div className="bg-white rounded-lg p-4">
-                          <h5 className="font-bold text-gray-900 mb-2">
-                            2단계: {structuralIssues.map(item => item.category).join(', ')}
-                          </h5>
-                          <p className="text-gray-700 text-sm">
-                            구조적 문제 해결이 어려울 경우 월세 인상률 조정 요구
-                          </p>
-                        </div>
-                        <div className="bg-white rounded-lg p-4">
-                          <h5 className="font-bold text-gray-900 mb-2">3단계: 데이터 근거 제시</h5>
-                          <p className="text-gray-700 text-sm">
-                            "이웃 {analysisData.marketData.participantCount}명의 비교 데이터에 따르면..." 으로 객관적 근거 제시
-                          </p>
-                        </div>
-                      </div>
-                    </div>
 
                     {/* 활용 가이드 */}
                     
@@ -639,7 +721,7 @@ export default function DashboardPage() {
                   </h3>
                   <div className="bg-white rounded-lg p-4 border border-blue-100">
                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {generatedReport.primaryNegotiationCard}
+                      {generatedReport.primaryNegotiationCard || '주요 협상 카드가 생성되지 않았습니다.'}
                     </p>
                   </div>
                 </div>
@@ -652,33 +734,7 @@ export default function DashboardPage() {
                   </h3>
                   <div className="bg-white rounded-lg p-4 border border-green-100">
                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {generatedReport.secondaryNegotiationCard}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 1 */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-yellow-800 mb-3 flex items-center">
-                    <i className="ri-play-circle-line mr-2"></i>
-                    {generatedReport.step1.split(':')[0]}
-                  </h3>
-                  <div className="bg-white rounded-lg p-4 border border-yellow-100">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {generatedReport.step1.split(':').slice(1).join(':').trim()}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center">
-                    <i className="ri-checkbox-circle-line mr-2"></i>
-                    {generatedReport.step2.split(':')[0]}
-                  </h3>
-                  <div className="bg-white rounded-lg p-4 border border-purple-100">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {generatedReport.step2.split(':').slice(1).join(':').trim()}
+                      {generatedReport.secondaryNegotiationCard || '보조 협상 카드가 생성되지 않았습니다.'}
                     </p>
                   </div>
                 </div>
@@ -704,7 +760,7 @@ export default function DashboardPage() {
                 {generatedReport && (
                   <button
                     onClick={() => {
-                      const fullReport = `주요 협상 카드:\n\n${generatedReport.primaryNegotiationCard}\n\n보조 협상 카드:\n\n${generatedReport.secondaryNegotiationCard}\n\n${generatedReport.step1}\n\n${generatedReport.step2}`;
+                      const fullReport = `주요 협상 카드:\n\n${generatedReport.primaryNegotiationCard || '주요 협상 카드가 생성되지 않았습니다.'}\n\n보조 협상 카드:\n\n${generatedReport.secondaryNegotiationCard || '보조 협상 카드가 생성되지 않았습니다.'}`;
                       navigator.clipboard.writeText(fullReport);
                       alert('리포트가 클립보드에 복사되었습니다!');
                     }}

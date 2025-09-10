@@ -221,6 +221,137 @@ export interface ReportResponse {
   step2: string;
 }
 
+// 새로운 리포트 템플릿 타입 정의
+export interface ContractInfo {
+  address: string;
+  buildingName: string;
+  buildingType: string;
+  contractType: string;
+  deposit: number;
+  monthlyRent: number;
+  managementFee: number;
+  gpsVerified: boolean;
+  contractVerified: boolean;
+}
+
+export interface SubjectiveMetrics {
+  overallScore: number;
+  neighborhoodAverage: number;
+  buildingAverage: number;
+  categories: {
+    lighting: { myScore: number; neighborhoodAvg: number; buildingAvg: number };
+    soundproofing: { myScore: number; neighborhoodAvg: number; buildingAvg: number };
+    parking: { myScore: number; neighborhoodAvg: number; buildingAvg: number };
+  };
+}
+
+export interface ObjectiveMetrics {
+  marketPrice: {
+    nationalAverage: number;
+    myContract: number;
+    difference: number;
+    differencePercent: number;
+  };
+  managementFee: {
+    nationalAverage: number;
+    myContract: number;
+    status: 'normal' | 'high' | 'low';
+  };
+  noise: {
+    nationalAverage: number;
+    userReported: number;
+    match: boolean;
+  };
+}
+
+export interface NegotiationCard {
+  priority: number;
+  title: string;
+  content: string;
+  recommendedMent: string;
+}
+
+export interface PolicyInfo {
+  title: string;
+  description: string;
+  eligibility: string;
+  link: string;
+}
+
+export interface DisputeGuide {
+  relatedLaw: string;
+  committeeContact: string;
+  templateDownload: string;
+}
+
+export interface ReportTemplate {
+  // 1. 리포트 헤더
+  header: {
+    title: string;
+    createdAt: string;
+    dataPeriod: string;
+    trustMetrics: {
+      participantCount: number;
+      averageResponseDays: number;
+      trustScore: number;
+    };
+  };
+  
+  // 2. 나의 계약 정보 요약
+  contractInfo: ContractInfo;
+  
+  // 3. 주관적 지표
+  subjectiveMetrics: SubjectiveMetrics;
+  
+  // 4. 객관적 지표
+  objectiveMetrics: ObjectiveMetrics;
+  
+  // 5. 협상 카드
+  negotiationCards: NegotiationCard[];
+  
+  // 6. 맞춤형 정책/지원 정보
+  policyInfo: PolicyInfo[];
+  
+  // 7. 분쟁 해결 가이드
+  disputeGuide: DisputeGuide;
+  
+  // 8. 업데이트 요소
+  updateInfo: {
+    autoUpdate: boolean;
+    dataValidityPeriod: string;
+  };
+}
+
+// GPS 인증 관련 타입 정의
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: number;
+}
+
+export interface AddressInfo {
+  address: string;
+  dong: string;
+  gu: string;
+  si: string;
+}
+
+export interface GPSVerificationResult {
+  isVerified: boolean;
+  confidence: number; // 0-100
+  locationData: LocationData;
+  addressInfo: AddressInfo;
+  verificationMethod: 'gps' | 'manual' | 'hybrid';
+  verifiedAt: string;
+}
+
+export interface GPSVerificationRequest {
+  userLocation: LocationData;
+  targetAddress: string;
+  toleranceRadius: number; // 미터 단위
+}
+
 // 알림 타입 정의
 export interface Notification {
   id: string;

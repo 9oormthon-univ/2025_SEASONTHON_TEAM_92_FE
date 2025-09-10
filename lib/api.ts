@@ -419,6 +419,84 @@ export const missionApi = {
   },
 };
 
+// GPS 인증 API
+export const gpsApi = {
+  verifyLocation: async (verificationData: any): Promise<any> => {
+    try {
+      // 백엔드 API 형식에 맞게 데이터 변환
+      const requestData = {
+        latitude: verificationData.userLocation.latitude,
+        longitude: verificationData.userLocation.longitude,
+        accuracy: verificationData.userLocation.accuracy,
+        timestamp: verificationData.userLocation.timestamp,
+        targetAddress: verificationData.targetAddress,
+        toleranceRadius: verificationData.toleranceRadius
+      };
+
+      const response = await api.post('/api/location/gps/verify', requestData);
+      return response.data;
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          success: true,
+          data: {
+            isVerified: true,
+            confidence: 87,
+            latitude: verificationData.userLocation.latitude,
+            longitude: verificationData.userLocation.longitude,
+            accuracy: verificationData.userLocation.accuracy,
+            timestamp: verificationData.userLocation.timestamp,
+            address: "서울시 마포구 망원동 123-45",
+            dong: "망원동",
+            gu: "마포구",
+            si: "서울시",
+            verificationMethod: "gps",
+            verifiedAt: new Date().toISOString(),
+            message: "GPS 인증이 완료되었습니다."
+          }
+        };
+      }
+      throw error;
+    }
+  },
+  
+  getLocationAccuracy: async (locationData: any): Promise<any> => {
+    try {
+      // 백엔드 API 형식에 맞게 데이터 변환
+      const requestData = {
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        accuracy: locationData.accuracy,
+        timestamp: locationData.timestamp
+      };
+
+      const response = await api.post('/api/location/gps/accuracy', requestData);
+      return response.data;
+    } catch (error: any) {
+      if (USE_MOCK_DATA || error.response?.status === 404) {
+        console.log('백엔드 API가 구현되지 않아 목업 데이터를 사용합니다.');
+        return {
+          success: true,
+          data: {
+            accuracy: locationData.accuracy || 15.5,
+            confidence: locationData.accuracy <= 10 ? 95 : 
+                       locationData.accuracy <= 50 ? 85 : 
+                       locationData.accuracy <= 100 ? 70 : 50,
+            recommendations: [
+              "실외에서 측정하세요",
+              "건물에서 멀리 떨어지세요",
+              "GPS 신호가 강한 곳에서 측정하세요"
+            ],
+            message: "위치 정확도 평가가 완료되었습니다."
+          }
+        };
+      }
+      throw error;
+    }
+  }
+};
+
 // 오피스텔 API (team_backend 코드 기반)
 export const officetelApi = {
   getRentData: async (lawdCd: string): Promise<ApiResponse<any>> => {
