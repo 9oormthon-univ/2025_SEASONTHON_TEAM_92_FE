@@ -8,10 +8,11 @@ import { authApi, diagnosisApi, missionApi } from '@/lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('report');
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  const [weeklyMission, setWeeklyMission] = useState<any>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
   
   // User data state
   const [userData, setUserData] = useState({
@@ -47,6 +48,41 @@ export default function DashboardPage() {
         // Fetch user profile from API
         const userProfile = await authApi.getCurrentUser();
         console.log('사용자 프로필 데이터:', userProfile);
+
+        // 주간 미션 로드
+        try {
+          const missionResponse = await missionApi.getCurrentMission();
+          if (missionResponse.success) {
+            setWeeklyMission(missionResponse.data);
+          }
+        } catch (error) {
+          console.log('주간 미션 로드 실패:', error);
+        }
+
+        // 알림 데이터 로드 (하드코딩)
+        setNotifications([
+          {
+            id: 1,
+            type: 'new_participant',
+            message: '새로운 이웃 2명이 우리 건물 데이터에 참여했어요!',
+            time: '2시간 전',
+            icon: 'ri-user-add-line'
+          },
+          {
+            id: 2,
+            type: 'score_update',
+            message: '지난주 \'소음\' 미션에 대한 우리 동네 평균 점수가 업데이트되었어요.',
+            time: '1일 전',
+            icon: 'ri-bar-chart-line'
+          },
+          {
+            id: 3,
+            type: 'report_update',
+            message: 'OO동 월세 리포트가 5명의 추가 데이터로 업데이트되었습니다.',
+            time: '3일 전',
+            icon: 'ri-file-text-line'
+          }
+        ]);
 
         // 백엔드 응답 구조에 맞게 데이터 매핑
         setUserData({
@@ -378,56 +414,6 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     
-                    {/* 1순위: 시설 개선 요구 */}
-                    {facilityIssues.length > 0 && (
-                      <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
-                        <div className="flex items-center mb-4">
-                          <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                            1
-                          </div>
-                          <h4 className="text-xl font-bold text-red-800">최우선 협상 카드: 시설 개선 요구</h4>
-                        </div>
-                        
-                        <div className="bg-red-100 border border-red-300 rounded-lg p-4 mb-4">
-                          <p className="text-red-700 text-sm">
-                            <strong>법적 수선 의무에 해당하는 항목들입니다.</strong> 
-                            월세 인하가 어렵다면, 이 데이터를 근거로 명확한 시설 개선을 최우선으로 요구하세요.
-                          </p>
-                        </div>
-                        
-                        <div className="bg-white rounded-lg p-4 border border-red-200">
-                          <p className="text-sm leading-relaxed text-gray-700">
-                            샤워할 때 수압이 매우 약해서(45점) 건물 평균(72점)보다 27점이나 낮아 일상생활에 큰 불편을 겪고 있습니다. 습도 조절이 매우 어려워(38점) 건물 평균(65점)보다 27점 낮아 곰팡이 발생으로 건강에 영향을 받고 있습니다.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 2순위: 월세 조정 요구 */}
-                    {structuralIssues.length > 0 && (
-                      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
-                        <div className="flex items-center mb-4">
-                          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                            2
-                          </div>
-                          <h4 className="text-xl font-bold text-yellow-800">차선 협상 카드: 월세 조정 요구</h4>
-                        </div>
-                        
-                        <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-4">
-                          <p className="text-yellow-700 text-sm">
-                            <strong>구조적 문제로 해결이 어려운 항목들입니다.</strong> 
-                            이를 근거로 월세 인상률을 동네 평균({analysisData.marketData.recentIncreaseRate}%)보다 
-                            낮은 {analysisData.marketData.recommendedIncreaseRate}%로 조정 요구하세요.
-                          </p>
-                        </div>
-                        
-                        <div className="bg-white rounded-lg p-4 border border-yellow-200">
-                          <p className="text-sm leading-relaxed text-gray-700">
-                            주차공간 확보가 어려워(52점) 동네 평균(71점)보다 19점 낮아 매일 주차 스트레스를 받고 있습니다. 층간소음이 자주 들려(58점) 동네 평균(75점)보다 17점 낮아 수면과 휴식에 방해를 받고 있습니다.
-                          </p>
-                        </div>
-                      </div>
-                    )}
 
                     {/* 활용 가이드 */}
                     
@@ -435,92 +421,6 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* 우리 동네 시세 탭 */}
-              {activeTab === 'market' && (
-                <div className="space-y-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">📊 {userData.location} 시세 리포트</h3>
-                  
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <i className="ri-home-line text-xl text-blue-600"></i>
-                        </div>
-                        <h4 className="font-bold text-gray-900 mb-2">평균 월세</h4>
-                        <div className="text-2xl font-bold text-blue-600 mb-1">{analysisData.marketData.avgRent}만원</div>
-                        <p className="text-sm text-gray-500">아파트 기준</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <i className="ri-bank-line text-xl text-green-600"></i>
-                        </div>
-                        <h4 className="font-bold text-gray-900 mb-2">평균 보증금</h4>
-                        <div className="text-2xl font-bold text-green-600 mb-1">{analysisData.marketData.avgDeposit}만원</div>
-                        <p className="text-sm text-gray-500">아파트 기준</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <i className="ri-arrow-up-line text-xl text-orange-600"></i>
-                        </div>
-                        <h4 className="font-bold text-gray-900 mb-2">평균 인상률</h4>
-                        <div className="text-2xl font-bold text-orange-600 mb-1">{analysisData.marketData.recentIncreaseRate}%</div>
-                        <p className="text-sm text-gray-500">최근 6개월</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <h4 className="font-bold text-gray-900 mb-4">건물 유형별 시세 비교</h4>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                        <span className="font-medium text-gray-900">아파트</span>
-                        <div className="text-right">
-                          <div className="font-bold text-blue-600">85-95만원</div>
-                          <div className="text-sm text-gray-500">월세 범위</div>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                        <span className="font-medium text-gray-900">빌라/연립</span>
-                        <div className="text-right">
-                          <div className="font-bold text-blue-600">70-80만원</div>
-                          <div className="text-sm text-gray-500">월세 범위</div>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                        <span className="font-medium text-gray-900">원룸/투룸</span>
-                        <div className="text-right">
-                          <div className="font-bold text-blue-600">55-70만원</div>
-                          <div className="text-sm text-gray-500">월세 범위</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50 rounded-xl p-6">
-                    <h4 className="font-bold text-blue-800 mb-3">💡 내 계약 조건 분석</h4>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">현재 월세 수준</span>
-                        <span className="font-semibold text-green-600">시세 대비 적정</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">예상 인상률</span>
-                        <span className="font-semibold text-orange-600">{analysisData.marketData.recentIncreaseRate}% (동네 평균)</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">권장 협상 목표</span>
-                        <span className="font-semibold text-blue-600">{analysisData.marketData.recommendedIncreaseRate}% 이하</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* 정책 정보 탭 */}
               {activeTab === 'support' && (

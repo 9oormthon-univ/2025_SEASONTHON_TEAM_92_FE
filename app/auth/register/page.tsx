@@ -48,9 +48,32 @@ export default function RegisterPage() {
         password: formData.password
       });
       
-      // 성공 처리 로직 변경
-      toast.success('회원가입 성공! 로그인 페이지로 이동합니다.');
-      router.push('/auth/login');
+      // 회원가입 성공 후 자동 로그인 처리
+      toast.success('회원가입 성공! 자동으로 로그인합니다.');
+      
+      // 자동 로그인 시도
+      const loginResponse = await authApi.login({
+        email: formData.email,
+        password: formData.password
+      });
+      
+      if (loginResponse.token) {
+        // 로그인 성공 시 토큰과 사용자 정보 저장
+        localStorage.setItem('jwtToken', loginResponse.token);
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userEmail', formData.email);
+        localStorage.setItem('userNickname', formData.name);
+        localStorage.setItem('userId', loginResponse.id.toString());
+        
+        toast.success('로그인 완료! 온보딩을 시작합니다.');
+        
+        // 온보딩 페이지로 이동
+        router.push('/onboarding/location');
+      } else {
+        // 자동 로그인 실패 시 로그인 페이지로 이동
+        toast.error('자동 로그인에 실패했습니다. 수동으로 로그인해주세요.');
+        router.push('/auth/login');
+      }
       
     } catch (err: any) {
       console.error('Register error:', err);
@@ -68,7 +91,7 @@ export default function RegisterPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-4 mx-auto mb-4 border-blue-200 border-t-blue-600"></div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">계정을 생성하고 있습니다...</h2>
-          <p className="text-gray-600">잠시만 기다려주세요</p>
+          <p className="text-gray-600">회원가입 후 자동으로 로그인됩니다</p>
         </div>
       </div>
     );

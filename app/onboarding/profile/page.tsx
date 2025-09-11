@@ -93,6 +93,15 @@ function ProfileSetupComponent() {
       const response = await authApi.updateUser(payload);
       console.log('프로필 업데이트 응답:', response);
       
+      // localStorage에도 저장하여 프로필 페이지에서 사용할 수 있도록 함
+      localStorage.setItem('userDong', formData.dong);
+      localStorage.setItem('userBuilding', formData.building);
+      localStorage.setItem('userBuildingType', formData.buildingType);
+      localStorage.setItem('userContractType', formData.contractType);
+      localStorage.setItem('userSecurity', formData.security);
+      localStorage.setItem('userRent', formData.rent);
+      localStorage.setItem('userMaintenanceFee', formData.maintenanceFee);
+      
       toast.success('프로필이 성공적으로 저장되었습니다!');
       
       // 진단 페이지로 이동

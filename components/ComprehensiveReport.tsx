@@ -78,16 +78,21 @@ export default function ComprehensiveReport({ reportId, userId }: ComprehensiveR
       setIsLoading(true);
       setError('');
       
+      console.log('리포트 로드 시작, reportId:', reportId);
       const response = await reportApi.getReport(reportId!);
+      console.log('리포트 응답:', response);
+      
       if (response && response.success) {
         setReportData(response.data);
         setShareUrl(`${window.location.origin}/report/${reportId}`);
+        console.log('리포트 데이터 설정 완료');
       } else {
-        setError('리포트를 불러올 수 없습니다.');
+        console.error('리포트 로드 실패:', response);
+        setError(response?.message || '리포트를 불러올 수 없습니다.');
       }
     } catch (err: any) {
       console.error('Report load error:', err);
-      setError('리포트를 불러오는 중 오류가 발생했습니다.');
+      setError('리포트를 불러오는 중 오류가 발생했습니다: ' + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -292,18 +297,38 @@ export default function ComprehensiveReport({ reportId, userId }: ComprehensiveR
               <div className="space-y-4">
                 <h3 className="font-semibold text-gray-700 mb-3">인증 상태</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-3 ${reportData.contractSummary.gpsVerified ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-gray-700">GPS 위치 인증</span>
-                    {reportData.contractSummary.gpsVerified && (
-                      <i className="ri-check-line text-green-600 ml-2"></i>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className={`w-3 h-3 rounded-full mr-3 ${reportData.contractSummary.gpsVerified ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                      <span className="text-gray-700">GPS 위치 인증</span>
+                    </div>
+                    {reportData.contractSummary.gpsVerified ? (
+                      <div className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                        <i className="ri-check-line mr-1"></i>
+                        인증됨
+                      </div>
+                    ) : (
+                      <div className="flex items-center bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                        <i className="ri-close-line mr-1"></i>
+                        미인증
+                      </div>
                     )}
                   </div>
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-3 ${reportData.contractSummary.contractVerified ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-gray-700">계약서/고지서 인증</span>
-                    {reportData.contractSummary.contractVerified && (
-                      <i className="ri-check-line text-green-600 ml-2"></i>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className={`w-3 h-3 rounded-full mr-3 ${reportData.contractSummary.contractVerified ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                      <span className="text-gray-700">계약서/고지서 인증</span>
+                    </div>
+                    {reportData.contractSummary.contractVerified ? (
+                      <div className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                        <i className="ri-check-line mr-1"></i>
+                        인증됨
+                      </div>
+                    ) : (
+                      <div className="flex items-center bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                        <i className="ri-close-line mr-1"></i>
+                        미인증
+                      </div>
                     )}
                   </div>
                 </div>
@@ -452,28 +477,109 @@ export default function ComprehensiveReport({ reportId, userId }: ComprehensiveR
           <h2 className="text-3xl font-bold text-gray-900 mb-6">🎯 협상 카드 (자동 생성)</h2>
           
           <div className="space-y-6">
-            {reportData.negotiationCards.map((card, index) => (
-              <div key={index} className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    {card.priority}순위: {card.title}
-                  </h3>
-                  <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
-                    우선순위 {card.priority}
-                  </span>
+            {/* 백엔드에서 생성된 협상 카드 */}
+            {reportData.negotiationCards && reportData.negotiationCards.length > 0 ? (
+              reportData.negotiationCards.map((card, index) => (
+                <div key={index} className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {card.priority}순위: {card.title}
+                    </h3>
+                    <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                      우선순위 {card.priority}
+                    </span>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <p className="text-gray-700 leading-relaxed">{card.recommendationScript}</p>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <span className="font-semibold">💡 추천 멘트:</span> "{card.recommendationScript}"
+                    </p>
+                  </div>
                 </div>
-                
-                <div className="bg-white rounded-lg p-4 mb-4">
-                  <p className="text-gray-700 leading-relaxed">{card.recommendationScript}</p>
+              ))
+            ) : (
+              /* 하드코딩된 기본 협상 카드 */
+              <>
+                {/* 1순위: 시설 개선 요구 */}
+                <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      1순위: 시설 개선 요구
+                    </h3>
+                    <span className="bg-red-200 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                      최우선
+                    </span>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <p className="text-gray-700 leading-relaxed">
+                      임대인에게 법적 수선 의무가 있는 항목들을 우선적으로 개선 요구하세요. 
+                      수압 문제, 곰팡이 발생, 난방 시설 등은 임대인의 책임 범위에 해당합니다.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <span className="font-semibold">💡 추천 멘트:</span> "수압 문제는 우리 건물 평균 대비 50% 낮습니다. 수선 의무가 있으니 보일러/배관 점검을 요구하세요."
+                    </p>
+                  </div>
                 </div>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
-                    <span className="font-semibold">💡 추천 멘트:</span> "{card.recommendationScript}"
-                  </p>
+
+                {/* 2순위: 월세 조정 요구 */}
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      2순위: 월세 조정 요구
+                    </h3>
+                    <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                      차선책
+                    </span>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <p className="text-gray-700 leading-relaxed">
+                      구조적 문제로 해결이 어려운 항목들(층간소음, 주차 문제 등)을 근거로 
+                      월세 인상률을 동네 평균보다 낮게 조정하거나 동결을 요구하세요.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <span className="font-semibold">💡 추천 멘트:</span> "층간소음 문제로 수면에 방해를 받고 있습니다. 이런 구조적 문제를 고려해 월세 인상률을 동네 평균보다 낮게 조정해주세요."
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+
+                {/* 3순위: 관리비 검증 */}
+                <div className="bg-green-50 border-l-4 border-green-500 rounded-lg p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      3순위: 관리비 검증
+                    </h3>
+                    <span className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                      검증
+                    </span>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <p className="text-gray-700 leading-relaxed">
+                      관리비가 동네 평균보다 높다면 상세 내역을 요구하고, 
+                      불필요한 항목이 있다면 삭제를 요구하세요.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <span className="font-semibold">💡 추천 멘트:</span> "관리비가 동네 평균보다 높습니다. 상세 내역을 확인하고 불필요한 항목이 있다면 조정해주세요."
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </section>
 

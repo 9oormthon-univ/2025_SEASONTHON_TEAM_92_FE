@@ -98,6 +98,7 @@ export default function DiagnosisPage() {
       // 진단 완료 플래그 설정
       localStorage.setItem('diagnosis_completed', 'true');
       
+      // 진단 결과 페이지로 이동하되, 프로필로 돌아갈 수 있는 옵션 제공
       router.push('/diagnosis/results');
 
     } catch (err: any) {

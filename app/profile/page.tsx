@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { authApi, diagnosisApi } from '../../lib/api';
+import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -13,38 +15,166 @@ export default function ProfilePage() {
     location: '',
     buildingName: '',
     monthsLived: '',
-    role: 'tenant'
+    role: 'tenant',
+    buildingType: '',
+    contractType: '',
+    security: '',
+    rent: '',
+    maintenanceFee: '',
+    gpsVerified: false,
+    contractVerified: false,
+    diagnosisCompleted: false,
+    diagnosisScore: null,
+    lastDiagnosisDate: null
   });
   const [tempProfileData, setTempProfileData] = useState(profileData);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // 페이지 포커스 시 데이터 새로고침
   useEffect(() => {
-    // 로그인 체크
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/auth/login');
-      return;
-    }
-
-    // 사용자 정보 로드
-    const email = localStorage.getItem('userEmail') || '';
-    const nickname = localStorage.getItem('userNickname') || email.split('@')[0];
-    const location = localStorage.getItem('userLocation') || '';
-    const buildingName = localStorage.getItem('userBuildingName') || '';
-    const monthsLived = localStorage.getItem('userMonthsLived') || '';
-    const role = localStorage.getItem('userRole') || 'tenant';
-
-    const userData = {
-      email,
-      nickname,
-      location,
-      buildingName,
-      monthsLived,
-      role
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        loadUserProfile();
+      }
     };
 
-    setProfileData(userData);
-    setTempProfileData(userData);
+    document.addEventListener('visibilitychange', handleFocus);
+    return () => document.removeEventListener('visibilitychange', handleFocus);
+  }, []);
+
+  const loadUserProfile = async () => {
+      try {
+        // 로그인 체크
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+          router.push('/auth/login');
+          return;
+        }
+
+        setIsLoading(true);
+
+        // 백엔드에서 사용자 정보 가져오기
+        const userProfile = await authApi.getCurrentUser();
+        console.log('프로필 데이터:', userProfile);
+
+        if (userProfile && userProfile.success) {
+          const userData = userProfile.data;
+          console.log('사용자 데이터 상세:', userData);
+          
+          const profileInfo = {
+            email: userData.email || '',
+            nickname: userData.name || userData.nickname || userData.email?.split('@')[0] || '',
+            location: userData.dong || userData.location || '',
+            buildingName: userData.building || userData.buildingName || '',
+            monthsLived: userData.monthsLived?.toString() || '',
+            role: userData.role || 'tenant',
+            buildingType: userData.buildingType || '',
+            contractType: userData.contractType || '',
+            security: userData.security?.toString() || '',
+            rent: userData.rent?.toString() || '',
+            maintenanceFee: userData.maintenanceFee?.toString() || '',
+            gpsVerified: userData.gpsVerified || false,
+            contractVerified: userData.contractVerified || false
+          };
+
+          // 진단 정보도 함께 가져오기
+          try {
+            const diagnosisResult = await diagnosisApi.getResult();
+            if (diagnosisResult && diagnosisResult.success && diagnosisResult.data) {
+              profileInfo.diagnosisCompleted = true;
+              profileInfo.diagnosisScore = diagnosisResult.data.totalScore || diagnosisResult.data.score;
+              profileInfo.lastDiagnosisDate = diagnosisResult.data.createdAt || diagnosisResult.data.date;
+              console.log('진단 결과:', diagnosisResult.data);
+            }
+          } catch (error) {
+            console.log('진단 결과 없음 또는 오류:', error);
+            // localStorage에서 진단 완료 여부 확인
+            const diagnosisCompleted = localStorage.getItem('diagnosis_completed') === 'true';
+            profileInfo.diagnosisCompleted = diagnosisCompleted;
+          }
+
+          setProfileData(profileInfo);
+          setTempProfileData(profileInfo);
+        } else {
+          // 백엔드에서 데이터를 가져올 수 없는 경우 localStorage 사용
+          const email = localStorage.getItem('userEmail') || '';
+          const nickname = localStorage.getItem('userNickname') || email.split('@')[0];
+          const location = localStorage.getItem('userLocation') || localStorage.getItem('userDong') || '';
+          const buildingName = localStorage.getItem('userBuildingName') || localStorage.getItem('userBuilding') || '';
+          const monthsLived = localStorage.getItem('userMonthsLived') || '';
+          const role = localStorage.getItem('userRole') || 'tenant';
+          const buildingType = localStorage.getItem('userBuildingType') || '';
+          const contractType = localStorage.getItem('userContractType') || '';
+          const security = localStorage.getItem('userSecurity') || '';
+          const rent = localStorage.getItem('userRent') || '';
+          const maintenanceFee = localStorage.getItem('userMaintenanceFee') || '';
+
+          const diagnosisCompleted = localStorage.getItem('diagnosis_completed') === 'true';
+          
+          const fallbackData = {
+            email,
+            nickname,
+            location,
+            buildingName,
+            monthsLived,
+            role,
+            buildingType,
+            contractType,
+            security,
+            rent,
+            maintenanceFee,
+            gpsVerified: false,
+            contractVerified: false,
+            diagnosisCompleted,
+            diagnosisScore: null,
+            lastDiagnosisDate: null
+          };
+
+          setProfileData(fallbackData);
+          setTempProfileData(fallbackData);
+        }
+      } catch (error) {
+        console.error('프로필 로드 실패:', error);
+        toast.error('프로필 정보를 불러오는데 실패했습니다.');
+        
+        // 에러 시 localStorage에서 기본 정보만 로드
+        const email = localStorage.getItem('userEmail') || '';
+        const nickname = localStorage.getItem('userNickname') || email.split('@')[0];
+        
+        const diagnosisCompleted = localStorage.getItem('diagnosis_completed') === 'true';
+        
+        const fallbackData = {
+          email,
+          nickname,
+          location: '',
+          buildingName: '',
+          monthsLived: '',
+          role: 'tenant',
+          buildingType: '',
+          contractType: '',
+          security: '',
+          rent: '',
+          maintenanceFee: '',
+          gpsVerified: false,
+          contractVerified: false,
+          diagnosisCompleted,
+          diagnosisScore: null,
+          lastDiagnosisDate: null
+        };
+
+        setProfileData(fallbackData);
+        setTempProfileData(fallbackData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserProfile();
   }, [router]);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -56,19 +186,48 @@ export default function ProfilePage() {
     setTempProfileData(profileData);
   };
 
-  const handleSave = () => {
-    // 로컬 스토리지에 저장
-    localStorage.setItem('userNickname', tempProfileData.nickname);
-    localStorage.setItem('userLocation', tempProfileData.location);
-    localStorage.setItem('userBuildingName', tempProfileData.buildingName);
-    localStorage.setItem('userMonthsLived', tempProfileData.monthsLived);
-    localStorage.setItem('userRole', tempProfileData.role);
+  const handleSave = async () => {
+    try {
+      // 백엔드에 프로필 업데이트 요청
+      const updateData = {
+        name: tempProfileData.nickname,
+        dong: tempProfileData.location,
+        building: tempProfileData.buildingName,
+        buildingType: tempProfileData.buildingType,
+        contractType: tempProfileData.contractType,
+        security: tempProfileData.security ? parseInt(tempProfileData.security) : null,
+        rent: tempProfileData.rent ? parseInt(tempProfileData.rent) : null,
+        maintenanceFee: tempProfileData.maintenanceFee ? parseInt(tempProfileData.maintenanceFee) : null
+      };
 
-    setProfileData(tempProfileData);
-    setIsEditing(false);
-    
-    // 성공 메시지
-    alert('프로필이 성공적으로 업데이트되었습니다!');
+      const response = await authApi.updateUser(updateData);
+      
+      if (response && response.success) {
+        // 로컬 스토리지에도 저장
+        localStorage.setItem('userNickname', tempProfileData.nickname);
+        localStorage.setItem('userLocation', tempProfileData.location);
+        localStorage.setItem('userDong', tempProfileData.location);
+        localStorage.setItem('userBuildingName', tempProfileData.buildingName);
+        localStorage.setItem('userBuilding', tempProfileData.buildingName);
+        localStorage.setItem('userMonthsLived', tempProfileData.monthsLived);
+        localStorage.setItem('userRole', tempProfileData.role);
+        localStorage.setItem('userBuildingType', tempProfileData.buildingType);
+        localStorage.setItem('userContractType', tempProfileData.contractType);
+        localStorage.setItem('userSecurity', tempProfileData.security);
+        localStorage.setItem('userRent', tempProfileData.rent);
+        localStorage.setItem('userMaintenanceFee', tempProfileData.maintenanceFee);
+
+        setProfileData(tempProfileData);
+        setIsEditing(false);
+        
+        toast.success('프로필이 성공적으로 업데이트되었습니다!');
+      } else {
+        toast.error('프로필 업데이트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('프로필 업데이트 실패:', error);
+      toast.error('프로필 업데이트 중 오류가 발생했습니다.');
+    }
   };
 
   const handleLogout = () => {
@@ -130,17 +289,29 @@ export default function ProfilePage() {
           <div className="p-8">
             <div className="flex justify-between items-center mb-6">
               <h4 className="text-xl font-bold text-gray-900">기본 정보</h4>
-              {!isEditing ? (
-                <button
-                  onClick={handleEdit}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  <div className="flex items-center">
-                    <i className="ri-edit-line mr-2"></i>
-                    편집하기
-                  </div>
-                </button>
-              ) : (
+              <div className="flex space-x-3">
+                {!isEditing ? (
+                  <>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      <div className="flex items-center">
+                        <i className="ri-refresh-line mr-2"></i>
+                        새로고침
+                      </div>
+                    </button>
+                    <button
+                      onClick={handleEdit}
+                      className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      <div className="flex items-center">
+                        <i className="ri-edit-line mr-2"></i>
+                        편집하기
+                      </div>
+                    </button>
+                  </>
+                ) : (
                 <div className="flex space-x-3">
                   <button
                     onClick={handleCancel}
@@ -268,6 +439,183 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  건물 유형
+                </label>
+                {isEditing ? (
+                  <div className="relative">
+                    <select
+                      value={tempProfileData.buildingType}
+                      onChange={(e) => setTempProfileData({...tempProfileData, buildingType: e.target.value})}
+                      className="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm cursor-pointer"
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="아파트">아파트</option>
+                      <option value="빌라">빌라</option>
+                      <option value="연립">연립</option>
+                      <option value="원룸">원룸</option>
+                      <option value="투룸">투룸</option>
+                      <option value="오피스텔">오피스텔</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <i className="ri-arrow-down-s-line text-gray-400"></i>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    {profileData.buildingType || '설정되지 않음'}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  계약 유형
+                </label>
+                {isEditing ? (
+                  <div className="relative">
+                    <select
+                      value={tempProfileData.contractType}
+                      onChange={(e) => setTempProfileData({...tempProfileData, contractType: e.target.value})}
+                      className="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm cursor-pointer"
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="월세">월세</option>
+                      <option value="전세">전세</option>
+                      <option value="반전세">반전세</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <i className="ri-arrow-down-s-line text-gray-400"></i>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    {profileData.contractType || '설정되지 않음'}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  보증금 (만원)
+                </label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={tempProfileData.security}
+                    onChange={(e) => setTempProfileData({...tempProfileData, security: e.target.value})}
+                    placeholder="예: 1000"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                ) : (
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    {profileData.security ? `${profileData.security}만원` : '설정되지 않음'}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  월세 (만원)
+                </label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={tempProfileData.rent}
+                    onChange={(e) => setTempProfileData({...tempProfileData, rent: e.target.value})}
+                    placeholder="예: 60"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                ) : (
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    {profileData.rent ? `${profileData.rent}만원` : '설정되지 않음'}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  관리비 (만원)
+                </label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={tempProfileData.maintenanceFee}
+                    onChange={(e) => setTempProfileData({...tempProfileData, maintenanceFee: e.target.value})}
+                    placeholder="예: 10"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                ) : (
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    {profileData.maintenanceFee ? `${profileData.maintenanceFee}만원` : '설정되지 않음'}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 진단 정보 섹션 */}
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <h4 className="text-xl font-bold text-gray-900 mb-4">진단 정보</h4>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    진단 완료 여부
+                  </label>
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                    {profileData.diagnosisCompleted ? (
+                      <div className="flex items-center text-green-600">
+                        <i className="ri-check-circle-fill mr-2"></i>
+                        완료됨
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-orange-600">
+                        <i className="ri-time-line mr-2"></i>
+                        미완료
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {profileData.diagnosisCompleted && (
+                  <>
+                    {profileData.diagnosisScore && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          진단 점수
+                        </label>
+                        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                          {profileData.diagnosisScore}점
+                        </div>
+                      </div>
+                    )}
+                    
+                    {profileData.lastDiagnosisDate && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          마지막 진단일
+                        </label>
+                        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                          {new Date(profileData.lastDiagnosisDate).toLocaleDateString('ko-KR')}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              
+              {!profileData.diagnosisCompleted && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-center text-blue-800">
+                    <i className="ri-information-line mr-2"></i>
+                    <span className="text-sm font-medium">아직 진단을 완료하지 않으셨습니다.</span>
+                  </div>
+                  <p className="text-sm text-blue-600 mt-1">
+                    정확한 분석을 위해 진단을 완료해주세요.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Quick Links */}

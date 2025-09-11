@@ -238,6 +238,15 @@ export default function DiagnosisResultsPage() {
                   주간 미션 참여하기
                 </div>
               </button>
+              
+              <Link href="/profile">
+                <button className="bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-700 transition-colors cursor-pointer whitespace-nowrap">
+                  <div className="flex items-center justify-center">
+                    <i className="ri-user-line mr-2"></i>
+                    내 프로필 보기
+                  </div>
+                </button>
+              </Link>
             </div>
           </div>
         </div>
