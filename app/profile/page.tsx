@@ -70,10 +70,28 @@ export default function ProfilePage() {
           contractVerified: userData.contractVerified,
         };
       } else {
-        // 사용자 정보 로드 실패 시 로그인 페이지로 리디렉션
-        toast.error('사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.');
-        router.push('/auth/login');
-        return;
+        // 사용자 정보 로드 실패 시 임시 데이터 사용 (개발용)
+        console.error('사용자 정보 로드 실패:', userRes);
+        console.log('임시 데이터로 프로필 표시');
+        
+        const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+        const userNickname = localStorage.getItem('userNickname') || '사용자';
+        
+        userProfile = {
+          email: userEmail,
+          name: userNickname,
+          dong: '임시 지역',
+          building: '임시 건물',
+          buildingType: '아파트',
+          contractType: '월세',
+          security: '1000',
+          rent: '50',
+          maintenanceFee: '10',
+          gpsVerified: false,
+          contractVerified: false,
+        };
+        
+        toast.info('백엔드 연결이 원활하지 않습니다. 임시 데이터를 표시합니다.');
       }
 
       // 진단 결과 처리
@@ -92,7 +110,14 @@ export default function ProfilePage() {
     } catch (error) {
       console.error('프로필 로드 실패:', error);
       toast.error('프로필 정보를 불러오는데 실패했습니다.');
-      router.push('/'); // 에러 발생 시 홈으로 이동
+      
+      // 로그인 상태 확인 후 적절한 페이지로 리다이렉트
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      if (!isLoggedIn) {
+        router.push('/auth/login');
+      } else {
+        router.push('/'); // 에러 발생 시 홈으로 이동
+      }
     } finally {
       setIsLoading(false);
     }
