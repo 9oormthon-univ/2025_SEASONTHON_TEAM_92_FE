@@ -823,47 +823,108 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Usage Section */}
+      {/* How It Works Section */}
       <section id="usage" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-gray-900">
-              사용법
+              어떻게 작동하나요?
             </h2>
             <p className="text-xl text-gray-600">
-              간단한 3단계로 월세 협상을 시작하세요
+              복잡한 설명 대신, 간단한 3단계로 시작하세요
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-6">
-                1
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-user-add-line text-3xl text-blue-600"></i>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">정보 입력</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">1. 정보 입력</h3>
               <p className="text-gray-600">
-                현재 거주 중인 건물과 월세 정보를 입력합니다
+                3분만에 내 계약 정보와 거주 환경을 간단히 입력해요.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-6">
-                2
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-bar-chart-line text-3xl text-green-600"></i>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">분석 결과</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">2. 데이터 분석</h3>
               <p className="text-gray-600">
-                AI가 시장 데이터를 분석하여 적정 월세를 제시합니다
+                내 데이터와 이웃, 공공 데이터를 실시간으로 비교 분석해요.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-6">
-                3
+              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-file-text-line text-3xl text-purple-600"></i>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">협상 진행</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">3. 리포트 확인</h3>
               <p className="text-gray-600">
-                제공된 자료를 바탕으로 집주인과 협상을 진행합니다
+                월세 협상에 바로 활용할 수 있는 맞춤형 리포트를 받아요.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Problem & Solution Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold mb-6 text-gray-900">
+                깜깜이 월세 계약,<br />
+                혼자서는 막막하셨죠?
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                정보 비대칭으로 인한 불안감, 혼자서는 막막한 협상...<br />
+                이런 문제들을 해결해드립니다.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-close-line text-red-600"></i>
+                  </div>
+                  <span className="text-gray-700">정보 부족으로 비싼 월세를 내고 있나요?</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-close-line text-red-600"></i>
+                  </div>
+                  <span className="text-gray-700">혼자서는 협상이 어렵다고 느끼시나요?</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-close-line text-red-600"></i>
+                  </div>
+                  <span className="text-gray-700">객관적인 근거 없이 협상하고 계신가요?</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-white rounded-2xl shadow-lg p-8">
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
+                  데이터가 당신의 협상 무기가 됩니다
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                      <i className="ri-user-line text-2xl text-gray-600"></i>
+                    </div>
+                    <i className="ri-arrow-right-line text-2xl text-gray-400"></i>
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center ml-4">
+                      <i className="ri-group-line text-2xl text-blue-600"></i>
+                    </div>
+                  </div>
+                  <p className="text-gray-600">
+                    개인(임차인)이 집단(네트워크)의 데이터를 통해<br />
+                    힘을 얻는 과정을 시각적으로 보여줍니다.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -933,30 +994,83 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gray-800">
+      {/* Trust & Security Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">
+              신뢰와 데이터 보안
+            </h2>
+            <p className="text-xl text-gray-600">
+              사용자가 가질 수 있는 개인정보 우려를 해소시켜드립니다
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-shield-check-line text-3xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">익명 처리</h3>
+              <p className="text-gray-600">
+                모든 데이터는 익명으로 처리돼요.<br />
+                개인 신원이 노출되지 않습니다.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-map-pin-line text-3xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">주소 보호</h3>
+              <p className="text-gray-600">
+                상세 주소는 리포트에 절대 노출되지 않아요.<br />
+                동 단위로만 표시됩니다.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-database-2-line text-3xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">목적 제한</h3>
+              <p className="text-gray-600">
+                수집된 정보는 오직 비교 분석에만 사용돼요.<br />
+                다른 용도로 활용되지 않습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-red-600 to-red-700">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-6">
-            지금 바로 시작하세요
+            지금 바로 시작해서,<br />
+            다음 월세 협상에서 우위를 점하세요
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            공정한 월세를 위한 첫걸음을 내딛어보세요
+          <p className="text-xl text-red-100 mb-8">
+            이웃의 데이터로 확인하세요. 혹시 나만 월세를 비싸게 내고 있나요?
           </p>
           {!isLoggedIn ? (
             <Link
               href="/auth/register"
-              className="bg-white text-gray-800 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all cursor-pointer inline-block"
+              className="bg-white text-red-600 px-10 py-5 rounded-xl text-xl font-bold hover:bg-gray-100 transition-all cursor-pointer inline-block shadow-lg"
             >
-              무료로 시작하기
+              내 협상 리포트 무료로 받기
             </Link>
           ) : (
             <Link
               href="/dashboard"
-              className="bg-white text-gray-800 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all cursor-pointer inline-block"
+              className="bg-white text-red-600 px-10 py-5 rounded-xl text-xl font-bold hover:bg-gray-100 transition-all cursor-pointer inline-block shadow-lg"
             >
-              리포트 생성하기
+              내 협상 리포트 생성하기
             </Link>
           )}
+          <div className="mt-6 text-red-200 text-sm">
+            ⚡ 3분만에 시작 • 💯 무료 • 🔒 개인정보 보호
+          </div>
         </div>
       </section>
 

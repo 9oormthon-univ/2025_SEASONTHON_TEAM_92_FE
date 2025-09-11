@@ -35,6 +35,13 @@ export default function ProfilePage() {
   const loadUserProfile = useCallback(async () => {
     setIsLoading(true);
     try {
+      // 로그인 체크
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      if (!isLoggedIn) {
+        router.push('/auth/login');
+        return;
+      }
+
       // 두 API를 동시에 호출하여 효율성 증대
       const [userRes, diagnosisRes] = await Promise.allSettled([
         authApi.getCurrentUser(),

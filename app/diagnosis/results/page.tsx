@@ -129,7 +129,7 @@ export default function DiagnosisResultsPage() {
                 <div className="text-center">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-green-600">
-                      {diagnosisResult.summary?.buildingAverage || 0}
+                      {(diagnosisResult.summary?.buildingAverage || 0).toFixed(2)}
                     </span>
                   </div>
                   <h4 className="font-bold text-gray-900 mb-1">건물 평균</h4>
@@ -139,7 +139,7 @@ export default function DiagnosisResultsPage() {
                 <div className="text-center">
                   <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-orange-600">
-                      {diagnosisResult.summary?.neighborhoodAverage || 0}
+                      {(diagnosisResult.summary?.neighborhoodAverage || 0).toFixed(2)}
                     </span>
                   </div>
                   <h4 className="font-bold text-gray-900 mb-1">동네 평균</h4>
@@ -172,13 +172,13 @@ export default function DiagnosisResultsPage() {
                           <div className="bg-white rounded-lg p-4">
                             <div className="flex justify-between items-center">
                               <span className="text-gray-600">건물 평균</span>
-                              <span className="font-semibold text-green-600">{category.buildingAverage || 0}</span>
+                              <span className="font-semibold text-green-600">{(category.buildingAverage || 0).toFixed(2)}</span>
                             </div>
                           </div>
                           <div className="bg-white rounded-lg p-4">
                             <div className="flex justify-between items-center">
                               <span className="text-gray-600">동네 평균</span>
-                              <span className="font-semibold text-orange-600">{category.neighborhoodAverage || 0}</span>
+                              <span className="font-semibold text-orange-600">{(category.neighborhoodAverage || 0).toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
