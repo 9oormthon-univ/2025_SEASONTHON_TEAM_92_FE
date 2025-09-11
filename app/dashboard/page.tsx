@@ -45,19 +45,19 @@ export default function DashboardPage() {
         }
 
         // Fetch user profile from API
-        const userProfile = await authApi.getCurrentUser(jwtToken);
+        const userProfile = await authApi.getCurrentUser();
         console.log('사용자 프로필 데이터:', userProfile);
 
-        // Map API response to userData state
+        // 백엔드 응답 구조에 맞게 데이터 매핑
         setUserData({
-          id: userProfile.id?.toString() || '',
-          name: userProfile.nickname || userProfile.email?.split('@')[0] || '사용자',
-          building: userProfile.buildingName || '건물명',
-          location: userProfile.neighborhood || userProfile.address || '위치',
-          monthsLived: userProfile.monthsLived || 0,
-          overallScore: userProfile.overallScore || 0,
-          buildingAverage: userProfile.buildingAverage || 0,
-          neighborhoodAverage: userProfile.neighborhoodAverage || 0
+          id: (userProfile as any).id?.toString() || '',
+          name: (userProfile as any).name || (userProfile as any).email?.split('@')[0] || '사용자',
+          building: (userProfile as any).buildingName || '건물명',
+          location: (userProfile as any).neighborhood || (userProfile as any).address || '위치',
+          monthsLived: (userProfile as any).monthsLived || 0,
+          overallScore: (userProfile as any).overallScore || 0,
+          buildingAverage: (userProfile as any).buildingAverage || 0,
+          neighborhoodAverage: (userProfile as any).neighborhoodAverage || 0
         });
 
       } catch (error) {
@@ -159,7 +159,13 @@ export default function DashboardPage() {
       // 1단계: 백엔드에 리포트 작성 요청 (POST)
       const reportContent = `사용자 ${userData.name}님의 거주지 ${userData.building}에서 겪고 있는 문제점들을 바탕으로 협상 리포트를 생성해주세요.`;
       
-      const createResponse = await fetch('https://www.jinwook.shop/report/create', {
+      // API 기본 URL 가져오기
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 
+        (process.env.NODE_ENV === 'production' 
+          ? 'https://2025seasonthonteam92be-production.up.railway.app' 
+          : 'http://localhost:8080');
+      
+      const createResponse = await fetch(`${baseURL}/report/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -208,7 +214,7 @@ export default function DashboardPage() {
       }
 
       // 2단계: 백엔드에서 작성한 리포트 불러오기 (GET)
-      const getResponse = await fetch(`https://www.jinwook.shop/report/${reportId}`, {
+      const getResponse = await fetch(`${baseURL}/report/${reportId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${jwtToken}`

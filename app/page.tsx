@@ -16,6 +16,7 @@ export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -136,6 +137,21 @@ export default function HomePage() {
     setShowSurpriseWeeklyMission(false);
   };
 
+  const handleShowLogin = () => {
+    setShowLoginModal(true);
+  };
+
+  const handleCloseLogin = () => {
+    setShowLoginModal(false);
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    setIsLoggedIn(true);
+    // 페이지 새로고침하여 로그인 상태 반영
+    window.location.reload();
+  };
+
   // 빠른 페이지 이동을 위한 프리로드 함수
   const handleLoginClick = () => {
     try {
@@ -236,12 +252,12 @@ export default function HomePage() {
                 </div>
               ) : (
                 <>
-                  <Link
-                    href="/auth/login"
+                  <button
+                    onClick={handleShowLogin}
                     className={`px-4 py-2 font-medium rounded-lg transition-all cursor-pointer hover:opacity-80 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
                   >
                     로그인
-                  </Link>
+                  </button>
                   <div className={`w-px h-4 ${isScrolled ? 'bg-gray-300' : 'bg-white bg-opacity-50'}`}></div>
                   <Link
                     href="/auth/register"
@@ -714,6 +730,96 @@ export default function HomePage() {
                 진단 시작하기 →
               </Link>
             </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-government-line text-2xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                맞춤형 정책 정보
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                청년 주거 지원 정책과 지역별 맞춤 지원사업을 찾아보세요
+              </p>
+              <Link 
+                href="/policy"
+                className="inline-block mt-4 text-blue-600 font-medium hover:text-blue-700 transition-colors"
+              >
+                정책 확인하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-database-2-line text-2xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                공공 데이터 조회
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                국토부 실거래가 데이터를 기반으로 한 객관적 시세 정보를 확인하세요
+              </p>
+              <Link 
+                href="/officetel"
+                className="inline-block mt-4 text-green-600 font-medium hover:text-green-700 transition-colors"
+              >
+                시세 조회하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-customer-service-2-line text-2xl text-red-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                분쟁 해결 기관
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                임대차 관련 분쟁 해결을 위한 전문 기관 정보를 찾아보세요
+              </p>
+              <Link 
+                href="/dispute"
+                className="inline-block mt-4 text-red-600 font-medium hover:text-red-700 transition-colors"
+              >
+                기관 찾기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-book-open-line text-2xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                임대차 관련 법령
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                임대차 관련 법령과 조항을 상황별로 검색하고 확인하세요
+              </p>
+              <Link 
+                href="/legal"
+                className="inline-block mt-4 text-purple-600 font-medium hover:text-purple-700 transition-colors"
+              >
+                법령 검색하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-information-line text-2xl text-yellow-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                상황별 정보 카드
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                현재 겪고 있는 상황에 맞는 종합 정보를 한 번에 확인하세요
+              </p>
+              <Link 
+                href="/info-card"
+                className="inline-block mt-4 text-yellow-600 font-medium hover:text-yellow-700 transition-colors"
+              >
+                정보 카드 보기 →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -901,6 +1007,46 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* 로그인 모달 */}
+      {showLoginModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleCloseLogin}
+        >
+          <div 
+            className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">로그인</h2>
+              <button
+                onClick={handleCloseLogin}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <i className="ri-close-line text-xl"></i>
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <Link
+                href="/auth/login"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                onClick={handleCloseLogin}
+              >
+                로그인하기
+              </Link>
+              <Link
+                href="/auth/register"
+                className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors text-center block"
+                onClick={handleCloseLogin}
+              >
+                회원가입하기
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

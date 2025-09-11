@@ -34,30 +34,45 @@ export default function ReportPage() {
         return;
       }
 
-      // OpenAI API를 활용한 리포트 생성
-      const response = await fetch('/api/report/generate', {
+      // 백엔드 API를 활용한 리포트 생성
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 
+        (process.env.NODE_ENV === 'production' 
+          ? 'https://2025seasonthonteam92be-production.up.railway.app' 
+          : 'http://localhost:8080');
+      
+      const response = await fetch(`${baseURL}/report/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`
         },
         body: JSON.stringify({
-          userId: userId,
-          jwtToken: jwtToken,
           reportContent: reportContent
         }),
       });
 
       const result = await response.json();
       
-      if (result.success && result.reportId) {
+      if (response.ok) {
+        // 백엔드에서 반환하는 reportId 처리
+        let reportId;
+        
+        if (typeof result === 'number') {
+          reportId = result;
+        } else if (result.reportId) {
+          reportId = result.reportId;
+        } else {
+          throw new Error('리포트 ID를 받지 못했습니다.');
+        }
+        
         toast.success('AI가 맞춤형 리포트를 생성했습니다!');
         
         // 생성된 리포트 조회
-        const reportResponse = await reportApi.getReport(result.reportId);
+        const reportResponse = await reportApi.getReport(reportId.toString());
         setReportData({
-          ...reportResponse,
-          reportId: result.reportId,
-          reportUrl: `${window.location.origin}/report/${result.reportId}`
+          ...reportResponse.data,
+          reportId: reportId,
+          reportUrl: `${window.location.origin}/report/${reportId}`
         });
       } else {
         setError(result.message || '리포트 생성에 실패했습니다.');

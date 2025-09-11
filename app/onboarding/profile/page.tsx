@@ -1,29 +1,58 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { authApi } from '../../../lib/api';
+import toast from 'react-hot-toast';
 
-export default function ProfileSetupPage() {
+function ProfileSetupComponent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [locationData, setLocationData] = useState({ lat: 0, lon: 0 });
   const [formData, setFormData] = useState({
-    address: '',
-    buildingName: '',
+    dong: '',
+    detailAddress: '',
+    building: '',
     buildingType: '',
-    contractType: 'monthly',
-    deposit: '',
-    monthlyRent: '',
+    contractType: '월세', // 기본값
+    security: '', // 보증금
+    rent: '', // 월세
     maintenanceFee: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const dong = searchParams.get('dong');
+    const lat = searchParams.get('lat');
+    const lon = searchParams.get('lon');
+
+    if (dong && lat && lon) {
+      setFormData(prev => ({ ...prev, dong }));
+      setLocationData({ lat: parseFloat(lat), lon: parseFloat(lon) });
+    } else {
+      toast.error('위치 정보가 올바르지 않습니다. 이전 단계로 돌아가 다시 시도해주세요.');
+      router.push('/onboarding/location');
+    }
+  }, [searchParams, router]);
+
   const buildingTypes = [
-    { value: 'apartment', label: '아파트' },
-    { value: 'officetel', label: '오피스텔' },
-    { value: 'villa', label: '빌라/연립' }
+    { value: '아파트', label: '아파트' },
+    { value: '오피스텔', label: '오피스텔' },
+    { value: '빌라', label: '빌라/연립' }
   ];
+
+  const contractTypes = [
+    { value: '월세', label: '월세' },
+    { value: '전세', label: '전세' },
+  ];
+
+  const parseNumber = (value: string) => {
+    return parseInt(value.replace(/[^0-9]/g, ''), 10) || 0;
+  };
 
   const formatNumber = (value: string) => {
     const number = value.replace(/[^0-9]/g, '');
@@ -31,23 +60,20 @@ export default function ProfileSetupPage() {
     return parseInt(number).toLocaleString();
   };
 
-  const handleNumberChange = (field: string, value: string) => {
+  const handleNumberChange = (field: keyof typeof formData, value: string) => {
     const formatted = formatNumber(value);
-    setFormData({...formData, [field]: formatted});
+    setFormData(prev => ({ ...prev, [field]: formatted }));
   };
 
   const isFormValid = () => {
-    return formData.address && 
-           formData.buildingName &&
-           formData.buildingType && 
-           formData.deposit && 
-           formData.monthlyRent;
+    return formData.dong && formData.building && formData.buildingType && formData.contractType && formData.security;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) {
-      setError('모든 필수 필드를 입력해주세요.');
+      setError('필수 필드를 모두 입력해주세요.');
+      toast.error('필수 필드를 모두 입력해주세요.');
       return;
     }
 
@@ -55,34 +81,27 @@ export default function ProfileSetupPage() {
     setError('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const payload = {
+        ...formData,
+        security: parseNumber(formData.security),
+        rent: parseNumber(formData.rent),
+        maintenanceFee: parseNumber(formData.maintenanceFee),
+        latitude: locationData.lat,
+        longitude: locationData.lon,
+      };
+
+      const response = await authApi.updateUser(payload);
+      console.log('프로필 업데이트 응답:', response);
       
-      // Complete registration process
-      const tempEmail = localStorage.getItem('temp_userEmail');
-      const tempNickname = localStorage.getItem('temp_userNickname');
-      const tempRole = localStorage.getItem('temp_userRole');
+      toast.success('프로필이 성공적으로 저장되었습니다!');
       
-      if (tempEmail && tempNickname) {
-        // Set user as logged in
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', tempEmail);
-        localStorage.setItem('userNickname', tempNickname);
-        localStorage.setItem('userRole', tempRole || 'tenant');
-        
-        // Clear temporary data
-        localStorage.removeItem('temp_userEmail');
-        localStorage.removeItem('temp_userNickname');
-        localStorage.removeItem('temp_userRole');
-        
-        // Set onboarding completed flag to show diagnosis prompt
-        localStorage.setItem('onboarding_completed', 'true');
-      }
-      
-      // Redirect to main page
-      router.push('/');
-    } catch (err) {
-      setError('프로필 설정 중 오류가 발생했습니다.');
+      // 진단 페이지로 이동
+      router.push('/diagnosis');
+
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || '프로필 설정 중 오류가 발생했습니다.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +112,7 @@ export default function ProfileSetupPage() {
       <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세 공동협약</h1>
+            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
           </Link>
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
@@ -108,75 +127,41 @@ export default function ProfileSetupPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 거주지 주소 섹션 */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                거주지 주소
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">거주지 정보</label>
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="district" className="block text-xs text-gray-500 mb-1">
-                    구/동 (자동 입력됨)
-                  </label>
-                  <input
-                    id="district"
-                    name="district"
-                    type="text"
-                    disabled
-                    className="appearance-none relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-500 rounded-lg bg-gray-100 text-sm"
-                    value="강남구 역삼동"
-                  />
+                  <label htmlFor="dong" className="block text-xs text-gray-500 mb-1">구/동 (GPS 인증 완료)</label>
+                  <input id="dong" name="dong" type="text" readOnly value={formData.dong} className="appearance-none block w-full px-4 py-3 border border-gray-200 text-gray-500 rounded-lg bg-gray-100 text-sm cursor-not-allowed" />
                 </div>
-
                 <div>
-                  <label htmlFor="address" className="block text-xs text-gray-500 mb-1">
-                    세부 주소 *
-                  </label>
-                  <input
-                    id="address"
-                    name="address"
-                    type="text"
-                    required
-                    className="appearance-none relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors duration-200"
-                    placeholder="예: 역삼로 123"
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  />
+                  <label htmlFor="building" className="block text-xs text-gray-500 mb-1">건물명 *</label>
+                  <input id="building" name="building" type="text" required value={formData.building} onChange={(e) => setFormData({...formData, building: e.target.value})} className="appearance-none block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: OO빌라, XX아파트" />
                 </div>
-
-                <div>
-                  <label htmlFor="buildingName" className="block text-xs text-gray-500 mb-1">
-                    건물명 *
-                  </label>
-                  <input
-                    id="buildingName"
-                    name="buildingName"
-                    type="text"
-                    required
-                    className="appearance-none relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors duration-200"
-                    placeholder="예: 역삼타워"
-                    value={formData.buildingName}
-                    onChange={(e) => setFormData({...formData, buildingName: e.target.value})}
-                  />
+                 <div>
+                  <label htmlFor="detailAddress" className="block text-xs text-gray-500 mb-1">상세 주소 (선택)</label>
+                  <input id="detailAddress" name="detailAddress" type="text" value={formData.detailAddress} onChange={(e) => setFormData({...formData, detailAddress: e.target.value})} className="appearance-none block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 101동 202호" />
                 </div>
               </div>
             </div>
 
             {/* 건물 유형 */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                건물 유형 *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">건물 유형 *</label>
               <div className="grid grid-cols-3 gap-3">
                 {buildingTypes.map((type) => (
-                  <button
-                    key={type.value}
-                    type="button"
-                    onClick={() => setFormData({...formData, buildingType: type.value})}
-                    className={`px-3 py-3 text-sm font-medium rounded-lg border-2 transition-colors whitespace-nowrap cursor-pointer ${
-                      formData.buildingType === type.value
-                        ? 'border-gray-500 bg-gray-50 text-gray-700'
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
-                  >
+                  <button key={type.value} type="button" onClick={() => setFormData({...formData, buildingType: type.value})} className={`px-3 py-3 text-sm font-medium rounded-lg border-2 transition-colors whitespace-nowrap cursor-pointer ${formData.buildingType === type.value ? 'border-gray-500 bg-gray-50 text-gray-800 font-bold' : 'border-gray-200 hover:border-gray-300 text-gray-700'}`}>
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 계약 유형 */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">계약 유형 *</label>
+              <div className="grid grid-cols-3 gap-3">
+                {contractTypes.map((type) => (
+                  <button key={type.value} type="button" onClick={() => setFormData({...formData, contractType: type.value})} className={`px-3 py-3 text-sm font-medium rounded-lg border-2 transition-colors whitespace-nowrap cursor-pointer ${formData.contractType === type.value ? 'border-gray-500 bg-gray-50 text-gray-800 font-bold' : 'border-gray-200 hover:border-gray-300 text-gray-700'}`}>
                     {type.label}
                   </button>
                 ))}
@@ -185,108 +170,43 @@ export default function ProfileSetupPage() {
 
             {/* 계약 조건 */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                계약 조건
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">계약 조건 *</label>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="deposit" className="block text-xs text-gray-500 mb-1">
-                    보증금 *
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="deposit"
-                      name="deposit"
-                      type="text"
-                      required
-                      className="appearance-none relative block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors duration-200"
-                      placeholder="0"
-                      value={formData.deposit}
-                      onChange={(e) => handleNumberChange('deposit', e.target.value)}
-                    />
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                      만원
-                    </span>
-                  </div>
+                  <label htmlFor="security" className="block text-xs text-gray-500 mb-1">보증금 (만원)</label>
+                  <div className="relative"><input id="security" name="security" type="text" required value={formData.security} onChange={(e) => handleNumberChange('security', e.target.value)} className="appearance-none block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 500" /><span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">만원</span></div>
                 </div>
-
-                <div>
-                  <label htmlFor="monthlyRent" className="block text-xs text-gray-500 mb-1">
-                    월세 *
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="monthlyRent"
-                      name="monthlyRent"
-                      type="text"
-                      required
-                      className="appearance-none relative block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors duration-200"
-                      placeholder="0"
-                      value={formData.monthlyRent}
-                      onChange={(e) => handleNumberChange('monthlyRent', e.target.value)}
-                    />
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                      만원
-                    </span>
+                {formData.contractType === '월세' && (
+                  <div>
+                    <label htmlFor="rent" className="block text-xs text-gray-500 mb-1">월세 (만원)</label>
+                    <div className="relative"><input id="rent" name="rent" type="text" required={formData.contractType === '월세'} value={formData.rent} onChange={(e) => handleNumberChange('rent', e.target.value)} className="appearance-none block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 50" /><span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">만원</span></div>
                   </div>
-                </div>
-
+                )}
                 <div>
-                  <label htmlFor="maintenanceFee" className="block text-xs text-gray-500 mb-1">
-                    관리비 (선택)
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="maintenanceFee"
-                      name="maintenanceFee"
-                      type="text"
-                      className="appearance-none relative block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors duration-200"
-                      placeholder="0"
-                      value={formData.maintenanceFee}
-                      onChange={(e) => handleNumberChange('maintenanceFee', e.target.value)}
-                    />
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                      만원
-                    </span>
-                  </div>
+                  <label htmlFor="maintenanceFee" className="block text-xs text-gray-500 mb-1">관리비 (만원, 선택)</label>
+                  <div className="relative"><input id="maintenanceFee" name="maintenanceFee" type="text" value={formData.maintenanceFee} onChange={(e) => handleNumberChange('maintenanceFee', e.target.value)} className="appearance-none block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 5" /><span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">만원</span></div>
                 </div>
               </div>
             </div>
 
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 rounded-lg p-4">
-                <p className="text-red-600 text-sm font-medium">{error}</p>
-              </div>
-            )}
+            {error && <div className="bg-red-50 border-l-4 border-red-400 rounded-lg p-4"><p className="text-red-600 text-sm font-medium">{error}</p></div>}
 
             <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading || !isFormValid()}
-                className="group relative w-full flex justify-center py-4 px-6 border border-transparent text-sm font-semibold rounded-xl text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer transition-all duration-200"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    저장 중...
-                  </div>
-                ) : (
-                  '프로필 저장 완료'
-                )}
+              <button type="submit" disabled={isLoading || !isFormValid()} className="group w-full flex justify-center py-4 px-6 border border-transparent text-sm font-semibold rounded-xl text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                {isLoading ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div> 저장 중...</> : '프로필 저장 및 서비스 시작'}
               </button>
             </div>
           </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <div className="flex items-center text-xs text-gray-500">
-              <div className="w-4 h-4 flex items-center justify-center mr-2">
-                <i className="ri-shield-check-line"></i>
-              </div>
-              <p>입력된 정보는 분석을 위해서만 사용되며 안전하게 보호됩니다.</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
+}
+
+export default function ProfileSetupPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ProfileSetupComponent />
+        </Suspense>
+    )
 }

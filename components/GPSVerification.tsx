@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LocationData, GPSVerificationResult, AddressInfo } from '@/types';
-import { gpsApi } from '@/lib/api';
+import { locationApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 interface GPSVerificationProps {
@@ -120,7 +120,7 @@ export default function GPSVerification({
         toleranceRadius: 100 // 100미터 허용 오차
       };
 
-      const apiResponse = await gpsApi.verifyLocation(verificationData);
+      const apiResponse = await locationApi.verifyLocation(verificationData);
       
       if (apiResponse.success && apiResponse.data) {
         const result: GPSVerificationResult = apiResponse.data;
@@ -173,7 +173,7 @@ export default function GPSVerification({
       };
 
       // 백엔드 API를 통한 정확도 개선 확인
-      const accuracyResponse = await gpsApi.getLocationAccuracy(improvedLocation);
+      const accuracyResponse = await locationApi.getAddressPreview(improvedLocation.latitude, improvedLocation.longitude);
       
       if (accuracyResponse.success && accuracyResponse.data) {
         const improvedData = accuracyResponse.data;

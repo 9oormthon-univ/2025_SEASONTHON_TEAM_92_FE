@@ -1,18 +1,41 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { locationApi } from '../../../lib/api';
+import toast from 'react-hot-toast';
+
+interface LocationData {
+  district: string;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+const extractDistrict = (fullAddress: string): string => {
+    const addressParts = fullAddress.split(' ');
+    if (addressParts.length >= 2) {
+        // 시/도 다음 구/군, 그 다음 동/읍/면을 찾는 로직
+        let district = '';
+        for (let i = 1; i < addressParts.length; i++) {
+            const part = addressParts[i];
+            if (part.endsWith('구') || part.endsWith('군')) {
+                district += part + ' ';
+            } else if (part.endsWith('동') || part.endsWith('읍') || part.endsWith('면')) {
+                district += part;
+                return district.trim();
+            }
+        }
+    }
+    return fullAddress; // 패턴을 못찾으면 전체 주소 반환
+};
 
 export default function LocationVerificationPage() {
   const router = useRouter();
-  const [location, setLocation] = useState({
-    district: ''
-  });
+  const [location, setLocation] = useState<LocationData>({ district: '', latitude: null, longitude: null });
   const [isLoading, setIsLoading] = useState(false);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<'none' | 'success' | 'error'>('none');
   const [error, setError] = useState('');
 
   const handleGetLocation = async () => {
@@ -21,62 +44,67 @@ export default function LocationVerificationPage() {
 
     if (!navigator.geolocation) {
       setError('위치 서비스가 지원되지 않는 브라우저입니다.');
+      toast.error('위치 서비스가 지원되지 않는 브라우저입니다.');
       setIsGettingLocation(false);
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        const { latitude, longitude } = position.coords;
+        const loadingToast = toast.loading('현재 위치를 주소로 변환 중입니다...');
+
         try {
-          // Simulate reverse geocoding
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          setLocation({
-            district: '강남구 역삼동'
-          });
-          setLocationStatus('success');
-        } catch (err) {
-          setLocationStatus('error');
-          setError('위치 정보를 가져올 수 없습니다. 수동으로 입력해주세요.');
+          const response = await locationApi.getAddressPreview(latitude, longitude);
+          toast.dismiss(loadingToast);
+
+          // 실제 응답 구조인 response.data.address를 사용하도록 수정
+          if (response && response.data && response.data.address) {
+            const fullAddress = response.data.address;
+            const district = extractDistrict(fullAddress);
+            setLocation({ district: district, latitude, longitude });
+            toast.success(`현재 위치: ${district}`);
+          } else {
+            throw new Error(response?.message || '주소 조회에 실패했습니다.');
+          }
+        } catch (err: any) {
+          toast.dismiss(loadingToast);
+          const errorMessage = err.response?.data?.message || '위치 정보를 주소로 변환하는데 실패했습니다.';
+          setError(errorMessage);
+          toast.error(errorMessage);
         } finally {
           setIsGettingLocation(false);
         }
       },
       (error) => {
-        setLocationStatus('error');
-        setError('위치 권한이 거부되었습니다. 수동으로 입력하거나 설정에서 위치 권한을 허용해주세요.');
+        setError('위치 권한이 거부되었습니다. 설정에서 위치 권한을 허용해주세요.');
+        toast.error('위치 권한이 거부되었습니다.');
         setIsGettingLocation(false);
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
-      }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
-    if (!location.district) {
-      setError('거주 동네를 입력해주세요.');
-      setIsLoading(false);
+    if (!location.district || location.latitude === null || location.longitude === null) {
+      setError('먼저 GPS로 우리 동네를 인증해주세요.');
+      toast.error('먼저 GPS로 우리 동네를 인증해주세요.');
       return;
     }
 
-    try {
-      // Simulate location verification API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirect to profile setup
-      router.push('/onboarding/profile');
-    } catch (err) {
-      setError('위치 인증 중 오류가 발생했습니다.');
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    
+    // 다음 페이지로 위치 정보를 쿼리 파라미터로 넘겨줍니다.
+    const query = new URLSearchParams({
+        dong: location.district,
+        lat: location.latitude.toString(),
+        lon: location.longitude.toString(),
+    }).toString();
+
+    router.push(`/onboarding/profile?${query}`);
   };
 
   return (
@@ -84,7 +112,7 @@ export default function LocationVerificationPage() {
       <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세 공동협약</h1>
+            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
           </Link>
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
@@ -117,54 +145,24 @@ export default function LocationVerificationPage() {
             </button>
           </div>
 
-          {locationStatus === 'success' && (
-            <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
-              <div className="flex items-center">
-                <div className="w-5 h-5 flex items-center justify-center mr-3">
-                  <i className="ri-check-circle-fill text-green-600"></i>
-                </div>
-                <span className="text-green-700 font-medium text-sm">동네 인증이 완료되었습니다!</span>
-              </div>
-            </div>
-          )}
-
-          {locationStatus === 'error' && (
-            <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
-              <div className="flex items-start">
-                <div className="w-5 h-5 flex items-center justify-center mr-3 mt-0.5">
-                  <i className="ri-error-warning-fill text-yellow-600"></i>
-                </div>
-                <div className="text-yellow-700">
-                  <p className="font-medium mb-1 text-sm">자동 인증에 실패했습니다</p>
-                  <p className="text-xs">아래에서 수동으로 입력해주세요</p>
-                </div>
-              </div>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="district" className="block text-sm font-semibold text-gray-700 mb-2">
-                거주 동네 인증
+                인증된 동네
               </label>
-              <div>
-                <label htmlFor="district" className="block text-xs text-gray-500 mb-1">
-                  구/군 + 동(洞) 단위 *
-                </label>
-                <input
-                  id="district"
-                  name="district"
-                  type="text"
-                  required
-                  className="appearance-none relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors duration-200"
-                  placeholder="예: 마포구 망원동"
-                  value={location.district}
-                  onChange={(e) => setLocation({district: e.target.value})}
-                />
-                <p className="mt-2 text-xs text-gray-500">
-                  동(洞) 단위까지만 입력하시면 됩니다. 상세 주소는 다음 단계에서 입력합니다.
-                </p>
-              </div>
+              <input
+                id="district"
+                name="district"
+                type="text"
+                required
+                readOnly
+                className="appearance-none relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm bg-gray-100 cursor-not-allowed"
+                placeholder="GPS 인증 버튼을 눌러주세요"
+                value={location.district}
+              />
+              <p className="mt-2 text-xs text-gray-500">
+                GPS 인증이 완료되면 다음 단계로 진행할 수 있습니다.
+              </p>
             </div>
 
             {error && (
@@ -176,16 +174,16 @@ export default function LocationVerificationPage() {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !location.district}
                 className="group relative w-full flex justify-center py-4 px-6 border border-transparent text-sm font-semibold rounded-xl text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    인증 처리 중...
+                    이동 중...
                   </div>
                 ) : (
-                  '동네 인증 완료'
+                  '프로필 설정 계속하기'
                 )}
               </button>
             </div>

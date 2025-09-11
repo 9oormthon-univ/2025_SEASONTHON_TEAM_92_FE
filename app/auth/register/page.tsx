@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
-    nickname: '',
+    name: '', // 'nickname'에서 'name'으로 변경
     password: '',
     confirmPassword: ''
   });
@@ -23,7 +23,7 @@ export default function RegisterPage() {
     setError('');
     
     // 입력 검증
-    if (!formData.email || !formData.nickname || !formData.password || !formData.confirmPassword) {
+    if (!formData.email || !formData.name || !formData.password || !formData.confirmPassword) {
       setError('모든 필드를 입력해주세요.');
       return;
     }
@@ -41,33 +41,22 @@ export default function RegisterPage() {
     setIsLoading(true);
     
     try {
-      // 실제 API 호출
-      const response = await authApi.register({
-        name: formData.nickname,
+      // API 호출 시 DTO에 맞게 name 필드 사용
+      await authApi.register({
+        name: formData.name,
         email: formData.email,
         password: formData.password
       });
       
-      // Backend returns just the user ID directly (number)
-      if (response && typeof response === 'number') {
-        // 회원가입 성공 처리
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', formData.email);
-        localStorage.setItem('userNickname', formData.nickname);
-        localStorage.setItem('userId', response.toString());
-        localStorage.setItem('onboarding_completed', 'true');
-        
-        toast.success('회원가입 성공!');
-        
-        // 온보딩 페이지로 이동
-        router.push('/onboarding/location');
-      } else {
-        setError('회원가입에 실패했습니다.');
-      }
+      // 성공 처리 로직 변경
+      toast.success('회원가입 성공! 로그인 페이지로 이동합니다.');
+      router.push('/auth/login');
       
     } catch (err: any) {
       console.error('Register error:', err);
-      setError(err.response?.data?.message || '회원가입 중 오류가 발생했습니다.');
+      const errorMessage = err.response?.data?.message || '회원가입 중 오류가 발생했습니다.';
+      setError(errorMessage);
+      toast.error(errorMessage); // 에러 발생 시에도 토스트 메시지 표시
     } finally {
       setIsLoading(false);
     }
@@ -118,18 +107,18 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="nickname" className="block text-sm font-medium text-gray-900 mb-2">
-              닉네임 *
+            <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
+              이름 * 
             </label>
             <input
-              id="nickname"
-              name="nickname"
+              id="name"
+              name="name"
               type="text"
               required
               className="appearance-none relative block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
-              placeholder="닉네임을 입력하세요"
-              value={formData.nickname}
-              onChange={(e) => setFormData({...formData, nickname: e.target.value})}
+              placeholder="이름을 입력하세요"
+              value={formData.name} // value와 onChange를 name으로 변경
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
           </div>
           

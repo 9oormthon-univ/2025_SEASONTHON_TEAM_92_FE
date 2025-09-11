@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { reportApi } from '@/lib/api';
-import { ReportResponse, ReportTemplate } from '@/types';
+import { ReportResponse } from '@/types';
 import ReportTemplate from '@/components/ReportTemplate';
 import { mockReportData } from '@/lib/mockData';
 
@@ -14,7 +14,7 @@ interface ReportPageProps {
 export default function ReportPage({ params }: ReportPageProps) {
   const [reportId, setReportId] = useState<string | null>(null);
   const [report, setReport] = useState<ReportResponse | null>(null);
-  const [reportTemplate, setReportTemplate] = useState<ReportTemplate | null>(null);
+  const [reportTemplate, setReportTemplate] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,15 +27,15 @@ export default function ReportPage({ params }: ReportPageProps) {
           const fetchReport = async () => {
             try {
               setLoading(true);
-              const response = await reportApi.getReport(Number(id));
-              if (response && response.data && response.data.reportContent) {
-                // Assuming reportContent is a stringified ReportResponse
-                const parsedReport: ReportResponse = JSON.parse(response.data.reportContent);
-                setReport(parsedReport);
+              const response = await reportApi.getReport(id);
+              console.log('리포트 상세 응답:', response);
+              
+              if (response && response.data) {
+                // 백엔드 응답 구조에 맞게 수정
+                setReport(response.data);
                 
-                // For now, use mock data for the template
-                // Later this will be replaced with actual data from the backend
-                setReportTemplate(mockReportData);
+                // 백엔드 데이터를 템플릿 형태로 변환
+                setReportTemplate(response.data);
               } else {
                 setError('Report data not found.');
               }

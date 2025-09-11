@@ -18,45 +18,46 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // 입력 검증
+    setError('');
+
     if (!formData.email || !formData.password) {
       setError('이메일과 비밀번호를 모두 입력해주세요.');
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('비밀번호는 8자 이상이어야 합니다.');
-      return;
-    }
-
     setIsLoading(true);
-    setError('');
 
     try {
-      // 실제 API 호출
       const response = await authApi.login(formData);
       
-      // Backend returns { id: number, token: string } directly
-      if (response && response.id && response.token) {
-        // 로그인 성공 처리
+      // 백엔드 응답 구조에 맞게 토큰 추출
+      // 백엔드에서 { id: number, token: string } 형태로 응답
+      const token = response?.token;
+
+      if (token) {
+        // JWT 토큰을 localStorage에 저장
+        localStorage.setItem('jwtToken', token);
+        
+        // 로그인 상태 표시
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
-        localStorage.setItem('userId', response.id.toString());
-        localStorage.setItem('jwtToken', response.token);
-        localStorage.setItem('just_logged_in', 'true');
         
-        toast.success('로그인 성공!');
+        toast.success('로그인 성공! 온보딩을 시작합니다.');
         
-        // Next.js router를 사용한 페이지 이동
-        router.push('/');
+        // 온보딩 페이지로 이동
+        router.push('/onboarding/location');
       } else {
-        setError('로그인에 실패했습니다.');
+        // 토큰이 없는 경우의 에러 처리
+        const errorMessage = response?.message || '로그인에 실패했습니다. 응답에 토큰이 없습니다.';
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
       
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.response?.data?.message || '로그인 중 오류가 발생했습니다.');
+      const errorMessage = err.response?.data?.message || '로그인 중 오류가 발생했습니다.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

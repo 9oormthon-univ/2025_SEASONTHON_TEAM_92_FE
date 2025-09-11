@@ -1,25 +1,125 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ReportTemplate } from '@/types';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { reportApi, policyApi, disputeAgencyApi, rentalLawApi } from '@/lib/api';
 import VerificationBadge from './VerificationBadge';
+import toast from 'react-hot-toast';
 
 interface ReportTemplateProps {
   data: ReportTemplate;
+  reportId?: string;
 }
 
-export default function ReportTemplate({ data }: ReportTemplateProps) {
+export default function ReportTemplate({ data, reportId }: ReportTemplateProps) {
+  const [reportData, setReportData] = useState<ReportTemplate>(data);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (reportId) {
+      loadReportData();
+    }
+  }, [reportId]);
+
+  const loadReportData = async () => {
+    try {
+      setIsLoading(true);
+      setError('');
+      
+      const response = await reportApi.getReport(reportId!);
+      if (response && response.success) {
+        setReportData(response.data);
+      } else {
+        setError('리포트를 불러올 수 없습니다.');
+      }
+    } catch (err: any) {
+      console.error('Report load error:', err);
+      setError('리포트를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadPolicyInfo = async () => {
+    try {
+      const response = await policyApi.getPersonalizedPolicies();
+      if (response && response.success) {
+        // 정책 정보를 리포트 데이터에 추가
+        setReportData(prev => ({
+          ...prev,
+          policyInfo: response.data.recommendedPolicies.map((policy: any) => ({
+            title: policy.policyName,
+            description: policy.summary,
+            eligibility: policy.eligibilityStatus,
+            link: policy.externalUrl
+          }))
+        }));
+      }
+    } catch (err: any) {
+      console.error('Policy load error:', err);
+    }
+  };
+
+  const loadDisputeGuide = async () => {
+    try {
+      const response = await disputeAgencyApi.getRecommendedAgencies('general');
+      if (response && response.success && response.data.agencies.length > 0) {
+        const agency = response.data.agencies[0];
+        setReportData(prev => ({
+          ...prev,
+          disputeGuide: {
+            relatedLaw: "주택임대차보호법 제8조 (임대인 수선 의무)",
+            committeeContact: `${agency.agencyName}: ${agency.contactInfo.phone}`,
+            templateDownload: "수선 요구서 다운로드"
+          }
+        }));
+      }
+    } catch (err: any) {
+      console.error('Dispute guide load error:', err);
+    }
+  };
+
+  useEffect(() => {
+    // 정책 정보와 분쟁 해결 가이드 로드
+    loadPolicyInfo();
+    loadDisputeGuide();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">리포트를 불러오는 중...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-600">{error}</p>
+        <button
+          onClick={loadReportData}
+          className="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
   // 차트 데이터 준비
   const radarData = [
-    { category: '채광', myScore: data.subjectiveMetrics.categories.lighting.myScore, neighborhoodAvg: data.subjectiveMetrics.categories.lighting.neighborhoodAvg, buildingAvg: data.subjectiveMetrics.categories.lighting.buildingAvg },
-    { category: '방음', myScore: data.subjectiveMetrics.categories.soundproofing.myScore, neighborhoodAvg: data.subjectiveMetrics.categories.soundproofing.neighborhoodAvg, buildingAvg: data.subjectiveMetrics.categories.soundproofing.buildingAvg },
-    { category: '주차', myScore: data.subjectiveMetrics.categories.parking.myScore, neighborhoodAvg: data.subjectiveMetrics.categories.parking.neighborhoodAvg, buildingAvg: data.subjectiveMetrics.categories.parking.buildingAvg }
+    { category: '채광', myScore: reportData.subjectiveMetrics.categories.lighting.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.lighting.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.lighting.buildingAvg },
+    { category: '방음', myScore: reportData.subjectiveMetrics.categories.soundproofing.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.soundproofing.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.soundproofing.buildingAvg },
+    { category: '주차', myScore: reportData.subjectiveMetrics.categories.parking.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.parking.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.parking.buildingAvg }
   ];
 
   const barData = [
-    { name: '내 점수', value: data.subjectiveMetrics.overallScore },
-    { name: '동네 평균', value: data.subjectiveMetrics.neighborhoodAverage },
-    { name: '건물 평균', value: data.subjectiveMetrics.buildingAverage }
+    { name: '내 점수', value: reportData.subjectiveMetrics.overallScore },
+    { name: '동네 평균', value: reportData.subjectiveMetrics.neighborhoodAverage },
+    { name: '건물 평균', value: reportData.subjectiveMetrics.buildingAverage }
   ];
 
   return (
@@ -28,22 +128,22 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
         
         {/* 1. 리포트 헤더 */}
         <section className="border-b-2 border-blue-200 pb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{data.header.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{reportData.header.title}</h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="bg-blue-50 p-3 rounded-lg">
               <span className="font-semibold text-blue-800">생성일자:</span>
-              <span className="ml-2 text-gray-700">{data.header.createdAt}</span>
+              <span className="ml-2 text-gray-700">{reportData.header.createdAt}</span>
             </div>
             <div className="bg-green-50 p-3 rounded-lg">
               <span className="font-semibold text-green-800">참여 인원:</span>
-              <span className="ml-2 text-gray-700">{data.header.trustMetrics.participantCount}명</span>
+              <span className="ml-2 text-gray-700">{reportData.header.trustMetrics.participantCount}명</span>
             </div>
             <div className="bg-purple-50 p-3 rounded-lg">
               <span className="font-semibold text-purple-800">신뢰도 점수:</span>
-              <span className="ml-2 text-gray-700">{data.header.trustMetrics.trustScore}/100</span>
+              <span className="ml-2 text-gray-700">{reportData.header.trustMetrics.trustScore}/100</span>
             </div>
           </div>
-          <p className="text-gray-600 mt-4">{data.header.dataPeriod}</p>
+          <p className="text-gray-600 mt-4">{reportData.header.dataPeriod}</p>
         </section>
 
         {/* 2. 나의 계약 정보 요약 */}
@@ -53,27 +153,27 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">주소/건물명:</span>
-                <span className="text-gray-900">{data.contractInfo.address} {data.contractInfo.buildingName}</span>
+                <span className="text-gray-900">{reportData.contractInfo.address} {reportData.contractInfo.buildingName}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">건물 유형:</span>
-                <span className="text-gray-900">{data.contractInfo.buildingType}</span>
+                <span className="text-gray-900">{reportData.contractInfo.buildingType}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">계약 유형:</span>
-                <span className="text-gray-900">{data.contractInfo.contractType}</span>
+                <span className="text-gray-900">{reportData.contractInfo.contractType}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">조건:</span>
-                <span className="text-gray-900">보증금 {data.contractInfo.deposit}만원 / 월세 {data.contractInfo.monthlyRent}만원 / 관리비 {data.contractInfo.managementFee}만원</span>
+                <span className="text-gray-900">보증금 {reportData.contractInfo.deposit}만원 / 월세 {reportData.contractInfo.monthlyRent}만원 / 관리비 {reportData.contractInfo.managementFee}만원</span>
               </div>
             </div>
             <div className="space-y-3">
               <div>
                 <span className="font-semibold text-gray-700 block mb-2">인증 상태:</span>
                 <VerificationBadge 
-                  gpsVerified={data.contractInfo.gpsVerified}
-                  contractVerified={data.contractInfo.contractVerified}
+                  gpsVerified={reportData.contractInfo.gpsVerified}
+                  contractVerified={reportData.contractInfo.contractVerified}
                 />
               </div>
             </div>
@@ -89,9 +189,9 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
             <h3 className="text-lg font-semibold text-gray-800 mb-3">거주 환경 진단 요약</h3>
             <div className="bg-white rounded-lg p-4 mb-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{data.subjectiveMetrics.overallScore}점</div>
+                <div className="text-3xl font-bold text-blue-600 mb-2">{reportData.subjectiveMetrics.overallScore}점</div>
                 <div className="text-sm text-gray-600">
-                  동네 평균 {data.subjectiveMetrics.neighborhoodAverage}점 / 같은 건물 평균 {data.subjectiveMetrics.buildingAverage}점
+                  동네 평균 {reportData.subjectiveMetrics.neighborhoodAverage}점 / 같은 건물 평균 {reportData.subjectiveMetrics.buildingAverage}점
                 </div>
               </div>
             </div>
@@ -154,87 +254,88 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
         </section>
 
         {/* 4. 객관적 지표 */}
-        <section className="bg-green-50 rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">객관적 지표 (공공 데이터 기반)</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* 시세 비교 */}
-            <div className="bg-white rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">시세 비교</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">국토부 실거래가 평균:</span>
-                  <span className="font-semibold">{data.objectiveMetrics.marketPrice.nationalAverage}만원</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">내 계약:</span>
-                  <span className="font-semibold">{data.objectiveMetrics.marketPrice.myContract}만원</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">차이:</span>
-                  <span className={`font-semibold ${data.objectiveMetrics.marketPrice.differencePercent < 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {data.objectiveMetrics.marketPrice.differencePercent > 0 ? '+' : ''}{data.objectiveMetrics.marketPrice.differencePercent}%
-                  </span>
+        {reportData.objectiveMetrics && (
+          <section className="bg-green-50 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">객관적 지표 (공공 데이터 기반)</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* 시세 비교 */}
+              <div className="bg-white rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">시세 비교</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">국토부 실거래가 평균:</span>
+                    <span className="font-semibold">{reportData.objectiveMetrics.marketPrice.nationalAverage}만원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">내 계약:</span>
+                    <span className="font-semibold">{reportData.objectiveMetrics.marketPrice.myContract}만원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className={`font-semibold ${reportData.objectiveMetrics.marketPrice.differencePercent < 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      차이: {reportData.objectiveMetrics.marketPrice.differencePercent > 0 ? '+' : ''}{reportData.objectiveMetrics.marketPrice.differencePercent}%
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 관리비 비교 */}
-            <div className="bg-white rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">관리비 비교</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">공동주택 평균:</span>
-                  <span className="font-semibold">{data.objectiveMetrics.managementFee.nationalAverage}만원</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">내 입력값:</span>
-                  <span className="font-semibold">{data.objectiveMetrics.managementFee.myContract}만원</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">상태:</span>
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    data.objectiveMetrics.managementFee.status === 'normal' ? 'bg-green-100 text-green-800' :
-                    data.objectiveMetrics.managementFee.status === 'high' ? 'bg-red-100 text-red-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
-                    {data.objectiveMetrics.managementFee.status === 'normal' ? '정상 범위' :
-                     data.objectiveMetrics.managementFee.status === 'high' ? '높음' : '낮음'}
-                  </span>
+              {/* 관리비 비교 */}
+              <div className="bg-white rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">관리비 비교</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">공동주택 평균:</span>
+                    <span className="font-semibold">{reportData.objectiveMetrics.managementFee.nationalAverage}만원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">내 입력값:</span>
+                    <span className="font-semibold">{reportData.objectiveMetrics.managementFee.myContract}만원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">상태:</span>
+                    <span className={`px-2 py-1 rounded-full text-sm ${
+                      reportData.objectiveMetrics.managementFee.status === 'normal' ? 'bg-green-100 text-green-800' :
+                      reportData.objectiveMetrics.managementFee.status === 'high' ? 'bg-red-100 text-red-800' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
+                      {reportData.objectiveMetrics.managementFee.status === 'normal' ? '정상 범위' :
+                       reportData.objectiveMetrics.managementFee.status === 'high' ? '높음' : '낮음'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 소음/환경 */}
-            <div className="bg-white rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">소음/환경</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">환경부 평균:</span>
-                  <span className="font-semibold">{data.objectiveMetrics.noise.nationalAverage}dB</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">사용자 응답:</span>
-                  <span className="font-semibold">{data.objectiveMetrics.noise.userReported}dB</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">일치 여부:</span>
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    data.objectiveMetrics.noise.match ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {data.objectiveMetrics.noise.match ? '일치' : '불일치'}
-                  </span>
+              {/* 소음/환경 */}
+              <div className="bg-white rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">소음/환경</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">환경부 평균:</span>
+                    <span className="font-semibold">{reportData.objectiveMetrics.noise.nationalAverage}dB</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">사용자 응답:</span>
+                    <span className="font-semibold">{reportData.objectiveMetrics.noise.userReported}dB</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">일치 여부:</span>
+                    <span className={`px-2 py-1 rounded-full text-sm ${
+                      reportData.objectiveMetrics.noise.match ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {reportData.objectiveMetrics.noise.match ? '일치' : '불일치'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* 5. 협상 카드 */}
         <section className="bg-yellow-50 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">협상 카드 (자동 생성)</h2>
           <div className="space-y-4">
-            {data.negotiationCards.map((card, index) => (
+            {reportData.negotiationCards.map((card, index) => (
               <div key={index} className="bg-white rounded-lg p-4 border-l-4 border-blue-500">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-gray-800">{card.priority}순위: {card.title}</h3>
@@ -255,7 +356,7 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
         <section className="bg-purple-50 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">맞춤형 정책/지원 정보</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {data.policyInfo.map((policy, index) => (
+            {reportData.policyInfo.map((policy, index) => (
               <div key={index} className="bg-white rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">{policy.title}</h3>
                 <p className="text-gray-600 text-sm mb-3">{policy.description}</p>
@@ -282,16 +383,16 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
           <div className="space-y-4">
             <div className="bg-white rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">관련 법령</h3>
-              <p className="text-gray-700">{data.disputeGuide.relatedLaw}</p>
+              <p className="text-gray-700">{reportData.disputeGuide?.relatedLaw || "주택임대차보호법 제8조 (임대인 수선 의무)"}</p>
             </div>
             <div className="bg-white rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">분쟁조정위원회</h3>
-              <p className="text-gray-700">{data.disputeGuide.committeeContact}</p>
+              <p className="text-gray-700">{reportData.disputeGuide?.committeeContact || "서울서부 임대차분쟁조정위원회: 02-1234-5678"}</p>
             </div>
             <div className="bg-white rounded-lg p-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">표준 양식</h3>
               <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                {data.disputeGuide.templateDownload}
+                {reportData.disputeGuide?.templateDownload || "수선 요구서 다운로드"}
               </button>
             </div>
           </div>
@@ -302,8 +403,8 @@ export default function ReportTemplate({ data }: ReportTemplateProps) {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">업데이트 정보</h2>
           <div className="space-y-2 text-sm text-gray-600">
             <p>• 본 리포트는 새로운 참여자 데이터가 추가될 경우 자동 업데이트됩니다.</p>
-            <p>• 이 리포트는 {data.updateInfo.dataValidityPeriod}으로 작성되었습니다.</p>
-            <p>• 데이터 신뢰도: {data.header.trustMetrics.trustScore}/100점</p>
+            <p>• 이 리포트는 최근 3개월 내 데이터 기준으로 작성되었습니다.</p>
+            <p>• 데이터 신뢰도: {reportData.header.trustMetrics.trustScore}/100점</p>
           </div>
         </section>
       </div>
