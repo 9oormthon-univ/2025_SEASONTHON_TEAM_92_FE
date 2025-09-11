@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { diagnosisApi } from '../../lib/api';
+import { diagnosisApi, authApi } from '../../lib/api';
 import toast from 'react-hot-toast';
 
 // API로부터 받아올 데이터 타입 정의
