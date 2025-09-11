@@ -42,10 +42,24 @@ export default function DiagnosisPage() {
           return;
         }
 
-        // 온보딩 완료 여부 확인
-        const onboardingCompleted = localStorage.getItem('onboarding_completed');
+        // 온보딩 완료 여부 확인 (백엔드 우선, 로컬 fallback)
+        let onboardingCompleted = false;
+        
+        try {
+          // 백엔드에서 사용자 정보를 가져와서 온보딩 완료 상태 확인
+          const userResponse = await authApi.getCurrentUser();
+          if (userResponse && userResponse.success && userResponse.data) {
+            onboardingCompleted = userResponse.data.onboardingCompleted || false;
+            console.log('백엔드에서 온보딩 상태 확인:', onboardingCompleted);
+          }
+        } catch (error) {
+          console.log('백엔드 온보딩 상태 확인 실패, 로컬 확인으로 fallback');
+          // 백엔드 확인 실패 시 로컬 스토리지 확인
+          onboardingCompleted = localStorage.getItem('onboarding_completed') === 'true';
+        }
+        
         if (!onboardingCompleted) {
-          // 온보딩이 완료되지 않은 경우 온보딩 페이지로 이동
+          console.log('온보딩 미완료 - 온보딩 페이지로 이동');
           router.push('/onboarding/location');
           return;
         }

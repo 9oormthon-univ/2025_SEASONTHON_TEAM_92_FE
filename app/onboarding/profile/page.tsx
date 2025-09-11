@@ -102,8 +102,17 @@ function ProfileSetupComponent() {
       localStorage.setItem('userRent', formData.rent);
       localStorage.setItem('userMaintenanceFee', formData.maintenanceFee);
       
-      // 온보딩 완료 플래그 설정
+      // 온보딩 완료 플래그 설정 (로컬)
       localStorage.setItem('onboarding_completed', 'true');
+      
+      // 백엔드에 온보딩 완료 상태 저장
+      try {
+        await authApi.updateUser({ onboardingCompleted: true });
+        console.log('온보딩 완료 상태가 백엔드에 저장되었습니다.');
+      } catch (error) {
+        console.error('온보딩 완료 상태 저장 실패:', error);
+        // 백엔드 저장 실패해도 로컬은 저장되어 있으므로 계속 진행
+      }
       
       toast.success('프로필이 성공적으로 저장되었습니다!');
       
