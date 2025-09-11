@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { User } from '../types';
 import { diagnosisApi } from '../lib/api';
@@ -10,121 +10,87 @@ interface DiagnosisSystemProps {
   onGoHome?: () => void;
 }
 
+interface Question {
+  questionId: number;
+  questionText: string;
+  subText: string;
+}
 
-const categories = [
-  {
-    id: 'noise',
-    title: '소음',
-    icon: 'ri-volume-down-line',
-    description: '이웃 소음과 외부 소음 정도',
-    questions: [
-      { id: 'neighbor_noise', text: '옆집/윗집 생활소음이 어느 정도인가요?', scale: '매우 조용함~매우 시끄러움' },
-      { id: 'outside_noise', text: '외부 소음(교통, 공사 등)은 어떤가요?', scale: '전혀 안 들림~매우 시끄러움' }
-    ]
-  },
-  {
-    id: 'water',
-    title: '수압',
-    icon: 'ri-drop-line',
-    description: '물의 압력과 온수 공급',
-    questions: [
-      { id: 'water_pressure', text: '샤워할 때 수압은 어떤가요?', scale: '매우 약함~매우 강함' },
-      { id: 'hot_water', text: '온수가 나오는 속도는 어떤가요?', scale: '매우 늦음~매우 빠름' }
-    ]
-  },
-  {
-    id: 'lighting',
-    title: '채광',
-    icon: 'ri-sun-line',
-    description: '자연광과 햇빛 유입',
-    questions: [
-      { id: 'natural_light', text: '낮 시간 자연광은 충분한가요?', scale: '매우 어두움~매우 밝음' },
-      { id: 'sunlight_hours', text: '하루 중 햇빛이 드는 시간은?', scale: '거의 없음~하루종일' }
-    ]
-  },
-  {
-    id: 'parking',
-    title: '주차',
-    icon: 'ri-parking-line',
-    description: '주차 공간 확보와 접근성',
-    questions: [
-      { id: 'parking_availability', text: '주차공간 확보는 어떤가요?', scale: '매우 어려움~매우 쉬움' },
-      { id: 'parking_distance', text: '집까지의 거리는 어떤가요?', scale: '매우 멀음~매우 가까움' }
-    ]
-  },
-  {
-    id: 'heating',
-    title: '난방',
-    icon: 'ri-fire-line',
-    description: '난방 효율과 비용',
-    questions: [
-      { id: 'heating_efficiency', text: '겨울철 난방 효율은 어떤가요?', scale: '매우 나쁨~매우 좋음' },
-      { id: 'heating_cost', text: '난방비 부담은 어떤가요?', scale: '매우 부담~전혀 부담없음' }
-    ]
-  },
-  {
-    id: 'ventilation',
-    title: '환기',
-    icon: 'ri-windy-line',
-    description: '공기 순환과 습도 조절',
-    questions: [
-      { id: 'air_circulation', text: '실내 공기순환은 어떤가요?', scale: '매우 나쁨~매우 좋음' },
-      { id: 'humidity_control', text: '습도 조절은 어떤가요?', scale: '매우 어려움~매우 쉬움' }
-    ]
-  },
-  {
-    id: 'security',
-    title: '보안',
-    icon: 'ri-shield-line',
-    description: '건물 보안과 안전감',
-    questions: [
-      { id: 'building_security', text: '건물 보안시설은 어떤가요?', scale: '매우 미흡~매우 완벽' },
-      { id: 'safety_feeling', text: '밤시간 안전함은 어떤가요?', scale: '매우 불안~매우 안전' }
-    ]
-  },
-  {
-    id: 'maintenance',
-    title: '관리',
-    icon: 'ri-tools-line',
-    description: '건물 관리와 수리 대응',
-    questions: [
-      { id: 'building_maintenance', text: '건물 관리상태는 어떤가요?', scale: '매우 나쁨~매우 좋음' },
-      { id: 'repair_response', text: '수리 요청 시 대응속도는?', scale: '매우 늦음~매우 빠름' }
-    ]
-  },
-  {
-    id: 'convenience',
-    title: '편의성',
-    icon: 'ri-store-line',
-    description: '주변 시설과 교통',
-    questions: [
-      { id: 'nearby_facilities', text: '주변 편의시설은 어떤가요?', scale: '매우 불편~매우 편리' },
-      { id: 'public_transport', text: '대중교통 접근성은 어떤가요?', scale: '매우 불편~매우 편리' }
-    ]
-  },
-  {
-    id: 'internet',
-    title: '인터넷',
-    icon: 'ri-wifi-line',
-    description: '인터넷 속도와 안정성',
-    questions: [
-      { id: 'internet_speed', text: '인터넷 속도는 어떤가요?', scale: '매우 느림~매우 빠름' },
-      { id: 'wifi_stability', text: 'WiFi 안정성은 어떤가요?', scale: '매우 불안정~매우 안정' }
-    ]
-  }
-];
+interface Category {
+  categoryId: number;
+  sortOrder: number;
+  title: string;
+  description: string;
+  questions: Question[];
+}
+
+interface DiagnosisQuestionsResponse {
+  categories: Category[];
+}
 
 export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSystemProps) {
   const [responses, setResponses] = useState<{[key: string]: number}>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const totalQuestions = categories.reduce((sum, cat) => sum + cat.questions.length, 0);
   const completedQuestions = Object.keys(responses).length;
 
+  // 백엔드에서 질문 데이터 가져오기
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setQuestionsLoading(true);
+        const response = await diagnosisApi.getQuestions();
+        if (response.success && response.data) {
+          setCategories(response.data.categories);
+        } else {
+          toast.error('질문을 불러오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('질문 로딩 실패:', error);
+        toast.error('질문을 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setQuestionsLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
   const handleResponse = (questionId: string, value: number) => {
     setResponses({...responses, [questionId]: value});
   };
+
+  // 각 질문의 맥락에 맞는 점수 라벨 생성
+  const getScoreLabels = (subText: string) => {
+    const labels = subText.split('~');
+    if (labels.length === 2) {
+      return {
+        low: labels[0].trim(),
+        high: labels[1].trim()
+      };
+    }
+    return {
+      low: '매우 나쁨',
+      high: '매우 좋음'
+    };
+  };
+
+  // 질문 로딩 중일 때 표시
+  if (questionsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-20 w-20 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">질문을 불러오는 중...</h2>
+          <p className="text-gray-600">잠시만 기다려주세요</p>
+        </div>
+      </div>
+    );
+  }
 
   const scrollToNextCategory = (currentIndex: number) => {
     if (currentIndex < categories.length - 1) {
@@ -150,41 +116,13 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
       const response = await diagnosisApi.submitBulk(diagnosisData);
 
       if (response.success) {
-        // Mock comprehensive diagnosis result
-        const mockResult: any = {
-          id: Date.now().toString(),
-          userId: currentUser.id!,
-          overallScore: 75,
-          categoryScores: {
-            noise: 70,
-            water_pressure: 60,
-            lighting: 80,
-            parking: 65,
-            heating: 75,
-            security: 85,
-            elevator: 70,
-            facilities: 75
-          },
-          buildingComparison: {
-            averageScore: 68,
-            participantCount: 12,
-            rank: 3,
-            percentile: 75
-          },
-          neighborhoodComparison: {
-            averageScore: 71,
-            participantCount: 45,
-            rank: 8,
-            percentile: 82
-          },
-          recommendations: [
-            '수압 개선을 위한 펌프 점검 요구',
-            '주차 공간 확보 방안 논의',
-            '방음 시설 개선 검토'
-          ],
-          createdAt: new Date().toISOString()
-        };
-        onComplete(mockResult);
+        // 백엔드에서 실제 결과를 가져옴
+        const resultResponse = await diagnosisApi.getResult();
+        if (resultResponse.success) {
+          onComplete(resultResponse.data);
+        } else {
+          toast.error('진단 결과를 가져오는데 실패했습니다.');
+        }
       } else {
         toast.error('진단 결과 저장에 실패했습니다.');
       }
@@ -196,8 +134,8 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
     }
   };
 
-  const isCategoryComplete = (category: any) => {
-    return category.questions.every((q: any) => responses[q.id] !== undefined);
+  const isCategoryComplete = (category: Category) => {
+    return category.questions.every((q: Question) => responses[q.questionId.toString()] !== undefined);
   };
 
   const isAllComplete = () => {
@@ -274,56 +212,59 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
 
               <div className="p-8">
                 <div className="space-y-8">
-                  {category.questions.map((question, qIndex) => (
-                    <div key={question.id} className="space-y-4">
-                      <div className="bg-gray-50 rounded-xl p-6">
-                        <h4 className="text-lg font-bold text-gray-800 mb-2">
-                          Q{qIndex + 1}. {question.text}
-                        </h4>
-                        <p className="text-sm text-gray-500 mb-4">
-                          <i className="ri-information-line mr-1"></i>
-                          {question.scale}
-                        </p>
-                        
-                        <div className="grid grid-cols-5 gap-3">
-                          {[1, 2, 3, 4, 5].map((value) => (
-                            <button
-                              key={value}
-                              onClick={() => {
-                                handleResponse(question.id, value);
-                                // 답변 후 잠시 기다린 다음 자동 스크롤 (마지막 질문이 아닌 경우)
-                                if (qIndex === category.questions.length - 1 && categoryIndex < categories.length - 1) {
-                                  setTimeout(() => {
-                                    scrollToNextCategory(categoryIndex);
-                                  }, 500);
-                                }
-                              }}
-                              className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${
-                                responses[question.id] === value
-                                  ? 'border-blue-500 bg-blue-500 text-white shadow-lg'
-                                  : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                              }`}
-                            >
-                              <div className={`text-2xl font-bold mb-1 ${
-                                responses[question.id] === value ? 'text-white' : 'text-blue-600'
-                              }`}>
-                                {value}
-                              </div>
-                              <div className={`text-xs ${
-                                responses[question.id] === value ? 'text-blue-100' : 'text-gray-500'
-                              }`}>
-                                {value === 1 && '매우 나쁨'}
-                                {value === 2 && '나쁨'}
-                                {value === 3 && '보통'}
-                                {value === 4 && '좋음'}
-                                {value === 5 && '매우 좋음'}
-                              </div>
-                            </button>
-                          ))}
+                  {category.questions.map((question, qIndex) => {
+                    const scoreLabels = getScoreLabels(question.subText);
+                    return (
+                      <div key={question.questionId} className="space-y-4">
+                        <div className="bg-gray-50 rounded-xl p-6">
+                          <h4 className="text-lg font-bold text-gray-800 mb-2">
+                            Q{qIndex + 1}. {question.questionText}
+                          </h4>
+                          <p className="text-sm text-gray-500 mb-4">
+                            <i className="ri-information-line mr-1"></i>
+                            {question.subText}
+                          </p>
+                          
+                          <div className="grid grid-cols-5 gap-3">
+                            {[1, 2, 3, 4, 5].map((value) => (
+                              <button
+                                key={value}
+                                onClick={() => {
+                                  handleResponse(question.questionId.toString(), value);
+                                  // 답변 후 잠시 기다린 다음 자동 스크롤 (마지막 질문이 아닌 경우)
+                                  if (qIndex === category.questions.length - 1 && categoryIndex < categories.length - 1) {
+                                    setTimeout(() => {
+                                      scrollToNextCategory(categoryIndex);
+                                    }, 500);
+                                  }
+                                }}
+                                className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${
+                                  responses[question.questionId.toString()] === value
+                                    ? 'border-blue-500 bg-blue-500 text-white shadow-lg'
+                                    : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                }`}
+                              >
+                                <div className={`text-2xl font-bold mb-1 ${
+                                  responses[question.questionId.toString()] === value ? 'text-white' : 'text-blue-600'
+                                }`}>
+                                  {value}
+                                </div>
+                                <div className={`text-xs ${
+                                  responses[question.questionId.toString()] === value ? 'text-blue-100' : 'text-gray-500'
+                                }`}>
+                                  {value === 1 && scoreLabels.low}
+                                  {value === 2 && '나쁨'}
+                                  {value === 3 && '보통'}
+                                  {value === 4 && '좋음'}
+                                  {value === 5 && scoreLabels.high}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* 카테고리 완료 표시 및 다음 카테고리 버튼 */}

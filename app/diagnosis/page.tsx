@@ -119,6 +119,72 @@ export default function DiagnosisPage() {
     return completedQuestions === totalQuestions;
   };
 
+  const getScoreLabel = (questionText: string, value: number) => {
+    // 소음 관련 질문들 - 점수가 높을수록 나쁨
+    if (questionText.includes('소음') || questionText.includes('시끄러움')) {
+      const labels = ['매우 조용함', '조용함', '보통', '시끄러움', '매우 시끄러움'];
+      return labels[value - 1];
+    }
+    
+    // 수압 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('수압') || questionText.includes('온수') || questionText.includes('속도')) {
+      const labels = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
+      return labels[value - 1];
+    }
+    
+    // 채광 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('자연광') || questionText.includes('햇빛')) {
+      const labels = ['매우 어두움', '어두움', '보통', '밝음', '매우 밝음'];
+      return labels[value - 1];
+    }
+    
+    // 주차 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('주차') || questionText.includes('거리')) {
+      const labels = ['매우 어려움', '어려움', '보통', '쉬움', '매우 쉬움'];
+      return labels[value - 1];
+    }
+    
+    // 난방 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('난방') || questionText.includes('난방비')) {
+      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
+      return labels[value - 1];
+    }
+    
+    // 환기 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('공기순환') || questionText.includes('습도')) {
+      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
+      return labels[value - 1];
+    }
+    
+    // 보안 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('보안') || questionText.includes('안전함')) {
+      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
+      return labels[value - 1];
+    }
+    
+    // 관리 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('관리') || questionText.includes('대응')) {
+      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
+      return labels[value - 1];
+    }
+    
+    // 편의성 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('편의시설') || questionText.includes('대중교통')) {
+      const labels = ['매우 부족함', '부족함', '보통', '충분함', '매우 충분함'];
+      return labels[value - 1];
+    }
+    
+    // 인터넷 관련 질문들 - 점수가 높을수록 좋음
+    if (questionText.includes('인터넷') || questionText.includes('WiFi')) {
+      const labels = ['매우 느림', '느림', '보통', '빠름', '매우 빠름'];
+      return labels[value - 1];
+    }
+    
+    // 기본값
+    const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
+    return labels[value - 1];
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -190,8 +256,8 @@ export default function DiagnosisPage() {
                   {category.questions.map((question, qIndex) => (
                     <div key={question.id} className="space-y-4">
                       <div className="bg-blue-50 rounded-xl p-6">
-                        <h4 className="text-lg font-bold mb-2 text-gray-900">Q{qIndex + 1}. {question.text}</h4>
-                        <p className="text-sm mb-4 text-gray-600"><i className="ri-information-line mr-1"></i>{question.scale}</p>
+                        <h4 className="text-lg font-bold mb-2 text-gray-900">Q{qIndex + 1}. {question.questionText}</h4>
+                        <p className="text-sm mb-4 text-gray-600"><i className="ri-information-line mr-1"></i>{question.subText}</p>
                         <div className="grid grid-cols-5 gap-3">
                           {[1, 2, 3, 4, 5].map((value) => (
                             <button
@@ -205,7 +271,7 @@ export default function DiagnosisPage() {
                               className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${responses[question.id] === value ? 'bg-blue-600 text-white shadow-lg border-blue-600' : 'border-gray-200 hover:bg-gray-50'}`}>
                               <div className={`text-2xl font-bold mb-1 ${responses[question.id] === value ? 'text-white' : 'text-gray-900'}`}>{value}</div>
                               <div className={`text-xs ${responses[question.id] === value ? 'text-white' : 'text-gray-600'}`}>
-                                {value === 1 && '매우 나쁨'}{value === 2 && '나쁨'}{value === 3 && '보통'}{value === 4 && '좋음'}{value === 5 && '매우 좋음'}
+                                {getScoreLabel(question.questionText, value)}
                               </div>
                             </button>
                           ))}
