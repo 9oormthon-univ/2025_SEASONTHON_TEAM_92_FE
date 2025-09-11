@@ -33,6 +33,23 @@ export default function DiagnosisPage() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
+        // 로그인 체크
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const jwtToken = localStorage.getItem('jwtToken');
+        
+        if (!isLoggedIn || !jwtToken) {
+          router.push('/auth/login');
+          return;
+        }
+
+        // 온보딩 완료 여부 확인
+        const onboardingCompleted = localStorage.getItem('onboarding_completed');
+        if (!onboardingCompleted) {
+          // 온보딩이 완료되지 않은 경우 온보딩 페이지로 이동
+          router.push('/onboarding/location');
+          return;
+        }
+
         const response = await diagnosisApi.getQuestions();
         console.log('진단 질문 API 응답:', response);
         
@@ -55,7 +72,7 @@ export default function DiagnosisPage() {
     };
 
     fetchQuestions();
-  }, []);
+  }, [router]);
 
   const totalQuestions = categories.reduce((sum, cat) => sum + cat.questions.length, 0);
   const completedQuestions = Object.keys(responses).length;

@@ -102,6 +102,9 @@ function ProfileSetupComponent() {
       localStorage.setItem('userRent', formData.rent);
       localStorage.setItem('userMaintenanceFee', formData.maintenanceFee);
       
+      // 온보딩 완료 플래그 설정
+      localStorage.setItem('onboarding_completed', 'true');
+      
       toast.success('프로필이 성공적으로 저장되었습니다!');
       
       // 진단 페이지로 이동

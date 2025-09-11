@@ -251,21 +251,12 @@ export default function HomePage() {
                   </div>
                 </div>
               ) : (
-                <>
-                  <button
-                    onClick={handleShowLogin}
-                    className={`px-4 py-2 font-medium rounded-lg transition-all cursor-pointer hover:opacity-80 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
-                  >
-                    로그인
-                  </button>
-                  <div className={`w-px h-4 ${isScrolled ? 'bg-gray-300' : 'bg-white bg-opacity-50'}`}></div>
-                  <Link
-                    href="/auth/register"
-                    className="px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-all whitespace-nowrap cursor-pointer bg-blue-600 text-white"
-                  >
-                    회원가입
-                  </Link>
-                </>
+                <Link
+                  href="/auth/login"
+                  className="px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-all whitespace-nowrap cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+                >
+                  시작하기
+                </Link>
               )}
             </div>
           </div>
@@ -462,20 +453,12 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 {!isLoggedIn ? (
-                  <>
-                    <Link
-                      href="/auth/register"
-                      className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-red-600 text-white shadow-lg hover:bg-red-700"
-                    >
-                      내 협상 리포트 무료로 받기
-                    </Link>
-                    <Link
-                      href="/diagnosis"
-                      className="border-2 border-white/50 px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-80 transition-all whitespace-nowrap cursor-pointer text-center text-white"
-                    >
-                      무료 진단 받기
-                    </Link>
-                  </>
+                  <Link
+                    href="/auth/login"
+                    className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    내 협상 리포트 무료로 받기
+                  </Link>
                 ) : (
                   <>
                     <Link
@@ -609,18 +592,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Link
-                href="/auth/register"
-                className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all cursor-pointer text-center whitespace-nowrap"
+                href="/auth/login"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer text-center whitespace-nowrap"
               >
-                가입하고 진단받기
-              </Link>
-              <Link
-                href="/diagnosis"
-                className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-all cursor-pointer text-center whitespace-nowrap"
-              >
-                진단만 먼저 해보기
+                지금 시작하기
               </Link>
             </div>
           </div>
@@ -1044,31 +1021,31 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-red-600 to-red-700">
+      <section className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">
             지금 바로 시작해서,<br />
             다음 월세 협상에서 우위를 점하세요
           </h2>
-          <p className="text-xl text-red-100 mb-8">
+          <p className="text-xl text-gray-600 mb-8">
             이웃의 데이터로 확인하세요. 혹시 나만 월세를 비싸게 내고 있나요?
           </p>
           {!isLoggedIn ? (
             <Link
-              href="/auth/register"
-              className="bg-white text-red-600 px-10 py-5 rounded-xl text-xl font-bold hover:bg-gray-100 transition-all cursor-pointer inline-block shadow-lg"
+              href="/auth/login"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer inline-block shadow-lg"
             >
               내 협상 리포트 무료로 받기
             </Link>
           ) : (
             <Link
               href="/dashboard"
-              className="bg-white text-red-600 px-10 py-5 rounded-xl text-xl font-bold hover:bg-gray-100 transition-all cursor-pointer inline-block shadow-lg"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer inline-block shadow-lg"
             >
               내 협상 리포트 생성하기
             </Link>
           )}
-          <div className="mt-6 text-red-200 text-sm">
+          <div className="mt-6 text-gray-500 text-sm">
             ⚡ 3분만에 시작 • 💯 무료 • 🔒 개인정보 보호
           </div>
         </div>
