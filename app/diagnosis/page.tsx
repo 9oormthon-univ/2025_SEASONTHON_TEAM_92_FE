@@ -8,15 +8,15 @@ import toast from 'react-hot-toast';
 
 // API로부터 받아올 데이터 타입 정의
 interface Question {
-  id: number;
-  text: string;
-  scale: string;
+  questionId: number;
+  questionText: string;
+  subText: string;
 }
 
 interface Category {
-  id: number;
+  categoryId: number;
+  sortOrder: number;
   title: string;
-  icon: string;
   description: string;
   questions: Question[];
 }
@@ -66,7 +66,7 @@ export default function DiagnosisPage() {
 
   const scrollToNextCategory = (currentIndex: number) => {
     if (currentIndex < categories.length - 1) {
-      const nextElement = document.getElementById(`category-${categories[currentIndex + 1].id}`);
+      const nextElement = document.getElementById(`category-${categories[currentIndex + 1].categoryId}`);
       if (nextElement) {
         nextElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -111,7 +111,7 @@ export default function DiagnosisPage() {
   };
 
   const isCategoryComplete = (category: Category) => {
-    return category.questions.every((q) => responses[q.id] !== undefined);
+    return category.questions.every((q) => responses[q.questionId] !== undefined);
   };
 
   const isAllComplete = () => {
@@ -119,70 +119,26 @@ export default function DiagnosisPage() {
     return completedQuestions === totalQuestions;
   };
 
-  const getScoreLabel = (questionText: string, value: number) => {
-    // 소음 관련 질문들 - 점수가 높을수록 나쁨
-    if (questionText.includes('소음') || questionText.includes('시끄러움')) {
-      const labels = ['매우 조용함', '조용함', '보통', '시끄러움', '매우 시끄러움'];
-      return labels[value - 1];
-    }
-    
-    // 수압 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('수압') || questionText.includes('온수') || questionText.includes('속도')) {
-      const labels = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
-      return labels[value - 1];
-    }
-    
-    // 채광 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('자연광') || questionText.includes('햇빛')) {
-      const labels = ['매우 어두움', '어두움', '보통', '밝음', '매우 밝음'];
-      return labels[value - 1];
-    }
-    
-    // 주차 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('주차') || questionText.includes('거리')) {
-      const labels = ['매우 어려움', '어려움', '보통', '쉬움', '매우 쉬움'];
-      return labels[value - 1];
-    }
-    
-    // 난방 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('난방') || questionText.includes('난방비')) {
-      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
-      return labels[value - 1];
-    }
-    
-    // 환기 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('공기순환') || questionText.includes('습도')) {
-      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
-      return labels[value - 1];
-    }
-    
-    // 보안 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('보안') || questionText.includes('안전함')) {
-      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
-      return labels[value - 1];
-    }
-    
-    // 관리 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('관리') || questionText.includes('대응')) {
-      const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
-      return labels[value - 1];
-    }
-    
-    // 편의성 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('편의시설') || questionText.includes('대중교통')) {
-      const labels = ['매우 부족함', '부족함', '보통', '충분함', '매우 충분함'];
-      return labels[value - 1];
-    }
-    
-    // 인터넷 관련 질문들 - 점수가 높을수록 좋음
-    if (questionText.includes('인터넷') || questionText.includes('WiFi')) {
-      const labels = ['매우 느림', '느림', '보통', '빠름', '매우 빠름'];
-      return labels[value - 1];
+  const getScoreLabel = (subText: string, value: number) => {
+    // subText에서 범위를 파싱하여 적절한 라벨 생성
+    const labels = subText.split('~');
+    if (labels.length === 2) {
+      const lowLabel = labels[0].trim();
+      const highLabel = labels[1].trim();
+      
+      switch (value) {
+        case 1: return lowLabel;
+        case 2: return '나쁨';
+        case 3: return '보통';
+        case 4: return '좋음';
+        case 5: return highLabel;
+        default: return '보통';
+      }
     }
     
     // 기본값
-    const labels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
-    return labels[value - 1];
+    const defaultLabels = ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'];
+    return defaultLabels[value - 1];
   };
 
   if (isLoading) {
@@ -232,7 +188,7 @@ export default function DiagnosisPage() {
 
         <div className="space-y-12">
           {categories.map((category, categoryIndex) => (
-            <div key={category.id} id={`category-${category.id}`} className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <div key={category.categoryId} id={`category-${category.categoryId}`} className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-6 bg-blue-600">
                  <div className="flex items-center justify-between text-white mb-3">
                   <div className="flex items-center">
@@ -254,7 +210,7 @@ export default function DiagnosisPage() {
               <div className="p-8">
                 <div className="space-y-8">
                   {category.questions.map((question, qIndex) => (
-                    <div key={question.id} className="space-y-4">
+                    <div key={question.questionId} className="space-y-4">
                       <div className="bg-blue-50 rounded-xl p-6">
                         <h4 className="text-lg font-bold mb-2 text-gray-900">Q{qIndex + 1}. {question.questionText}</h4>
                         <p className="text-sm mb-4 text-gray-600"><i className="ri-information-line mr-1"></i>{question.subText}</p>
@@ -263,15 +219,15 @@ export default function DiagnosisPage() {
                             <button
                               key={value}
                               onClick={() => {
-                                handleResponse(question.id, value);
+                                handleResponse(question.questionId, value);
                                 if (qIndex === category.questions.length - 1) {
                                   setTimeout(() => scrollToNextCategory(categoryIndex), 300);
                                 }
                               }}
-                              className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${responses[question.id] === value ? 'bg-blue-600 text-white shadow-lg border-blue-600' : 'border-gray-200 hover:bg-gray-50'}`}>
-                              <div className={`text-2xl font-bold mb-1 ${responses[question.id] === value ? 'text-white' : 'text-gray-900'}`}>{value}</div>
-                              <div className={`text-xs ${responses[question.id] === value ? 'text-white' : 'text-gray-600'}`}>
-                                {getScoreLabel(question.questionText, value)}
+                              className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${responses[question.questionId] === value ? 'bg-blue-600 text-white shadow-lg border-blue-600' : 'border-gray-200 hover:bg-gray-50'}`}>
+                              <div className={`text-2xl font-bold mb-1 ${responses[question.questionId] === value ? 'text-white' : 'text-gray-900'}`}>{value}</div>
+                              <div className={`text-xs ${responses[question.questionId] === value ? 'text-white' : 'text-gray-600'}`}>
+                                {getScoreLabel(question.subText, value)}
                               </div>
                             </button>
                           ))}

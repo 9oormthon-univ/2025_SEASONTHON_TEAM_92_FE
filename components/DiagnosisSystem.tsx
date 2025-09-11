@@ -79,6 +79,23 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
     };
   };
 
+  // 카테고리별 아이콘 매핑
+  const getCategoryIcon = (categoryId: number) => {
+    const iconMap: {[key: number]: string} = {
+      1: 'ri-volume-down-line', // 소음
+      2: 'ri-drop-line', // 수압
+      3: 'ri-sun-line', // 채광
+      4: 'ri-parking-line', // 주차
+      5: 'ri-fire-line', // 난방
+      6: 'ri-windy-line', // 환기
+      7: 'ri-shield-line', // 보안
+      8: 'ri-tools-line', // 관리
+      9: 'ri-store-line', // 편의성
+      10: 'ri-wifi-line' // 인터넷
+    };
+    return iconMap[categoryId] || 'ri-question-line';
+  };
+
   // 질문 로딩 중일 때 표시
   if (questionsLoading) {
     return (
@@ -181,7 +198,7 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
         <div className="space-y-12">
           {categories.map((category, categoryIndex) => (
             <div 
-              key={category.id} 
+              key={category.categoryId} 
               id={`category-${categoryIndex}`}
               className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
             >
@@ -189,7 +206,7 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
                 <div className="flex items-center justify-between text-white mb-3">
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
-                      <i className={`${category.icon} text-2xl`}></i>
+                      <i className={`${getCategoryIcon(category.categoryId)} text-2xl`}></i>
                     </div>
                     <div>
                       <h3 className="text-xl font-bold">{category.title}</h3>
