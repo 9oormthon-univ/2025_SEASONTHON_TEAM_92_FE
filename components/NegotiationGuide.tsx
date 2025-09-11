@@ -152,31 +152,19 @@ const NegotiationGuide: React.FC<NegotiationGuideProps> = ({ userId = 'user_123'
               {negotiationCards
                 .sort((a, b) => a.priority - b.priority)
                 .map((card) => (
-                  <div key={card.issueId} className={`border rounded-lg p-4 ${getCategoryColor(card.category)}`}>
+                  <div key={card.priority} className={`border rounded-lg p-4 ${getCategoryColor('default')}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-medium">{card.issueName}</h3>
+                      <h3 className="text-lg font-medium">{card.title}</h3>
                       <span className="text-xs px-2 py-1 bg-white bg-opacity-50 rounded-full">
                         우선순위: {getPriorityLabel(card.priority)}
                       </span>
                     </div>
-                    <p className="text-sm mb-3 opacity-90">{card.description}</p>
+                    <p className="text-sm mb-3 opacity-90">{card.content}</p>
                     <div className="space-y-2">
                       <div>
                         <h4 className="font-medium text-sm mb-1">협상 전략:</h4>
-                        <p className="text-sm opacity-90">{card.negotiationStrategy}</p>
+                        <p className="text-sm opacity-90">{card.recommendedMent}</p>
                       </div>
-                      {card.legalBasis && (
-                        <div>
-                          <h4 className="font-medium text-sm mb-1">법적 근거:</h4>
-                          <p className="text-sm opacity-90">{card.legalBasis}</p>
-                        </div>
-                      )}
-                      {card.suggestedAction && (
-                        <div>
-                          <h4 className="font-medium text-sm mb-1">제안 행동:</h4>
-                          <p className="text-sm opacity-90">{card.suggestedAction}</p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}

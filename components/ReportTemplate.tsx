@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ReportTemplate } from '@/types';
+import type { ReportTemplate } from '@/types';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { reportApi, policyApi, disputeAgencyApi, rentalLawApi } from '@/lib/api';
 import VerificationBadge from './VerificationBadge';

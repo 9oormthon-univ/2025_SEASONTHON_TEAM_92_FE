@@ -304,7 +304,7 @@ export interface ReportTemplate {
   subjectiveMetrics: SubjectiveMetrics;
   
   // 4. 객관적 지표
-  objectiveMetrics: ObjectiveMetrics;
+  objectiveMetrics: ObjectiveMetrics | null;
   
   // 5. 협상 카드
   negotiationCards: NegotiationCard[];
@@ -313,7 +313,7 @@ export interface ReportTemplate {
   policyInfo: PolicyInfo[];
   
   // 7. 분쟁 해결 가이드
-  disputeGuide: DisputeGuide;
+  disputeGuide: DisputeGuide | null;
   
   // 8. 업데이트 요소
   updateInfo: {

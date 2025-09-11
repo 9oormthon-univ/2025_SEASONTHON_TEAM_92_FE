@@ -105,9 +105,9 @@ export const authApi = {
     const response = await api.post('/member/create', userData);
     return response.data;
   },
-  login: async (credentials: any): Promise<ApiResponse<any>> => {
+  login: async (credentials: any): Promise<any> => {
     const response = await api.post('/member/doLogin', credentials);
-    return response.data;
+    return response.data; // 백엔드에서 직접 { id: number, token: string } 응답
   },
   updateUser: async (userData: any): Promise<any> => {
     const response = await api.post('/member/profile/setting', userData);

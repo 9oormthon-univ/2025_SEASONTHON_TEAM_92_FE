@@ -31,8 +31,8 @@ export default function LoginPage() {
       const response = await authApi.login(formData);
       
       // 백엔드 응답 구조에 맞게 토큰 추출
-      // 백엔드에서 { id: number, token: string } 형태로 응답
-      const token = response?.token;
+      // 백엔드에서 { id: number, token: string } 형태로 직접 응답
+      const token = (response as any)?.token;
 
       if (token) {
         // JWT 토큰을 localStorage에 저장
@@ -48,7 +48,7 @@ export default function LoginPage() {
         router.push('/onboarding/location');
       } else {
         // 토큰이 없는 경우의 에러 처리
-        const errorMessage = response?.message || '로그인에 실패했습니다. 응답에 토큰이 없습니다.';
+        const errorMessage = (response as any)?.message || '로그인에 실패했습니다. 응답에 토큰이 없습니다.';
         setError(errorMessage);
         toast.error(errorMessage);
       }

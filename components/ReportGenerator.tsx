@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { ComprehensiveDiagnosis, MarketData, NegotiationReport, User } from '../types';
-import ReportSharing from './ReportSharing';
+import { User } from '../types';
 
 interface ReportGeneratorProps {
   currentUser: User;
-  diagnosisData: ComprehensiveDiagnosis;
-  marketData: MarketData;
-  onReportGenerated: (report: NegotiationReport) => void;
+  diagnosisData: any;
+  marketData: any;
+  onReportGenerated: (report: any) => void;
 }
 
 interface ReportFormData {
@@ -25,7 +24,7 @@ export default function ReportGenerator({
   onReportGenerated 
 }: ReportGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedReport, setGeneratedReport] = useState<NegotiationReport | null>(null);
+  const [generatedReport, setGeneratedReport] = useState<any | null>(null);
   const [showSharing, setShowSharing] = useState(false);
 
   const { register, handleSubmit } = useForm<ReportFormData>();
@@ -72,7 +71,7 @@ export default function ReportGenerator({
         // 추천사항 자동 생성
         const recommendations = generateRecommendations(diagnosisData);
 
-        const report: NegotiationReport = {
+        const report: any = {
           id: reportId.toString(),
           userId: currentUser.id || '',
           reportUrl: `${window.location.origin}/report/${reportId}`,
@@ -102,7 +101,7 @@ export default function ReportGenerator({
     }
   };
 
-  const generateKeyFindings = (diagnosis: ComprehensiveDiagnosis): string[] => {
+  const generateKeyFindings = (diagnosis: any): string[] => {
     const findings: string[] = [];
 
     // 진단 점수 기반 포인트
@@ -115,8 +114,8 @@ export default function ReportGenerator({
     }
 
     // 카테고리별 포인트
-    Object.entries(diagnosis.categoryScores).forEach(([category, score]) => {
-      if (score < 60) {
+    Object.entries(diagnosis.categoryScores || {}).forEach(([category, score]) => {
+      if ((score as number) < 60) {
         const categoryLabels: { [key: string]: string } = {
           'noise': '소음',
           'water_pressure': '수압',
@@ -136,7 +135,7 @@ export default function ReportGenerator({
     return findings;
   };
 
-  const generateRecommendations = (diagnosis: ComprehensiveDiagnosis): string[] => {
+  const generateRecommendations = (diagnosis: any): string[] => {
     const recommendations: string[] = [];
 
     // 진단 기반 추천
@@ -150,7 +149,7 @@ export default function ReportGenerator({
     return recommendations;
   };
 
-  const generateSummary = (diagnosis: ComprehensiveDiagnosis): string => {
+  const generateSummary = (diagnosis: any): string => {
     return `이 리포트는 ${currentUser.nickname}님의 거주 환경을 종합적으로 분석한 결과입니다. 
     전체 점수 ${diagnosis.overallScore}점으로, 같은 건물 내 ${diagnosis.buildingComparison.percentile}% 상위에 위치하고 있습니다. 
     동네 평균과 비교하여 객관적인 협상 근거를 제시합니다.`;
@@ -192,7 +191,7 @@ export default function ReportGenerator({
               <div>
                 <h4 className="font-semibold text-gray-800">주요 발견사항</h4>
                 <ul className="list-disc list-inside text-gray-600 space-y-1">
-                  {generatedReport.keyFindings.map((finding, index) => (
+                  {generatedReport.keyFindings.map((finding: any, index: number) => (
                     <li key={index}>{finding}</li>
                   ))}
                 </ul>
@@ -200,7 +199,7 @@ export default function ReportGenerator({
               <div>
                 <h4 className="font-semibold text-gray-800">추천사항</h4>
                 <ul className="list-disc list-inside text-gray-600 space-y-1">
-                  {generatedReport.recommendations.map((recommendation, index) => (
+                  {generatedReport.recommendations.map((recommendation: any, index: number) => (
                     <li key={index}>{recommendation}</li>
                   ))}
                 </ul>
@@ -285,13 +284,6 @@ export default function ReportGenerator({
         </form>
       </div>
       
-      {/* 리포트 공유 모달 */}
-      {showSharing && generatedReport && (
-        <ReportSharing 
-          report={generatedReport} 
-          onClose={() => setShowSharing(false)} 
-        />
-      )}
     </div>
   );
 }

@@ -55,7 +55,7 @@ const transformData = (backendData: any): ReportTemplateType => {
       overallScore: backendData.subjectiveMetrics.overallScore.myScore,
       neighborhoodAverage: backendData.subjectiveMetrics.overallScore.neighborhoodAverage,
       buildingAverage: backendData.subjectiveMetrics.overallScore.buildingAverage,
-      categories: subjectiveCategories,
+      categories: subjectiveCategories as any, // 타입 캐스팅으로 임시 해결
     },
     // 백엔드가 objectiveMetrics를 제공하지 않으므로 null 또는 빈 객체로 설정
     objectiveMetrics: null,
