@@ -452,23 +452,22 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="text-left">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white">
-                공정한 <span className="text-blue-400">월세</span>,
+                혹시 나만 <span className="text-red-400">월세를 비싸게</span>
                 <br />
-                함께 만들어요
+                내고 있나요?
               </h1>
               <p className="text-xl mb-8 leading-relaxed text-gray-300">
-                AI 분석과 그룹 협상으로 합리적인 월세를 만들어가는
-                <br />
-                20대를 위한 스마트한 월세 협상 플랫폼
+                이웃의 실제 거주 데이터와 공공 데이터를 종합 분석해,<br />
+                당신의 협상력을 높여줄 리포트를 무료로 제공합니다.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 {!isLoggedIn ? (
                   <>
                     <Link
                       href="/auth/register"
-                      className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-white text-gray-800"
+                      className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-red-600 text-white shadow-lg hover:bg-red-700"
                     >
-                      등록하기
+                      내 협상 리포트 무료로 받기
                     </Link>
                     <Link
                       href="/diagnosis"
@@ -481,9 +480,9 @@ export default function HomePage() {
                   <>
                     <Link
                       href="/dashboard"
-                      className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-white text-gray-800"
+                      className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-red-600 text-white shadow-lg hover:bg-red-700"
                     >
-                      리포트 생성하기
+                      내 협상 리포트 생성하기
                     </Link>
                     <Link
                       href="/diagnosis"

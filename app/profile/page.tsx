@@ -30,18 +30,6 @@ export default function ProfilePage() {
   const [tempProfileData, setTempProfileData] = useState(profileData);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 페이지 포커스 시 데이터 새로고침
-  useEffect(() => {
-    const handleFocus = () => {
-      if (document.visibilityState === 'visible') {
-        loadUserProfile();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleFocus);
-    return () => document.removeEventListener('visibilitychange', handleFocus);
-  }, []);
-
   const loadUserProfile = async () => {
       try {
         // 로그인 체크
@@ -172,8 +160,16 @@ export default function ProfilePage() {
     loadUserProfile();
   }, [router]);
 
+  // 페이지 포커스 시 데이터 새로고침
   useEffect(() => {
-    loadUserProfile();
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        loadUserProfile();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleFocus);
+    return () => document.removeEventListener('visibilitychange', handleFocus);
   }, []);
 
   const handleEdit = () => {
