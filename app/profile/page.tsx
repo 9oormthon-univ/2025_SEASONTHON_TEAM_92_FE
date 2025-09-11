@@ -32,6 +32,17 @@ export default function ProfilePage() {
   const [tempProfile, setTempProfile] = useState<ProfileState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 프로필 페이지 임시 비활성화
+  useEffect(() => {
+    toast('프로필 페이지는 현재 개발 중입니다. 곧 이용하실 수 있습니다.', {
+      icon: '🚧',
+      duration: 4000,
+    });
+    setTimeout(() => {
+      router.push('/');
+    }, 2000);
+  }, [router]);
+
   const loadUserProfile = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -91,7 +102,10 @@ export default function ProfilePage() {
           contractVerified: false,
         };
         
-        toast.info('백엔드 연결이 원활하지 않습니다. 임시 데이터를 표시합니다.');
+        toast('백엔드 연결이 원활하지 않습니다. 임시 데이터를 표시합니다.', {
+          icon: 'ℹ️',
+          duration: 3000,
+        });
       }
 
       // 진단 결과 처리
