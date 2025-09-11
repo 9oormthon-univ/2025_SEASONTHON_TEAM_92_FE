@@ -146,6 +146,12 @@ export default function DashboardPage() {
 
   const handleGenerateReport = async () => {
     console.log('리포트 생성 버튼 클릭됨');
+    // 리포트 페이지로 이동
+    router.push('/report');
+  };
+
+  const handleGenerateReportInModal = async () => {
+    console.log('리포트 생성 버튼 클릭됨 (모달)');
     setIsGeneratingReport(true);
     setShowReportModal(true);
     setGeneratedReport(null);

@@ -67,10 +67,11 @@ export default function ComprehensiveReport({ reportId, userId }: ComprehensiveR
   useEffect(() => {
     if (reportId) {
       loadReport();
-    } else if (userId) {
+    } else {
+      // reportId가 없으면 종합 리포트 생성
       generateComprehensiveReport();
     }
-  }, [reportId, userId]);
+  }, [reportId]);
 
   const loadReport = async () => {
     try {
@@ -97,13 +98,20 @@ export default function ComprehensiveReport({ reportId, userId }: ComprehensiveR
       setIsLoading(true);
       setError('');
       
-      const response = await reportApi.getComprehensiveReport();
-      if (response && response.success) {
-        setReportData(response.data);
+      console.log('종합 리포트 생성 시작...');
+      
+      // 종합 리포트 생성
+      const reportResponse = await reportApi.getComprehensiveReport();
+      console.log('리포트 응답:', reportResponse);
+      
+      if (reportResponse && reportResponse.success) {
+        setReportData(reportResponse.data);
         // 종합 리포트의 경우 공유 URL 생성
         const newReportId = Date.now().toString();
         setShareUrl(`${window.location.origin}/report/${newReportId}`);
+        console.log('리포트 데이터 설정 완료:', reportResponse.data);
       } else {
+        console.error('리포트 생성 실패:', reportResponse);
         setError('종합 리포트를 생성할 수 없습니다.');
       }
     } catch (err: any) {
@@ -129,7 +137,11 @@ export default function ComprehensiveReport({ reportId, userId }: ComprehensiveR
         <div className="text-center">
           <div className="animate-spin rounded-full h-20 w-20 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-800 mb-3">리포트 생성 중...</h2>
-          <p className="text-gray-600">데이터를 분석하고 맞춤형 리포트를 만들고 있습니다</p>
+          <p className="text-gray-600 mb-4">데이터를 분석하고 맞춤형 리포트를 만들고 있습니다</p>
+          <div className="w-64 bg-gray-200 rounded-full h-2 mx-auto">
+            <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+          </div>
+          <p className="text-sm text-gray-500 mt-2">예상 소요 시간: 2-3초</p>
         </div>
       </div>
     );
