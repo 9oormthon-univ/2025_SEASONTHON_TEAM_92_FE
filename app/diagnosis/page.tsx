@@ -85,7 +85,7 @@ export default function DiagnosisPage() {
       const payload = {
         responses: Object.entries(responses).map(([questionId, score]) => ({
           questionId: Number(questionId),
-          score: score // 숫자로 전송
+          score: score.toString() // 문자열로 전송
         }))
       };
 
@@ -126,6 +126,19 @@ export default function DiagnosisPage() {
       const lowLabel = labels[0].trim();
       const highLabel = labels[1].trim();
       
+      // 소음 관련 질문들은 점수가 높을수록 나쁨 (역순)
+      if (subText.includes('조용함') && subText.includes('시끄러움')) {
+        switch (value) {
+          case 1: return highLabel; // 매우 시끄러움
+          case 2: return '시끄러움';
+          case 3: return '보통';
+          case 4: return '조용함';
+          case 5: return lowLabel; // 매우 조용함
+          default: return '보통';
+        }
+      }
+      
+      // 일반적인 경우 (점수가 높을수록 좋음)
       switch (value) {
         case 1: return lowLabel;
         case 2: return '나쁨';

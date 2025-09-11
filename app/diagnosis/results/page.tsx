@@ -100,7 +100,7 @@ export default function DiagnosisResultsPage() {
                 <div className="flex items-center justify-center text-blue-800">
                   <i className="ri-bar-chart-line mr-2"></i>
                   <span className="font-medium">
-                    {diagnosisResult.participantCount || 0}명의 이웃 데이터와 비교 분석
+                    {diagnosisResult.statistics?.participantCount || 0}명의 이웃 데이터와 비교 분석
                   </span>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function DiagnosisResultsPage() {
                 <div className="text-center">
                   <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-blue-600">
-                      {diagnosisResult.overallScore || 0}
+                      {diagnosisResult.summary?.totalScore || 0}
                     </span>
                   </div>
                   <h4 className="font-bold text-gray-900 mb-1">내 점수</h4>
@@ -129,7 +129,7 @@ export default function DiagnosisResultsPage() {
                 <div className="text-center">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-green-600">
-                      {diagnosisResult.buildingAverage || 0}
+                      {diagnosisResult.summary?.buildingAverage || 0}
                     </span>
                   </div>
                   <h4 className="font-bold text-gray-900 mb-1">건물 평균</h4>
@@ -139,7 +139,7 @@ export default function DiagnosisResultsPage() {
                 <div className="text-center">
                   <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-orange-600">
-                      {diagnosisResult.neighborhoodAverage || 0}
+                      {diagnosisResult.summary?.neighborhoodAverage || 0}
                     </span>
                   </div>
                   <h4 className="font-bold text-gray-900 mb-1">동네 평균</h4>
@@ -149,37 +149,42 @@ export default function DiagnosisResultsPage() {
             </div>
 
             {/* Category Breakdown */}
-            {diagnosisResult.categories && (
+            {diagnosisResult.categoryDetails && (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
                 <h3 className="text-2xl font-bold mb-6 text-gray-900">📋 카테고리별 분석</h3>
                 
                 <div className="space-y-4">
-                  {Object.entries(diagnosisResult.categories).map(([category, data]: [string, any]) => (
-                    <div key={category} className="bg-gray-50 rounded-xl p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-bold text-gray-900 capitalize">{category}</h4>
-                        <div className="text-right">
-                          <div className="text-xl font-bold text-blue-600">{data.myScore || 0}</div>
-                          <div className="text-sm text-gray-600">내 점수</div>
-                        </div>
-                      </div>
-                      
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="bg-white rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-600">건물 평균</span>
-                            <span className="font-semibold text-green-600">{data.buildingAvg || 0}</span>
+                  {diagnosisResult.categoryDetails.map((category: any, index: number) => {
+                    const categoryNames = ['소음', '수압', '채광', '주차', '난방', '환기', '보안', '관리', '편의성', '인터넷'];
+                    const categoryName = categoryNames[category.categoryId - 1] || `카테고리 ${category.categoryId}`;
+                    
+                    return (
+                      <div key={category.categoryId} className="bg-gray-50 rounded-xl p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-bold text-gray-900">{categoryName}</h4>
+                          <div className="text-right">
+                            <div className="text-xl font-bold text-blue-600">{category.myScore || 0}</div>
+                            <div className="text-sm text-gray-600">내 점수</div>
                           </div>
                         </div>
-                        <div className="bg-white rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-600">동네 평균</span>
-                            <span className="font-semibold text-orange-600">{data.neighborhoodAvg || 0}</span>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="bg-white rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">건물 평균</span>
+                              <span className="font-semibold text-green-600">{category.buildingAverage || 0}</span>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">동네 평균</span>
+                              <span className="font-semibold text-orange-600">{category.neighborhoodAverage || 0}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

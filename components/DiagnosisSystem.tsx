@@ -269,11 +269,29 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
                                 <div className={`text-xs ${
                                   responses[question.questionId.toString()] === value ? 'text-blue-100' : 'text-gray-500'
                                 }`}>
-                                  {value === 1 && scoreLabels.low}
-                                  {value === 2 && '나쁨'}
-                                  {value === 3 && '보통'}
-                                  {value === 4 && '좋음'}
-                                  {value === 5 && scoreLabels.high}
+                                  {(() => {
+                                    // 소음 관련 질문들은 점수가 높을수록 나쁨 (역순)
+                                    if (question.subText.includes('조용함') && question.subText.includes('시끄러움')) {
+                                      switch (value) {
+                                        case 1: return scoreLabels.high; // 매우 시끄러움
+                                        case 2: return '시끄러움';
+                                        case 3: return '보통';
+                                        case 4: return '조용함';
+                                        case 5: return scoreLabels.low; // 매우 조용함
+                                        default: return '보통';
+                                      }
+                                    }
+                                    
+                                    // 일반적인 경우 (점수가 높을수록 좋음)
+                                    switch (value) {
+                                      case 1: return scoreLabels.low;
+                                      case 2: return '나쁨';
+                                      case 3: return '보통';
+                                      case 4: return '좋음';
+                                      case 5: return scoreLabels.high;
+                                      default: return '보통';
+                                    }
+                                  })()}
                                 </div>
                               </button>
                             ))}

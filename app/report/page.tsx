@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { reportApi } from '../../lib/api';
+import { reportApi, diagnosisApi } from '../../lib/api';
 import toast from 'react-hot-toast';
+import ComprehensiveReport from '../../components/ComprehensiveReport';
 
 export default function ReportPage() {
   const [reportContent, setReportContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
   const [error, setError] = useState('');
+  const [showComprehensiveReport, setShowComprehensiveReport] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,6 +88,34 @@ export default function ReportPage() {
     }
   };
 
+  const handleGenerateComprehensiveReport = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // 진단 결과가 있는지 확인
+      const diagnosisResponse = await diagnosisApi.getResult();
+      if (!diagnosisResponse.success) {
+        setError('먼저 진단을 완료해주세요.');
+        return;
+      }
+
+      setShowComprehensiveReport(true);
+      toast.success('종합 리포트를 생성했습니다!');
+      
+    } catch (err: any) {
+      console.error('Comprehensive report generation error:', err);
+      setError('종합 리포트 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 종합 리포트가 표시되는 경우
+  if (showComprehensiveReport) {
+    return <ComprehensiveReport />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -95,6 +125,64 @@ export default function ReportPage() {
           <p className="text-sm text-gray-500">• 진단 점수 기반 협상 포인트 분석</p>
           <p className="text-sm text-gray-500">• 개인화된 협상 카드 생성</p>
           <p className="text-sm text-gray-500">• 단계별 협상 가이드 제공</p>
+        </div>
+
+        {/* 리포트 타입 선택 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* 종합 리포트 */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-blue-200">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="ri-file-chart-line text-2xl text-blue-600"></i>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-3">종합 협상 리포트</h2>
+              <p className="text-gray-600 mb-4">진단 결과를 바탕으로 완전한 협상 리포트를 자동 생성합니다</p>
+              <ul className="text-sm text-gray-500 text-left mb-6 space-y-1">
+                <li>• 8개 섹션으로 구성된 완전한 리포트</li>
+                <li>• 객관적 데이터와 주관적 평가 통합</li>
+                <li>• 협상 카드 자동 생성</li>
+                <li>• 정책 정보 및 분쟁 해결 가이드</li>
+                <li>• 인쇄 및 공유 기능</li>
+              </ul>
+              <button
+                onClick={handleGenerateComprehensiveReport}
+                disabled={isLoading}
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    생성 중...
+                  </div>
+                ) : (
+                  '종합 리포트 생성하기'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* 맞춤형 리포트 */}
+          <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-200">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="ri-edit-line text-2xl text-green-600"></i>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-3">맞춤형 협상 리포트</h2>
+              <p className="text-gray-600 mb-4">직접 입력한 요구사항을 바탕으로 개인화된 리포트를 생성합니다</p>
+              <ul className="text-sm text-gray-500 text-left mb-6 space-y-1">
+                <li>• 사용자 입력 기반 맞춤형 내용</li>
+                <li>• AI가 생성한 협상 전략</li>
+                <li>• 단계별 협상 가이드</li>
+                <li>• 즉시 공유 가능한 링크</li>
+              </ul>
+              <button
+                onClick={() => setReportData(null)}
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                맞춤형 리포트 만들기
+              </button>
+            </div>
+          </div>
         </div>
 
         {!reportData ? (
