@@ -8,6 +8,7 @@ import { authApi, diagnosisApi, missionApi } from '@/lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('report');
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
