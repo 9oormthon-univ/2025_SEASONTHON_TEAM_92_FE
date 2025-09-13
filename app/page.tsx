@@ -272,7 +272,7 @@ export default function HomePage() {
                 <i className="ri-home-heart-line text-3xl text-blue-600"></i>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                환영합니다! 🎉
+                🎉 환영합니다! 🎉
               </h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
                 가입을 완료하셨네요!<br />
@@ -285,12 +285,23 @@ export default function HomePage() {
                   <i className="ri-time-line mr-2"></i>
                   <span>약 5분 소요</span>
                 </div>
-                <div className="flex items-center text-blue-800 text-sm mt-1">
-                  <i className="ri-bar-chart-line mr-2"></i>
-                  <span>곧바로 확인하는 우리 집 결과<br />
-                  바로 확인 가능한 이웃 비교 리포트<br />
-                  바로 이웃과의 비교 결과 확인<br />
-                  우리 집 vs 이웃 결과 확인</span>
+                <div className="text-blue-800 text-sm mt-1">
+                  <div className="flex items-center mb-1">
+                    <i className="ri-bar-chart-line mr-2"></i>
+                    <span className="text-left">곧바로 확인하는 우리 집 결과</span>
+                  </div>
+                  <div className="flex items-center mb-1">
+                    <i className="ri-bar-chart-line mr-2"></i>
+                    <span className="text-left">바로 확인 가능한 이웃 비교 리포트</span>
+                  </div>
+                  <div className="flex items-center mb-1">
+                    <i className="ri-bar-chart-line mr-2"></i>
+                    <span className="text-left">바로 이웃과의 비교 결과 확인</span>
+                  </div>
+                  <div className="flex items-center">
+                    <i className="ri-bar-chart-line mr-2"></i>
+                    <span className="text-left">우리 집 vs 이웃 결과 확인</span>
+                  </div>
                 </div>
               </div>
 
