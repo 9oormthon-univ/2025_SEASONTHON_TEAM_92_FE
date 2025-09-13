@@ -210,9 +210,13 @@ export default function ReportPage() {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="reportContent" className="block text-sm font-medium text-gray-700 mb-2">
-                  협상 요구사항을 자세히 설명해주세요
+                <label htmlFor="reportContent" className="block text-base font-semibold text-gray-800 mb-2">
+                  협상 요구사항을 자세히 설명해주세요.
                 </label>
+                <p className="text-sm text-gray-600 mb-3">
+                  입력하신 내용은 AI가 맞춤형 협상 전략과 협상 카드를 생성하는 데 사용됩니다. 
+                  구체적인 상황과 요구사항을 자세히 설명해주시면 더 정확한 리포트를 받을 수 있습니다.
+                </p>
                 <textarea
                   id="reportContent"
                   rows={8}
