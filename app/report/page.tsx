@@ -157,7 +157,7 @@ export default function ReportPage() {
                 <i className="ri-file-chart-line text-2xl text-blue-600"></i>
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-3">종합 협상 리포트</h2>
-              <p className="text-gray-600 mb-4">진단 결과를 바탕으로 완전한 협상 리포트를 자동 생성합니다</p>
+              <p className="text-gray-600 mb-4">진단 결과를 바탕으로<br />완전한 협상 리포트를 자동 생성합니다</p>
               <ul className="text-sm text-gray-500 text-left mb-6 space-y-1">
                 <li>• 8개 섹션으로 구성된 완전한 리포트</li>
                 <li>• 객관적 데이터와 주관적 평가 통합</li>
@@ -189,7 +189,7 @@ export default function ReportPage() {
                 <i className="ri-edit-line text-2xl text-green-600"></i>
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-3">맞춤형 협상 리포트</h2>
-              <p className="text-gray-600 mb-4">직접 입력한 요구사항을 바탕으로 개인화된 리포트를 생성합니다</p>
+              <p className="text-gray-600 mb-4">직접 입력한 요구사항을 바탕으로<br />개인화된 리포트를 생성합니다</p>
               <ul className="text-sm text-gray-500 text-left mb-6 space-y-1">
                 <li>• 사용자 입력 기반 맞춤형 내용</li>
                 <li>• AI가 생성한 협상 전략</li>
