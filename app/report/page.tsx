@@ -119,12 +119,33 @@ export default function ReportPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">AI 협상 리포트 생성</h1>
-          <p className="text-gray-600 mb-2">당신의 진단 결과와 요구사항을 바탕으로 AI가 맞춤형 협상 전략을 생성합니다</p>
-          <p className="text-sm text-gray-500">• 진단 점수 기반 협상 포인트 분석</p>
-          <p className="text-sm text-gray-500">• 개인화된 협상 카드 생성</p>
-          <p className="text-sm text-gray-500">• 단계별 협상 가이드 제공</p>
+        {/* 헤더와 네비게이션 */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <i className="ri-arrow-left-line mr-2"></i>
+              뒤로가기
+            </button>
+            <button
+              onClick={() => router.push('/')}
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <i className="ri-home-line mr-2"></i>
+              홈
+            </button>
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">AI 협상 리포트 생성</h1>
+            <p className="text-gray-600 mb-2">당신의 진단 결과와 요구사항을 바탕으로 AI가 맞춤형 협상 전략을 생성합니다</p>
+            <div className="text-sm text-gray-500 text-left max-w-md mx-auto">
+              <p>• 진단 점수 기반 협상 포인트 분석</p>
+              <p>• 개인화된 협상 카드 생성</p>
+              <p>• 단계별 협상 가이드 제공</p>
+            </div>
+          </div>
         </div>
 
         {/* 리포트 타입 선택 */}
