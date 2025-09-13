@@ -64,6 +64,13 @@ api.interceptors.response.use(
   (error) => {
     console.error('❌ API 응답 에러:', error.config?.url, error.response?.status, error.message);
     
+    // 네트워크 오류 처리
+    if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+      console.warn('🌐 네트워크 연결 오류 - 백엔드 서버에 연결할 수 없습니다');
+      // 네트워크 오류 시에는 로그아웃하지 않고 그대로 진행
+      return Promise.reject(error);
+    }
+    
     // 401 Unauthorized 오류 처리 - 자동 로그아웃
     if (error.response?.status === 401) {
       console.log('🔐 인증 오류 감지 - 자동 로그아웃 실행');

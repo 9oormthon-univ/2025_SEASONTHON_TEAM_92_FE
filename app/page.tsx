@@ -65,6 +65,24 @@ export default function HomePage() {
 
         } catch (error) {
           console.error("Failed to fetch user profile for modal logic:", error);
+          // 네트워크 오류 시에도 로컬 스토리지 기반으로 모달 표시
+          const onboardingCompleted = localStorage.getItem('onboarding_completed');
+          if (onboardingCompleted === 'true') {
+            setShowDiagnosisPrompt(true);
+            localStorage.removeItem('onboarding_completed');
+          }
+
+          const diagnosisCompleted = localStorage.getItem('diagnosis_completed');
+          if (diagnosisCompleted === 'true') {
+            setShowWeeklyMissionPrompt(true);
+            localStorage.removeItem('diagnosis_completed');
+          }
+
+          const justLoggedIn = localStorage.getItem('just_logged_in');
+          if (justLoggedIn === 'true') {
+            setShowSurpriseWeeklyMission(true);
+            localStorage.removeItem('just_logged_in');
+          }
         }
       }
     };
