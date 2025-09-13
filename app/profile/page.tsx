@@ -275,11 +275,11 @@ export default function ProfilePage() {
                 <VerificationBadge gpsVerified={profile.gpsVerified} contractVerified={profile.contractVerified} />
               </div>
               <div className="flex space-x-3">
-                <Link href="/diagnosis">
+                <Link href="/onboarding/location">
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer whitespace-nowrap">
                     <div className="flex items-center">
-                      <i className="ri-file-text-line mr-2"></i>
-                      진단하러 가기
+                      <i className="ri-map-pin-line mr-2"></i>
+                      GPS 재인증
                     </div>
                   </button>
                 </Link>
