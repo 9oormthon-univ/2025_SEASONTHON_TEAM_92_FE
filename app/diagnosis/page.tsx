@@ -48,8 +48,9 @@ export default function DiagnosisPage() {
         try {
           // 백엔드에서 사용자 정보를 가져와서 온보딩 완료 상태 확인
           const userResponse = await authApi.getCurrentUser();
-          if (userResponse && userResponse.success && userResponse.data) {
-            onboardingCompleted = userResponse.data.onboardingCompleted || false;
+          console.log('백엔드 사용자 정보 응답:', userResponse);
+          if (userResponse && userResponse.onboardingCompleted !== undefined) {
+            onboardingCompleted = userResponse.onboardingCompleted || false;
             console.log('백엔드에서 온보딩 상태 확인:', onboardingCompleted);
           }
         } catch (error) {
