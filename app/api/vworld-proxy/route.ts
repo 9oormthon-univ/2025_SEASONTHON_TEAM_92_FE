@@ -1,48 +1,82 @@
-import { type NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-// Vercel의 빠른 Edge 런타임 사용
 export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
-  // 백엔드에서 보낸 요청의 URL에서 파라미터를 그대로 가져옵니다.
-  const { searchParams } = new URL(request.url);
-
-  // Vercel에 설정할 VWorld API 키를 가져옵니다.
-  const apiKey = process.env.VWORLD_API_KEY;
-
-  if (!apiKey) {
-    return new Response('Vercel 환경변수에 VWORLD_API_KEY가 설정되지 않았습니다.', {
-      status: 500 });
-  }
-
-  // 실제 VWorld API의 주소
-  const vworldUrl = new URL('https://api.vworld.kr/req/address');
-
-  // 백엔드가 보낸 모든 파라미터를 VWorld URL에 그대로 추가합니다.
-  searchParams.forEach((value, key) => {
-    vworldUrl.searchParams.append(key, value);
-  });
-
-  // 환경변수에서 가져온 진짜 API 키를 추가합니다.
-  vworldUrl.searchParams.append('key', apiKey);
-
   try {
-    // Vercel 서버(서울)에서 실제 VWorld API로 요청을 보냅니다.
+    console.log('VWorld 프록시 요청 시작:', request.url);
+    
+    const { searchParams } = new URL(request.url);
+    console.log('받은 파라미터:', Object.fromEntries(searchParams));
+
+    const apiKey = process.env.VWORLD_API_KEY;
+    if (!apiKey) {
+      console.error('VWORLD_API_KEY 환경변수가 설정되지 않음');
+      return NextResponse.json(
+        { error: 'Vercel 환경변수 VWORLD_API_KEY가 설정되지 않았습니다.' },
+        { status: 500 }
+      );
+    }
+
+    const vworldUrl = new URL('https://api.vworld.kr/req/address');
+    
+    // 백엔드가 보낸 모든 파라미터를 VWorld URL에 추가
+    searchParams.forEach((value, key) => {
+      vworldUrl.searchParams.append(key, value);
+    });
+    
+    // API 키는 마지막에 설정 (덮어쓰기 방지)
+    vworldUrl.searchParams.set('key', apiKey);
+
+    console.log('VWorld API 요청 URL:', vworldUrl.toString());
+
     const response = await fetch(vworldUrl.toString(), {
       method: 'GET',
-      headers: { 'Accept': 'application/json' },
+      headers: { 
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (compatible; Vercel-Proxy/1.0)'
+      },
     });
 
-    // VWorld로부터 받은 응답을 그대로 우리 백엔드 서버로 전달합니다.
-    return new Response(response.body, {
+    if (!response.ok) {
+      console.error('VWorld API 오류:', response.status, response.statusText);
+      return NextResponse.json(
+        { error: `VWorld API 오류: ${response.status} ${response.statusText}` },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.text();
+    console.log('VWorld API 응답 길이:', data.length);
+
+    // CORS 헤더 추가
+    return new NextResponse(data, {
       status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
     });
 
   } catch (error) {
     console.error('VWorld 프록시 오류:', error);
-    return new Response('VWorld API 호출 중 프록시 서버에서 오류가 발생했습니다.', {
-      status: 500 });
+    return NextResponse.json(
+      { error: 'VWorld API 호출 중 프록시 서버에서 오류가 발생했습니다.', details: error.message },
+      { status: 500 }
+    );
   }
+}
+
+// CORS preflight 요청 처리
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }
