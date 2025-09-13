@@ -113,19 +113,22 @@ export default function ProfilePage() {
       // 진단 결과 처리
       if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value) {
         const diagnosisData = diagnosisRes.value;
+        console.log('백엔드에서 받은 진단 데이터:', diagnosisData);
         // 진단 결과가 있고 점수가 0보다 크면 완료된 것으로 간주
         if (diagnosisData.summary && diagnosisData.summary.totalScore > 0) {
           userProfile.diagnosisCompleted = true;
           userProfile.diagnosisScore = diagnosisData.summary.totalScore;
           userProfile.lastDiagnosisDate = new Date().toISOString();
+          console.log('진단 완료 상태로 설정:', userProfile.diagnosisCompleted, userProfile.diagnosisScore);
         } else {
           userProfile.diagnosisCompleted = false;
           userProfile.diagnosisScore = 0;
+          console.log('진단 미완료 상태로 설정');
         }
       } else {
         userProfile.diagnosisCompleted = false;
         userProfile.diagnosisScore = 0;
-        console.log('진단 결과 조회 실패 또는 미완료 상태');
+        console.log('진단 결과 조회 실패 또는 미완료 상태:', diagnosisRes);
       }
 
       setProfile(userProfile as ProfileState);
@@ -153,9 +156,8 @@ export default function ProfilePage() {
 
 
   const handleEdit = () => {
-    if (!profile) return;
-    setTempProfile(profile);
-    setIsEditing(true);
+    // 온보딩 프로필 페이지로 이동하여 정보 업데이트
+    router.push('/onboarding/profile');
   };
 
   const handleCancel = () => {

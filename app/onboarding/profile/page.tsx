@@ -31,13 +31,50 @@ function ProfileSetupComponent() {
     const lon = searchParams.get('lon');
 
     if (dong && lat && lon) {
+      // 새로운 온보딩인 경우
       setFormData(prev => ({ ...prev, dong }));
       setLocationData({ lat: parseFloat(lat), lon: parseFloat(lon) });
     } else {
-      toast.error('위치 정보가 올바르지 않습니다. 이전 단계로 돌아가 다시 시도해주세요.');
-      router.push('/onboarding/location');
+      // 프로필 편집인 경우 - 기존 데이터 불러오기
+      loadExistingProfile();
     }
   }, [searchParams, router]);
+
+  const loadExistingProfile = async () => {
+    try {
+      const userEmail = localStorage.getItem('userEmail');
+      const userDong = localStorage.getItem('userDong');
+      const userBuilding = localStorage.getItem('userBuilding');
+      const userBuildingType = localStorage.getItem('userBuildingType');
+      const userContractType = localStorage.getItem('userContractType');
+      const userSecurity = localStorage.getItem('userSecurity');
+      const userRent = localStorage.getItem('userRent');
+      const userMaintenanceFee = localStorage.getItem('userMaintenanceFee');
+
+      if (userDong) {
+        setFormData({
+          dong: userDong,
+          detailAddress: '',
+          building: userBuilding || '',
+          buildingType: userBuildingType || '',
+          contractType: userContractType || '월세',
+          security: userSecurity || '',
+          rent: userRent || '',
+          maintenanceFee: userMaintenanceFee || ''
+        });
+        
+        // 기본 위치 설정 (서울 강남구)
+        setLocationData({ lat: 37.5665, lon: 126.9780 });
+      } else {
+        toast.error('기존 프로필 정보를 찾을 수 없습니다. 위치 인증부터 다시 진행해주세요.');
+        router.push('/onboarding/location');
+      }
+    } catch (error) {
+      console.error('기존 프로필 로드 실패:', error);
+      toast.error('프로필 정보를 불러오는데 실패했습니다.');
+      router.push('/onboarding/location');
+    }
+  };
 
   const buildingTypes = [
     { value: '아파트', label: '아파트' },
