@@ -85,8 +85,9 @@ export default function ProfilePage() {
         };
         console.log('화면에 표시할 프로필 객체:', userProfile);
       } else {
-        console.error('사용자 정보 API 호출 실패. 원인:', userRes.reason);
-        throw new Error(`사용자 정보를 불러오는데 실패했습니다: ${userRes.reason?.message || '알 수 없는 오류'}`);
+        const errorMessage = userRes.status === 'rejected' ? userRes.reason?.message || '알 수 없는 오류' : 'API 호출 실패';
+        console.error('사용자 정보 API 호출 실패. 원인:', errorMessage);
+        throw new Error(`사용자 정보를 불러오는데 실패했습니다: ${errorMessage}`);
       }
 
       if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value?.data) {
@@ -101,7 +102,8 @@ export default function ProfilePage() {
           userProfile.diagnosisScore = 0;
         }
       } else {
-        console.warn('진단 정보 API 호출 실패 또는 데이터 없음. 원인:', diagnosisRes.reason);
+        const errorMessage = diagnosisRes.status === 'rejected' ? diagnosisRes.reason?.message || '알 수 없는 오류' : 'API 호출 실패';
+        console.warn('진단 정보 API 호출 실패 또는 데이터 없음. 원인:', errorMessage);
         userProfile.diagnosisCompleted = false;
         userProfile.diagnosisScore = 0;
       }

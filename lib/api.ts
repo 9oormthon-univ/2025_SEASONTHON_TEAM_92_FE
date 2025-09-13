@@ -113,7 +113,7 @@ export const authApi = {
     const response = await api.put('/member/update', userData);
     return response; // Return the whole response
   },
-  getCurrentUser: async (): Promise<ApiResponse<any>> => {
+  getCurrentUser: async (): Promise<any> => {
     const response = await api.get('/member/profile');
     return response.data;
   },
