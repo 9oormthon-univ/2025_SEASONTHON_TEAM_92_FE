@@ -111,11 +111,19 @@ export default function ProfilePage() {
       // 진단 결과 처리
       if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value.success) {
         const diagnosisData = diagnosisRes.value.data;
-        userProfile.diagnosisCompleted = true;
-        userProfile.diagnosisScore = diagnosisData.summary.totalScore;
-        userProfile.lastDiagnosisDate = new Date().toISOString(); // 백엔드 응답에 날짜가 없으므로 현재 날짜 사용
+        // 진단 결과가 있고 점수가 0보다 크면 완료된 것으로 간주
+        if (diagnosisData.summary && diagnosisData.summary.totalScore > 0) {
+          userProfile.diagnosisCompleted = true;
+          userProfile.diagnosisScore = diagnosisData.summary.totalScore;
+          userProfile.lastDiagnosisDate = new Date().toISOString();
+        } else {
+          userProfile.diagnosisCompleted = false;
+          userProfile.diagnosisScore = 0;
+        }
       } else {
         userProfile.diagnosisCompleted = false;
+        userProfile.diagnosisScore = 0;
+        console.log('진단 결과 조회 실패 또는 미완료 상태');
       }
 
       setProfile(userProfile as ProfileState);
@@ -202,7 +210,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <Link href="/"><h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1></Link>
+          <Link href="/"><h1 className="text-4xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1></Link>
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-900">내 프로필</h2>
         </div>
@@ -214,7 +222,7 @@ export default function ProfilePage() {
                 <span className="text-3xl font-bold text-blue-600">{profile.name.charAt(0).toUpperCase()}</span>
               </div>
               <div className="text-white">
-                <h3 className="text-2xl font-bold mb-1">{profile.name}님</h3>
+                <h3 className="text-2xl font-bold mb-1">{profile.name} 님</h3>
                 <p className="text-blue-100">{profile.email}</p>
               </div>
             </div>

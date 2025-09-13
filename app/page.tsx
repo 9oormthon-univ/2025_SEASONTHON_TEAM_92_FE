@@ -182,13 +182,13 @@ export default function HomePage() {
         } ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
-              <div className="flex items-center space-x-3 cursor-pointer" onClick={scrollToTop}>
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center">
-                  <i className="ri-home-heart-line text-white text-sm"></i>
+              <div className="flex items-center space-x-4 cursor-pointer" onClick={scrollToTop}>
+                <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
+                  <i className="ri-home-heart-line text-white text-lg"></i>
                 </div>
-                <h1 className={`text-xl font-bold transition-colors ${isScrolled ? 'text-gray-900' : 'text-white'}`}>
+                <h1 className={`text-3xl font-bold transition-colors ${isScrolled ? 'text-gray-900' : 'text-white'}`}>
                   월세의 정석
                 </h1>
               </div>
@@ -196,14 +196,14 @@ export default function HomePage() {
             <div className="hidden md:flex items-center space-x-8">
               <a
                 href="#features"
-                className={`font-medium transition-colors cursor-pointer hover:opacity-80 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
+                className={`text-lg font-semibold transition-colors cursor-pointer hover:opacity-80 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
               >
                 기능
               </a>
-              <div className={`w-px h-4 ${isScrolled ? 'bg-gray-300' : 'bg-white bg-opacity-50'}`}></div>
+              <div className={`w-px h-5 ${isScrolled ? 'bg-gray-300' : 'bg-white bg-opacity-50'}`}></div>
               <a
                 href="#usage"
-                className={`font-medium transition-colors cursor-pointer hover:opacity-80 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
+                className={`text-lg font-semibold transition-colors cursor-pointer hover:opacity-80 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
               >
                 사용법
               </a>
@@ -222,7 +222,7 @@ export default function HomePage() {
                         </span>
                       </div>
                       <span className="font-medium text-blue-800">
-                        {userName}님
+                        {userName} 님
                       </span>
                       <i className={`ri-arrow-down-s-line ${showUserMenu ? 'rotate-180' : ''} transition-transform text-blue-800`}></i>
                     </button>
@@ -275,7 +275,8 @@ export default function HomePage() {
                 환영합니다! 🎉
               </h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                가입을 완료하셨네요! 이제 <strong>우리 집 종합 진단</strong>을 통해 
+                가입을 완료하셨네요!<br />
+                이제 <strong>우리 집 종합 진단</strong>을 통해<br />
                 이웃들과 비교한 결과를 바로 확인해보세요.
               </p>
               
@@ -286,7 +287,10 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center text-blue-800 text-sm mt-1">
                   <i className="ri-bar-chart-line mr-2"></i>
-                  <span>즉시 이웃 비교 결과 제공</span>
+                  <span>곧바로 확인하는 우리 집 결과<br />
+                  바로 확인 가능한 이웃 비교 리포트<br />
+                  바로 이웃과의 비교 결과 확인<br />
+                  우리 집 vs 이웃 결과 확인</span>
                 </div>
               </div>
 
@@ -443,8 +447,8 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="text-left">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white">
-                혹시 나만 <span className="text-red-400">월세를 비싸게</span>
-                <br />
+                혹시 나만<br />
+                <span className="text-red-400">월세를 비싸게</span><br />
                 내고 있나요?
               </h1>
               <p className="text-xl mb-8 leading-relaxed text-gray-300">
@@ -989,9 +993,11 @@ export default function HomePage() {
                 <i className="ri-shield-check-line text-3xl text-green-600"></i>
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900">익명 처리</h3>
-              <p className="text-gray-600">
-                모든 데이터는 익명으로 처리돼요.<br />
-                개인 신원이 노출되지 않습니다.
+              <p className="text-gray-600 leading-relaxed">
+                모든 데이터는<br />
+                익명으로 처리돼요.<br />
+                개인 신원이<br />
+                노출되지 않습니다.
               </p>
             </div>
 
@@ -1000,9 +1006,11 @@ export default function HomePage() {
                 <i className="ri-map-pin-line text-3xl text-blue-600"></i>
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900">주소 보호</h3>
-              <p className="text-gray-600">
-                상세 주소는 리포트에 절대 노출되지 않아요.<br />
-                동 단위로만 표시됩니다.
+              <p className="text-gray-600 leading-relaxed">
+                상세 주소는<br />
+                리포트에 절대<br />
+                노출되지 않아요.<br />
+                행정구 단위로만 표시됩니다.
               </p>
             </div>
 
@@ -1011,9 +1019,12 @@ export default function HomePage() {
                 <i className="ri-database-2-line text-3xl text-purple-600"></i>
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900">목적 제한</h3>
-              <p className="text-gray-600">
-                수집된 정보는 오직 비교 분석에만 사용돼요.<br />
-                다른 용도로 활용되지 않습니다.
+              <p className="text-gray-600 leading-relaxed">
+                수집된 정보는<br />
+                오직 비교 분석에만<br />
+                사용돼요.<br />
+                다른 용도로<br />
+                활용되지 않습니다.
               </p>
             </div>
           </div>
@@ -1028,7 +1039,7 @@ export default function HomePage() {
             다음 월세 협상에서 우위를 점하세요
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            이웃의 데이터로 확인하세요. 혹시 나만 월세를 비싸게 내고 있나요?
+            혹시 나만 월세를 비싸게 내고 있나요? 이웃의 데이터로 확인하세요.
           </p>
           {!isLoggedIn ? (
             <Link
@@ -1046,7 +1057,7 @@ export default function HomePage() {
             </Link>
           )}
           <div className="mt-6 text-gray-500 text-sm">
-            ⚡ 3분만에 시작 • 💯 무료 • 🔒 개인정보 보호
+            ⚡ 5분만에 시작 • 💯 무료 • 🔒 개인정보 보호
           </div>
         </div>
       </section>
@@ -1069,29 +1080,29 @@ export default function HomePage() {
 
             <div>
               <h4 className="font-bold mb-4">서비스</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors cursor-pointer">데이터 분석</a></li>
-                <li><a href="#" className="hover:text-white transition-colors cursor-pointer">그룹 협상</a></li>
-                <li><a href="#" className="hover:text-white transition-colors cursor-pointer">서류 지원</a></li>
+              <ul className="space-y-2 text-gray-500">
+                <li><span className="cursor-not-allowed opacity-50">데이터 분석</span></li>
+                <li><span className="cursor-not-allowed opacity-50">그룹 협상</span></li>
+                <li><span className="cursor-not-allowed opacity-50">서류 지원</span></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold mb-4">고객지원</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors cursor-pointer">FAQ</a></li>
-                <li><a href="#" className="hover:text-white transition-colors cursor-pointer">문의하기</a></li>
-                <li><a href="#" className="hover:text-white transition-colors cursor-pointer">이용약관</a></li>
+              <ul className="space-y-2 text-gray-500">
+                <li><span className="cursor-not-allowed opacity-50">FAQ</span></li>
+                <li><span className="cursor-not-allowed opacity-50">문의하기</span></li>
+                <li><span className="cursor-not-allowed opacity-50">이용약관</span></li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-800 pt-8 mt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400">&copy; 2024 월세의 정석. All rights reserved.</p>
+              <p className="text-gray-400">&copy; 2025 월세의 정석. All rights reserved.</p>
               <div className="flex space-x-6 mt-4 md:mt-0">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors cursor-pointer">개인정보처리방침</a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors cursor-pointer">서비스 이용약관</a>
+                <span className="text-gray-500 cursor-not-allowed opacity-50">개인정보처리방침</span>
+                <span className="text-gray-500 cursor-not-allowed opacity-50">서비스 이용약관</span>
               </div>
             </div>
           </div>

@@ -15,20 +15,34 @@ interface LocationData {
 
 const extractDistrict = (fullAddress: string): string => {
     const addressParts = fullAddress.split(' ');
-    if (addressParts.length >= 2) {
-        // 시/도 다음 구/군, 그 다음 동/읍/면을 찾는 로직
-        let district = '';
-        for (let i = 1; i < addressParts.length; i++) {
-            const part = addressParts[i];
-            if (part.endsWith('구') || part.endsWith('군')) {
-                district += part + ' ';
-            } else if (part.endsWith('동') || part.endsWith('읍') || part.endsWith('면')) {
-                district += part;
-                return district.trim();
-            }
+    let district = '';
+    
+    // 시/도 찾기
+    for (const part of addressParts) {
+        if (part.endsWith('시') || part.endsWith('도') || part.endsWith('특별시') || part.endsWith('광역시')) {
+            district += part + ' ';
+            break;
         }
     }
-    return fullAddress; // 패턴을 못찾으면 전체 주소 반환
+    
+    // 구/군 찾기
+    for (const part of addressParts) {
+        if (part.endsWith('구') || part.endsWith('군')) {
+            district += part + ' ';
+            break;
+        }
+    }
+    
+    // 동/읍/면 찾기
+    for (const part of addressParts) {
+        if (part.endsWith('동') || part.endsWith('읍') || part.endsWith('면')) {
+            district += part;
+            break;
+        }
+    }
+    
+    const result = district.trim();
+    return result || fullAddress; // 파싱 실패 시 전체 주소 반환
 };
 
 export default function LocationVerificationPage() {
@@ -69,7 +83,7 @@ export default function LocationVerificationPage() {
           }
         } catch (err: any) {
           toast.dismiss(loadingToast);
-          const errorMessage = err.response?.data?.message || '위치 정보를 주소로 변환하는데 실패했습니다.';
+          const errorMessage = err.response?.data?.message || err.message || '주소 조회에 실패했습니다. 다시 시도해주세요.';
           setError(errorMessage);
           toast.error(errorMessage);
         } finally {
@@ -111,15 +125,28 @@ export default function LocationVerificationPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <i className="ri-arrow-left-line mr-2"></i>
+              <span className="text-sm">뒤로가기</span>
+            </button>
+            <Link href="/" className="flex items-center text-gray-600 hover:text-gray-800 transition-colors">
+              <i className="ri-home-line mr-2"></i>
+              <span className="text-sm">홈</span>
+            </Link>
+          </div>
           <Link href="/">
-            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
+            <h1 className="text-4xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
           </Link>
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
             우리 동네 인증
           </h2>
           <p className="text-gray-600 text-sm leading-relaxed">
-            실제 거주자만 참여할 수 있도록 동(洞) 단위로 위치를 인증합니다
+            실제 거주자만 참여할 수 있도록 행정구 단위로 위치를 인증합니다
           </p>
         </div>
 
@@ -196,7 +223,12 @@ export default function LocationVerificationPage() {
               </div>
               <div>
                 <p className="font-medium mb-1">실거주자 데이터 신뢰성</p>
-                <p>동 단위 인증으로 실제 거주자만의 정확한 데이터를 수집하여 신뢰할 수 있는 분석 결과를 제공합니다.</p>
+                <p className="leading-relaxed">
+                  행정구 단위 인증으로<br />
+                  실제 거주자만의 정확한 데이터를<br />
+                  수집하여 신뢰할 수 있는<br />
+                  분석 결과를 제공합니다.
+                </p>
               </div>
             </div>
           </div>

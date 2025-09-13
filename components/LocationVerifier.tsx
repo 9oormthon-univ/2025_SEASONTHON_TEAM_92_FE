@@ -122,7 +122,7 @@ export default function LocationVerifier({ currentUser, onVerificationSuccess, o
             우리 동네 인증
           </h2>
           <p className="text-gray-600 text-sm leading-relaxed">
-            실제 거주자만 참여할 수 있도록 동(洞) 단위로 위치를 인증합니다
+            실제 거주자만 참여할 수 있도록 행정구 단위로 위치를 인증합니다
           </p>
         </div>
 
@@ -225,7 +225,7 @@ export default function LocationVerifier({ currentUser, onVerificationSuccess, o
               </div>
               <div>
                 <p className="font-medium mb-1">실거주자 데이터 신뢰성</p>
-                <p>동 단위 인증으로 실제 거주자만의 정확한 데이터를 수집하여 신뢰할 수 있는 분석 결과를 제공합니다.</p>
+                <p>행정구 단위 인증으로<br />실제 거주자만의 정확한 데이터를<br />수집하여 신뢰할 수 있는<br />분석 결과를 제공합니다.</p>
               </div>
             </div>
           </div>

@@ -200,7 +200,7 @@ export default function DashboardPage() {
       }
 
       // 1단계: 백엔드에 리포트 작성 요청 (POST)
-      const reportContent = `사용자 ${userData.name}님의 거주지 ${userData.building}에서 겪고 있는 문제점들을 바탕으로 협상 리포트를 생성해주세요.`;
+      const reportContent = `${userData.name} 님의 거주지 ${userData.building}에서 겪고 있는 문제점들을 바탕으로 협상 리포트를 생성해주세요.`;
       
       // API 기본 URL 가져오기
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 
@@ -305,7 +305,7 @@ export default function DashboardPage() {
             ) : (
               <div className="flex items-center justify-between">
                 <div className="text-left">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">안녕하세요, {userData.name}님!</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">안녕하세요, {userData.name} 님!</h2>
                   <p className="text-gray-600">{userData.building} • {userData.location}</p>
                   <p className="text-sm text-gray-500 mt-1">거주 기간: {userData.monthsLived}개월</p>
                 </div>
@@ -324,26 +324,26 @@ export default function DashboardPage() {
             <div className="flex border-b border-gray-200">
               <button
                 onClick={() => setActiveTab('report')}
-                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors cursor-pointer ${
+                className={`flex-1 px-6 py-4 text-left font-semibold transition-colors cursor-pointer ${
                   activeTab === 'report'
                     ? 'bg-blue-500 text-white'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <div className="flex items-center justify-center">
+                <div className="flex items-center">
                   <i className="ri-file-text-line mr-2"></i>
                   맞춤형 협상 리포트
                 </div>
               </button>
               <button
                 onClick={() => setActiveTab('market')}
-                className={`flex-1 px-6 py-4 text-center font-semibold transition-colors cursor-pointer ${
+                className={`flex-1 px-6 py-4 text-left font-semibold transition-colors cursor-pointer ${
                   activeTab === 'market'
                     ? 'bg-blue-500 text-white'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <div className="flex items-center justify-center">
+                <div className="flex items-center">
                   <i className="ri-bar-chart-line mr-2"></i>
                   우리 동네 시세
                 </div>
@@ -448,7 +448,7 @@ export default function DashboardPage() {
                         <h5 className="font-bold text-gray-900 mb-2">청년 전월세 보증금 대출</h5>
                         <p className="text-sm text-gray-600 mb-3">최대 2억원까지 연 1.8% 금리로 지원</p>
                         <a 
-                          href="https://www.hug.or.kr" 
+                          href="https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00005696" 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="inline-flex items-center text-green-600 text-sm font-medium hover:text-green-700 cursor-pointer"
@@ -470,7 +470,7 @@ export default function DashboardPage() {
                             <p className="text-sm text-gray-600">임대차 관련 분쟁의 조정 및 중재</p>
                           </div>
                           <a 
-                            href="https://www.scourt.go.kr" 
+                            href="https://adrhome.reb.or.kr/adrhome/reb/main" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-orange-600 hover:text-orange-700 cursor-pointer"

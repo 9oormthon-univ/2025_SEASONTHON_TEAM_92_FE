@@ -133,7 +133,7 @@ function ProfileSetupComponent() {
       <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
+            <h1 className="text-4xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
           </Link>
           <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">

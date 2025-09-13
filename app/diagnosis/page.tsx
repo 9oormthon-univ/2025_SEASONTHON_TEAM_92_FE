@@ -215,7 +215,7 @@ export default function DiagnosisPage() {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
             <Link href="/">
-              <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1>
+              <h1 className="text-4xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1>
             </Link>
             <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">

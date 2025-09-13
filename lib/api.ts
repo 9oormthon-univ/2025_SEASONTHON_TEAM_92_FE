@@ -110,7 +110,7 @@ export const authApi = {
     return response.data; // 백엔드에서 직접 { id: number, token: string } 응답
   },
   updateUser: async (userData: any): Promise<any> => {
-    const response = await api.post('/member/profile/setting', userData);
+    const response = await api.put('/member/update', userData);
     return response; // Return the whole response
   },
   getCurrentUser: async (): Promise<ApiResponse<any>> => {
