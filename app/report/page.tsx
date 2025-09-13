@@ -113,7 +113,7 @@ export default function ReportPage() {
 
   // 종합 리포트가 표시되는 경우
   if (showComprehensiveReport) {
-    return <ComprehensiveReport userId={localStorage.getItem('userId') || undefined} />;
+    return <ComprehensiveReport />;
   }
 
   return (
