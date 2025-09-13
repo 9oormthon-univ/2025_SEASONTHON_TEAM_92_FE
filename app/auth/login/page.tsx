@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authApi } from '../../../lib/api';
 import toast from 'react-hot-toast';
+import { Button } from '../../../components/ui/button';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ export default function LoginPage() {
     setError('');
 
     if (!formData.email || !formData.password) {
-      setError('이메일과 비밀번호를 모두 입력해주세요.');
+      setError('이메일과 비밀번호를 모두 입력해주세요! 😊');
       return;
     }
 
@@ -42,7 +43,7 @@ export default function LoginPage() {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', formData.email);
         
-        toast.success('로그인 성공! 온보딩을 시작합니다.');
+        toast.success('로그인 성공! 🎉 월세 협상 준비를 시작해볼까요?');
         
         // 온보딩 페이지로 이동
         router.push('/onboarding/location');
@@ -72,10 +73,10 @@ export default function LoginPage() {
               <h1 className="text-3xl font-bold text-blue-600 cursor-pointer">월세의 정석</h1>
             </Link>
             <h2 className="mt-6 text-2xl font-bold text-gray-900">
-              로그인
+              안녕하세요! 👋
             </h2>
             <p className="mt-2 text-gray-600">
-              계정에 로그인하여 서비스를 이용하세요
+              월세 협상의 달인이 되어보세요
             </p>
           </div>
         </div>
@@ -142,10 +143,11 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <button
+            <Button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+              className="w-full"
+              size="lg"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -155,7 +157,7 @@ export default function LoginPage() {
               ) : (
                 '로그인'
               )}
-            </button>
+            </Button>
           </div>
 
           <div className="text-center">
@@ -177,32 +179,41 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-3">
-            <a
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/oauth2/authorization/google`}
-              className="w-full inline-flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            <Button
+              asChild
+              variant="outline"
+              className="w-full"
+              size="lg"
             >
-              <img className="h-5 w-5 mr-3" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
-              Google 계정으로 로그인
-            </a>
+              <a href={`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/oauth2/authorization/google`}>
+                <img className="h-5 w-5 mr-3" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
+                Google 계정으로 로그인
+              </a>
+            </Button>
           </div>
 
           {/* Admin Login Button */}
           <div className="text-center mt-4">
-            <Link
-              href="/admin/login"
-              className="inline-flex items-center justify-center w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+            <Button
+              asChild
+              variant="ghost"
+              className="w-full"
+              size="lg"
             >
-              <i className="ri-admin-line mr-2"></i>
-              관리자 로그인
-            </Link>
+              <Link href="/admin/login">
+                <i className="ri-admin-line mr-2"></i>
+                관리자 로그인
+              </Link>
+            </Button>
           </div>
 
           {/* Demo Credentials */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">데모 계정</h3>
+            <h3 className="text-sm font-medium text-blue-800 mb-2">🚀 빠른 체험하기</h3>
             <div className="text-xs text-blue-700 space-y-1">
               <p>이메일: test@example.com</p>
               <p>비밀번호: 12345678</p>
+              <p className="text-blue-600 font-medium mt-2">위 계정으로 바로 로그인해서 서비스를 체험해보세요!</p>
             </div>
           </div>
         </form>
