@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { authApi } from '../lib/api'; // authApi import
+import { authApi } from '../lib/api';
 
 export default function HomePage() {
   const router = useRouter();
@@ -16,6 +16,7 @@ export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,9 +24,9 @@ export default function HomePage() {
       setIsScrolled(currentScrollY > 50);
       if (currentScrollY < 100) {
         setIsHeaderVisible(true);
-      } else if (currentScrollY > lastScrollY) {
+      } else if (currentScrollY > lastScrollY && currentScrollY > 200) {
         setIsHeaderVisible(false);
-      } else {
+      } else if (currentScrollY < lastScrollY) {
         setIsHeaderVisible(true);
       }
       setLastScrollY(currentScrollY);
@@ -46,7 +47,7 @@ export default function HomePage() {
           const profile = await authApi.getCurrentUser();
           
           const onboardingCompleted = localStorage.getItem('onboarding_completed');
-          if (onboardingCompleted === 'true' && !profile.diagnosisCompleted) {
+          if (onboardingCompleted === 'true' && profile && !profile.diagnosisCompleted) {
             setShowDiagnosisPrompt(true);
             localStorage.removeItem('onboarding_completed');
           }
@@ -65,24 +66,6 @@ export default function HomePage() {
 
         } catch (error) {
           console.error("Failed to fetch user profile for modal logic:", error);
-          // 네트워크 오류 시에도 로컬 스토리지 기반으로 모달 표시
-          const onboardingCompleted = localStorage.getItem('onboarding_completed');
-          if (onboardingCompleted === 'true') {
-            setShowDiagnosisPrompt(true);
-            localStorage.removeItem('onboarding_completed');
-          }
-
-          const diagnosisCompleted = localStorage.getItem('diagnosis_completed');
-          if (diagnosisCompleted === 'true') {
-            setShowWeeklyMissionPrompt(true);
-            localStorage.removeItem('diagnosis_completed');
-          }
-
-          const justLoggedIn = localStorage.getItem('just_logged_in');
-          if (justLoggedIn === 'true') {
-            setShowSurpriseWeeklyMission(true);
-            localStorage.removeItem('just_logged_in');
-          }
         }
       }
     };
@@ -105,7 +88,10 @@ export default function HomePage() {
   }, [lastScrollY]);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   const handleLogout = () => {
@@ -119,7 +105,6 @@ export default function HomePage() {
     router.push('/');
   };
 
-  // ... (rest of the handler functions are the same)
   const handleStartDiagnosis = () => {
     setShowDiagnosisPrompt(false);
     router.push('/diagnosis');
@@ -145,6 +130,20 @@ export default function HomePage() {
 
   const handleSkipSurpriseWeeklyMission = () => {
     setShowSurpriseWeeklyMission(false);
+  };
+
+  const handleShowLogin = () => {
+    setShowLoginModal(true);
+  };
+
+  const handleCloseLogin = () => {
+    setShowLoginModal(false);
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    setIsLoggedIn(true);
+    window.location.reload();
   };
 
   return (
@@ -420,8 +419,711 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center bg-gradient-to-br from-gray-800 to-gray-900">
-        {/* ... rest of the page is the same */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="text-left">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white">
+                혹시 나만<br />
+                <span className="text-red-400">월세를 비싸게</span><br />
+                내고 있나요?
+              </h1>
+              <p className="text-xl mb-8 leading-relaxed text-gray-300">
+                이웃의 실제 거주 데이터와 공공 데이터를 종합 분석해,<br />
+                당신의 협상력을 높여줄 리포트를 무료로 제공합니다.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                {!isLoggedIn ? (
+                  <Link
+                    href="/auth/login"
+                    className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    내 협상 리포트 무료로 받기
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-all whitespace-nowrap cursor-pointer text-center bg-red-600 text-white shadow-lg hover:bg-red-700"
+                    >
+                      내 협상 리포트 생성하기
+                    </Link>
+                    <Link
+                      href="/diagnosis"
+                      className="border-2 border-white/50 px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-80 transition-all whitespace-nowrap cursor-pointer text-center text-white"
+                    >
+                      진단 다시 받기
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+            
+            <div className="hidden lg:block">
+              <div className="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=modern%20clean%20website%20interface%20mockup%20on%20laptop%20screen%20showing%20rental%20price%20analysis%20dashboard%20with%20gray%20and%20white%20color%2C%20professional%20minimal%20design%2C%20realistic%20device%20mockup%20against%20dark%20background&width=600&height=400&seq=rental-website-mockup-gray&orientation=landscape"
+                  alt="월세 공동협약 네트워크 웹사이트"
+                  className="w-full max-w-lg mx-auto rounded-2xl shadow-2xl object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t rounded-2xl" style={{ background: 'linear-gradient(to top, rgba(254,237,159,0.1), transparent)' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
+
+      {/* 로그인 사용자를 위한 협상 리포트 섹션 */}
+      {isLoggedIn && (
+        <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="bg-white rounded-2xl shadow-2xl p-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-file-text-line text-3xl text-white"></i>
+              </div>
+              
+              <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                맞춤형 협상 리포트 생성
+              </h2>
+              <p className="text-lg mb-8 text-gray-600">
+                수집된 데이터를 바탕으로 임대인과의 협상에 필요한<br />
+                실질적인 자료를 생성해보세요
+              </p>
+              
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 bg-blue-100">
+                    <i className="ri-bar-chart-line text-xl text-blue-600"></i>
+                  </div>
+                  <h3 className="font-bold mb-2 text-gray-900">데이터 분석</h3>
+                  <p className="text-sm text-gray-600">이웃들과 비교한 상세 데이터</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i className="ri-lightbulb-line text-xl text-green-600"></i>
+                  </div>
+                  <h3 className="font-bold mb-2 text-gray-900">전략 제안</h3>
+                  <p className="text-sm text-gray-600">구체적인 협상 전략 가이드</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i className="ri-share-line text-xl text-orange-600"></i>
+                  </div>
+                  <h3 className="font-bold mb-2 text-gray-900">간편 공유</h3>
+                  <p className="text-sm text-gray-600">임대인에게 바로 전달</p>
+                </div>
+              </div>
+
+              <Link
+                href="/dashboard"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer inline-block whitespace-nowrap shadow-lg"
+              >
+                <div className="flex items-center">
+                  <i className="ri-rocket-line mr-3"></i>
+                  협상 리포트 바로 생성하기
+                </div>
+              </Link>
+              
+              <div className="mt-4 text-sm text-gray-500">
+                진단 데이터를 바탕으로 맞춤형 협상 자료를 생성합니다
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Quick Start Section for New Users */}
+      {!isLoggedIn && (
+        <section className="py-16 bg-blue-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+              지금 바로 시작해보세요
+            </h2>
+            <p className="text-lg mb-8 text-gray-600">
+              3분만에 우리 집 거주 환경을 진단하고 이웃들과 비교해보세요
+            </p>
+            
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100">
+                    <i className="ri-user-add-line text-xl text-blue-600"></i>
+                  </div>
+                  <h3 className="font-bold mb-2 text-gray-900">1. 간편 가입</h3>
+                  <p className="text-sm text-gray-600">위치 인증과 기본 정보만 입력</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="ri-questionnaire-line text-xl text-blue-600"></i>
+                  </div>
+                  <h3 className="font-bold mb-2 text-gray-900">2. 환경 진단</h3>
+                  <p className="text-sm text-gray-600">10개 카테고리 간단 평가</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="ri-bar-chart-line text-xl text-blue-600"></i>
+                  </div>
+                  <h3 className="font-bold mb-2 text-gray-900">3. 즉시 결과</h3>
+                  <p className="text-sm text-gray-600">이웃들과 비교 분석 결과</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <Link
+                href="/auth/login"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer text-center whitespace-nowrap"
+              >
+                지금 시작하기
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">
+              주요 기능
+            </h2>
+            <p className="text-xl max-w-3xl mx-auto text-gray-600">
+              데이터 기반 분석과 협력을 통해 공정한 월세를 만들어갑니다
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-6 bg-blue-100">
+                <i className="ri-bar-chart-line text-2xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                데이터 분석
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                주변 시세와 건물 정보를 종합적으로 분석하여 적정 월세를 제시합니다
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-team-line text-2xl text-gray-700"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                그룹 협상
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                같은 건물 거주자들과 함께 협상하여 더 나은 조건을 만들어갑니다
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-file-text-line text-2xl text-gray-700"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                서류 지원
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                협상에 필요한 각종 서류와 템플릿을 자동으로 생성해드립니다
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-file-list-3-line text-2xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                AI 리포트 생성
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                AI가 당신을 위한 맞춤형 협상 카드와 단계별 가이드를 생성합니다
+              </p>
+              <Link 
+                href="/report"
+                className="inline-block mt-4 text-green-600 font-medium hover:text-green-700 transition-colors"
+              >
+                리포트 생성하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-trophy-line text-2xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                주간 미션
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                매주 새로운 미션에 참여하여 건물 환경을 개선하고 점수를 획득하세요
+              </p>
+              <Link 
+                href="/weekly-mission"
+                className="inline-block mt-4 text-purple-600 font-medium hover:text-purple-700 transition-colors"
+              >
+                미션 참여하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-stethoscope-line text-2xl text-orange-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                건물 진단
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                현재 거주하고 있는 건물의 상태를 체계적으로 진단하고 개선점을 찾아보세요
+              </p>
+              <Link 
+                href="/diagnosis"
+                className="inline-block mt-4 text-orange-600 font-medium hover:text-orange-700 transition-colors"
+              >
+                진단 시작하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-government-line text-2xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                맞춤형 정책 정보
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                청년 주거 지원 정책과 지역별 맞춤 지원사업을 찾아보세요
+              </p>
+              <Link 
+                href="/policy"
+                className="inline-block mt-4 text-blue-600 font-medium hover:text-blue-700 transition-colors"
+              >
+                정책 확인하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-database-2-line text-2xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                공공 데이터 조회
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                국토부 실거래가 데이터를 기반으로 한 객관적 시세 정보를 확인하세요
+              </p>
+              <Link 
+                href="/officetel"
+                className="inline-block mt-4 text-green-600 font-medium hover:text-green-700 transition-colors"
+              >
+                시세 조회하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-customer-service-2-line text-2xl text-red-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                분쟁 해결 기관
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                임대차 관련 분쟁 해결을 위한 전문 기관 정보를 찾아보세요
+              </p>
+              <Link 
+                href="/dispute"
+                className="inline-block mt-4 text-red-600 font-medium hover:text-red-700 transition-colors"
+              >
+                기관 찾기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-book-open-line text-2xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                임대차 관련 법령
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                임대차 관련 법령과 조항을 상황별로 검색하고 확인하세요
+              </p>
+              <Link 
+                href="/legal"
+                className="inline-block mt-4 text-purple-600 font-medium hover:text-purple-700 transition-colors"
+              >
+                법령 검색하기 →
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-6">
+                <i className="ri-information-line text-2xl text-yellow-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">
+                상황별 정보 카드
+              </h3>
+              <p className="leading-relaxed text-gray-600">
+                현재 겪고 있는 상황에 맞는 종합 정보를 한 번에 확인하세요
+              </p>
+              <Link 
+                href="/info-card"
+                className="inline-block mt-4 text-yellow-600 font-medium hover:text-yellow-700 transition-colors"
+              >
+                정보 카드 보기 →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="usage" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">
+              어떻게 작동하나요?
+            </h2>
+            <p className="text-xl text-gray-600">
+              복잡한 설명 대신, 간단한 3단계로 시작하세요
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-user-add-line text-3xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">1. 정보 입력</h3>
+              <p className="text-gray-600">
+                3분만에 내 계약 정보와 거주 환경을 간단히 입력해요.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-bar-chart-line text-3xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">2. 데이터 분석</h3>
+              <p className="text-gray-600">
+                내 데이터와 이웃, 공공 데이터를 실시간으로 비교 분석해요.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-file-text-line text-3xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">3. 리포트 확인</h3>
+              <p className="text-gray-600">
+                월세 협상에 바로 활용할 수 있는 맞춤형 리포트를 받아요.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Problem & Solution Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold mb-6 text-gray-900">
+                깜깜이 월세 계약,<br />
+                혼자서는 막막하셨죠?
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                정보 비대칭으로 인한 불안감, 혼자서는 막막한 협상...<br />
+                이런 문제들을 해결해드립니다.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-close-line text-red-600"></i>
+                  </div>
+                  <span className="text-gray-700">정보 부족으로 비싼 월세를 내고 있나요?</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-close-line text-red-600"></i>
+                  </div>
+                  <span className="text-gray-700">혼자서는 협상이 어렵다고 느끼시나요?</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                    <i className="ri-close-line text-red-600"></i>
+                  </div>
+                  <span className="text-gray-700">객관적인 근거 없이 협상하고 계신가요?</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-white rounded-2xl shadow-lg p-8">
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
+                  데이터가 당신의 협상 무기가 됩니다
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                      <i className="ri-user-line text-2xl text-gray-600"></i>
+                    </div>
+                    <i className="ri-arrow-right-line text-2xl text-gray-400"></i>
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center ml-4">
+                      <i className="ri-group-line text-2xl text-blue-600"></i>
+                    </div>
+                  </div>
+                  <p className="text-gray-600">
+                    개인(임차인)이 집단(네트워크)의 데이터를 통해<br />
+                    힘을 얻는 과정을 시각적으로 보여줍니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section id="reviews" className="py-20 bg-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">
+              후기
+            </h2>
+            <p className="text-xl text-gray-600">
+              실제 사용자들의 성공 사례를 확인해보세요
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                  김
+                </div>  
+                <div>
+                  <div className="font-bold text-gray-900">김지원님</div>
+                  <div className="text-gray-600 text-sm">강남구</div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "데이터 분석 결과를 바탕으로 협상했더니 월세를 25만원이나 줄일 수 있었어요!"
+              </p>
+              <div className="text-green-600 font-bold">월 25만원 절약</div>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                  박
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900">박민수님</div>
+                  <div className="text-gray-600 text-sm">마포구</div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "같은 건물 주민들과 함께 그룹 협상을 진행해서 더 좋은 결과를 얻었습니다."
+              </p>
+              <div className="text-green-600 font-bold">월 18만원 절약</div>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                  이
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900">이서연님</div>
+                  <div className="text-gray-600 text-sm">송파구</div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "처음엔 어려워 보였지만 단계별 가이드 덕분에 쉽게 협상할 수 있었어요."
+              </p>
+              <div className="text-green-600 font-bold">월 32만원 절약</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust & Security Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">
+              신뢰와 데이터 보안
+            </h2>
+            <p className="text-xl text-gray-600">
+              사용자가 가질 수 있는 개인정보 우려를 해소시켜드립니다
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-shield-check-line text-3xl text-green-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">익명 처리</h3>
+              <p className="text-gray-600 leading-relaxed">
+                모든 데이터는<br />
+                익명으로 처리돼요.<br />
+                개인 신원이<br />
+                노출되지 않습니다.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-map-pin-line text-3xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">주소 보호</h3>
+              <p className="text-gray-600 leading-relaxed">
+                상세 주소는<br />
+                리포트에 절대<br />
+                노출되지 않아요.<br />
+                행정구 단위로만 표시됩니다.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="ri-database-2-line text-3xl text-purple-600"></i>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">목적 제한</h3>
+              <p className="text-gray-600 leading-relaxed">
+                수집된 정보는<br />
+                오직 비교 분석에만<br />
+                사용돼요.<br />
+                다른 용도로<br />
+                활용되지 않습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">
+            지금 바로 시작해서,<br />
+            다음 월세 협상에서 우위를 점하세요
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            혹시 나만 월세를 비싸게 내고 있나요? 이웃의 데이터로 확인하세요.
+          </p>
+          {!isLoggedIn ? (
+            <Link
+              href="/auth/login"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer inline-block shadow-lg"
+            >
+              내 협상 리포트 무료로 받기
+            </Link>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-5 rounded-xl text-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer inline-block shadow-lg"
+            >
+              내 협상 리포트 생성하기
+            </Link>
+          )}
+          <div className="mt-6 text-gray-500 text-sm">
+            ⚡ 5분만에 시작 • 💯 무료 • 🔒 개인정보 보호
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
+                  <i className="ri-home-heart-line text-white text-sm"></i>
+                </div>
+                <h3 className="text-xl font-bold">월세의 정석</h3>
+              </div>
+              <p className="text-gray-400 mb-6">
+                공정한 월세를 위한 스마트한 협상 플랫폼
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-4">서비스</h4>
+              <ul className="space-y-2 text-gray-500">
+                <li><span className="cursor-not-allowed opacity-50">데이터 분석</span></li>
+                <li><span className="cursor-not-allowed opacity-50">그룹 협상</span></li>
+                <li><span className="cursor-not-allowed opacity-50">서류 지원</span></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-4">고객지원</h4>
+              <ul className="space-y-2 text-gray-500">
+                <li><span className="cursor-not-allowed opacity-50">FAQ</span></li>
+                <li><span className="cursor-not-allowed opacity-50">문의하기</span></li>
+                <li><span className="cursor-not-allowed opacity-50">이용약관</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8 mt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-gray-400">&copy; 2025 월세의 정석. All rights reserved.</p>
+              <div className="flex space-x-6 mt-4 md:mt-0">
+                <span className="text-gray-500 cursor-not-allowed opacity-50">개인정보처리방침</span>
+                <span className="text-gray-500 cursor-not-allowed opacity-50">서비스 이용약관</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* 로그인 모달 - This was not in the original file, but it's good practice to keep it */}
+      {showLoginModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleCloseLogin}
+        >
+          <div 
+            className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">로그인</h2>
+              <button
+                onClick={handleCloseLogin}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <i className="ri-close-line text-xl"></i>
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <Link
+                href="/auth/login"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                onClick={handleCloseLogin}
+              >
+                로그인하기
+              </Link>
+              <Link
+                href="/auth/register"
+                className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors text-center block"
+                onClick={handleCloseLogin}
+              >
+                회원가입하기
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
