@@ -290,14 +290,6 @@ export default function HomePage() {
                     <i className="ri-bar-chart-line mr-2"></i>
                     <span className="text-left">곧바로 확인하는 우리 집 결과</span>
                   </div>
-                  <div className="flex items-center mb-1">
-                    <i className="ri-bar-chart-line mr-2"></i>
-                    <span className="text-left">바로 확인 가능한 이웃 비교 리포트</span>
-                  </div>
-                  <div className="flex items-center mb-1">
-                    <i className="ri-bar-chart-line mr-2"></i>
-                    <span className="text-left">바로 이웃과의 비교 결과 확인</span>
-                  </div>
                   <div className="flex items-center">
                     <i className="ri-bar-chart-line mr-2"></i>
                     <span className="text-left">우리 집 vs 이웃 결과 확인</span>

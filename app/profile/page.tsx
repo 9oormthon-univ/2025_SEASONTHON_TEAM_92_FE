@@ -67,6 +67,7 @@ export default function ProfilePage() {
       // 사용자 프로필 처리
       if (userRes.status === 'fulfilled' && userRes.value) {
         const userData = userRes.value;
+        console.log('백엔드에서 받은 사용자 데이터:', userData);
         userProfile = {
           email: userData.email,
           name: userData.name,
@@ -80,6 +81,7 @@ export default function ProfilePage() {
           gpsVerified: userData.gpsVerified,
           contractVerified: userData.contractVerified,
         };
+        console.log('처리된 사용자 프로필:', userProfile);
       } else {
         // 사용자 정보 로드 실패 시 임시 데이터 사용 (개발용)
         console.error('사용자 정보 로드 실패:', userRes);
@@ -270,32 +272,17 @@ export default function ProfilePage() {
             <div className="mt-8 pt-8 border-t border-gray-200">
               <h4 className="text-xl font-bold text-gray-900 mb-4">인증 정보</h4>
               <div className="flex space-x-4 mb-4">
-                <VerificationBadge gpsVerified={profile.gpsVerified} contractVerified={false} />
-                <VerificationBadge gpsVerified={false} contractVerified={profile.contractVerified} />
+                <VerificationBadge gpsVerified={profile.gpsVerified} contractVerified={profile.contractVerified} />
               </div>
               <div className="flex space-x-3">
-                <Link href="/gps-verification">
+                <Link href="/diagnosis">
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer whitespace-nowrap">
                     <div className="flex items-center">
-                      <i className="ri-map-pin-line mr-2"></i>
-                      GPS 재인증
+                      <i className="ri-file-text-line mr-2"></i>
+                      진단하러 가기
                     </div>
                   </button>
                 </Link>
-                <button 
-                  onClick={() => {
-                    if (confirm('온보딩을 다시 진행하시겠습니까? 기존 정보는 유지됩니다.')) {
-                      localStorage.removeItem('onboarding_completed');
-                      router.push('/onboarding/location');
-                    }
-                  }}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  <div className="flex items-center">
-                    <i className="ri-refresh-line mr-2"></i>
-                    온보딩 다시하기
-                  </div>
-                </button>
               </div>
             </div>
 
