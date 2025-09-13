@@ -62,8 +62,9 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('VWorld 프록시 오류:', error);
+    const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
     return NextResponse.json(
-      { error: 'VWorld API 호출 중 프록시 서버에서 오류가 발생했습니다.', details: error.message },
+      { error: 'VWorld API 호출 중 프록시 서버에서 오류가 발생했습니다.', details: errorMessage },
       { status: 500 }
     );
   }
