@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-export default function SocialLoginPage() {
+function SocialLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -38,5 +38,18 @@ export default function SocialLoginPage() {
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
         <p className="mt-4 text-gray-600">소셜 로그인 정보를 처리 중입니다. 잠시만 기다려주세요...</p>
     </div>
+  );
+}
+
+export default function SocialLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+        <p className="mt-4 text-gray-600">로딩 중...</p>
+      </div>
+    }>
+      <SocialLoginContent />
+    </Suspense>
   );
 }
