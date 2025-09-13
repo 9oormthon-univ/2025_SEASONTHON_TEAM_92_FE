@@ -31,122 +31,92 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileState | null>(null);
   const [tempProfile, setTempProfile] = useState<ProfileState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // 프로필 페이지 활성화
-  // useEffect(() => {
-  //   toast('프로필 페이지는 현재 개발 중입니다. 곧 이용하실 수 있습니다.', {
-  //     icon: '🚧',
-  //     duration: 4000,
-  //   });
-  //   setTimeout(() => {
-  //     router.push('/');
-  //   }, 2000);
-  // }, [router]);
+  const [error, setError] = useState<string | null>(null);
 
   const loadUserProfile = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
+    console.log('프로필 데이터 로딩을 시작합니다...');
+
     try {
-      // 로그인 체크 강화
       const isLoggedIn = localStorage.getItem('isLoggedIn');
       const jwtToken = localStorage.getItem('jwtToken');
       
       if (!isLoggedIn || !jwtToken) {
-        console.log('로그인 상태 없음 - 로그인 페이지로 리다이렉트');
+        console.log('로그인 정보 없음. 로그인 페이지로 이동합니다.');
         router.push('/auth/login');
         return;
       }
 
-      // 두 API를 동시에 호출하여 효율성 증대
+      console.log('API 요청을 보냅니다: getCurrentUser, getResult');
       const [userRes, diagnosisRes] = await Promise.allSettled([
         authApi.getCurrentUser(),
         diagnosisApi.getResult(),
       ]);
 
+      console.log('--- API 응답 상세 ---');
+      console.log('사용자 정보 응답 (userRes):', JSON.stringify(userRes, null, 2));
+      console.log('진단 정보 응답 (diagnosisRes):', JSON.stringify(diagnosisRes, null, 2));
+      console.log('---------------------');
+
       let userProfile: Partial<ProfileState> = {};
 
-      // 사용자 프로필 처리
       if (userRes.status === 'fulfilled' && userRes.value) {
         const userData = userRes.value;
-        console.log('백엔드에서 받은 사용자 데이터:', userData);
+        console.log('사용자 정보 API 호출 성공. 받은 데이터:', userData);
+
+        // 백엔드 응답 데이터 구조 확인
+        if (!userData || typeof userData !== 'object') {
+            throw new Error('API에서 사용자 정보를 받았지만, 데이터 형식이 올바르지 않습니다.');
+        }
+
         userProfile = {
-          email: userData.email,
-          name: userData.name,
-          dong: userData.dong,
-          building: userData.building,
-          buildingType: userData.buildingType,
-          contractType: userData.contractType,
+          email: userData.email ?? '이메일 정보 없음',
+          name: userData.name ?? '이름 정보 없음',
+          dong: userData.dong ?? '',
+          building: userData.building ?? '',
+          buildingType: userData.buildingType ?? '',
+          contractType: userData.contractType ?? '',
           security: userData.security?.toString() ?? '',
           rent: userData.rent?.toString() ?? '',
           maintenanceFee: userData.maintenanceFee?.toString() ?? '',
-          gpsVerified: userData.gpsVerified,
-          contractVerified: userData.contractVerified,
+          gpsVerified: userData.gpsVerified ?? false,
+          contractVerified: userData.contractVerified ?? false,
         };
-        console.log('처리된 사용자 프로필:', userProfile);
+        console.log('화면에 표시할 프로필 객체:', userProfile);
       } else {
-        // 사용자 정보 로드 실패 시 임시 데이터 사용 (개발용)
-        console.error('사용자 정보 로드 실패:', userRes);
-        console.log('임시 데이터로 프로필 표시');
-        
-        const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
-        const userNickname = localStorage.getItem('userNickname') || '사용자';
-        
-        userProfile = {
-          email: userEmail,
-          name: userNickname,
-          dong: '임시 지역',
-          building: '임시 건물',
-          buildingType: '아파트',
-          contractType: '월세',
-          security: '1000',
-          rent: '50',
-          maintenanceFee: '10',
-          gpsVerified: false,
-          contractVerified: false,
-        };
-        
-        toast('백엔드 연결이 원활하지 않습니다. 임시 데이터를 표시합니다.', {
-          icon: 'ℹ️',
-          duration: 3000,
-        });
+        console.error('사용자 정보 API 호출 실패. 원인:', userRes.reason);
+        throw new Error(`사용자 정보를 불러오는데 실패했습니다: ${userRes.reason?.message || '알 수 없는 오류'}`);
       }
 
-      // 진단 결과 처리
-      if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value) {
-        const diagnosisData = diagnosisRes.value;
-        console.log('백엔드에서 받은 진단 데이터:', diagnosisData);
-        // 진단 결과가 있고 점수가 0보다 크면 완료된 것으로 간주
+      if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value?.data) {
+        const diagnosisData = diagnosisRes.value.data;
+        console.log('진단 정보 API 호출 성공. 받은 데이터:', diagnosisData);
         if (diagnosisData.summary && diagnosisData.summary.totalScore > 0) {
           userProfile.diagnosisCompleted = true;
           userProfile.diagnosisScore = diagnosisData.summary.totalScore;
           userProfile.lastDiagnosisDate = new Date().toISOString();
-          console.log('진단 완료 상태로 설정:', userProfile.diagnosisCompleted, userProfile.diagnosisScore);
         } else {
           userProfile.diagnosisCompleted = false;
           userProfile.diagnosisScore = 0;
-          console.log('진단 미완료 상태로 설정');
         }
       } else {
+        console.warn('진단 정보 API 호출 실패 또는 데이터 없음. 원인:', diagnosisRes.reason);
         userProfile.diagnosisCompleted = false;
         userProfile.diagnosisScore = 0;
-        console.log('진단 결과 조회 실패 또는 미완료 상태:', diagnosisRes);
       }
 
       setProfile(userProfile as ProfileState);
       setTempProfile(userProfile as ProfileState);
 
-    } catch (error) {
-      console.error('프로필 로드 실패:', error);
-      toast.error('프로필 정보를 불러오는데 실패했습니다.');
-      
-      // 로그인 상태 확인 후 적절한 페이지로 리다이렉트
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      if (!isLoggedIn) {
-        router.push('/auth/login');
-      } else {
-        router.push('/'); // 에러 발생 시 홈으로 이동
-      }
+    } catch (err: any) {
+      console.error('프로필 로드 중 심각한 오류 발생:', err);
+      const errorMessage = err.message || '프로필 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
+      console.log('프로필 데이터 로딩을 종료합니다.');
     }
   }, [router]);
 
@@ -156,7 +126,6 @@ export default function ProfilePage() {
 
 
   const handleEdit = () => {
-    // 온보딩 프로필 페이지로 이동하여 정보 업데이트
     router.push('/onboarding/profile');
   };
 
@@ -197,15 +166,41 @@ export default function ProfilePage() {
   const handleLogout = () => {
     if (confirm('정말 로그아웃하시겠습니까?')) {
       localStorage.removeItem('jwtToken');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userNickname');
       toast.success('로그아웃 되었습니다.');
       router.push('/');
     }
   };
 
-  if (isLoading || !profile) {
+  if (isLoading) {
     return (
         <div className="min-h-screen flex items-center justify-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+        </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">오류 발생</h2>
+        <p className="text-gray-700 mb-6 whitespace-pre-wrap">{error}</p>
+        <button 
+          onClick={() => loadUserProfile()}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+        >
+          재시도
+        </button>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <p>프로필 정보를 표시할 수 없습니다.</p>
         </div>
     );
   }
@@ -294,7 +289,7 @@ export default function ProfilePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">최근 진단 점수</label>
-                        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-bold text-lg">{profile.diagnosisScore}점</div>
+                        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-bold text-lg">{profile.diagnosisScore} / 100점</div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">마지막 진단일</label>

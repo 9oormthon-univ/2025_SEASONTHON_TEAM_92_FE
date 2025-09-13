@@ -117,6 +117,10 @@ export const authApi = {
     const response = await api.get('/member/profile');
     return response.data;
   },
+  setProfileInfo: async (profileData: any): Promise<any> => {
+    const response = await api.post('/member/profile/setting', profileData);
+    return response.data;
+  },
 };
 
 export const locationApi = {

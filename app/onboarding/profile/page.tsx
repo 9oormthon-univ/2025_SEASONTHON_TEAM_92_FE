@@ -29,10 +29,11 @@ function ProfileSetupComponent() {
     const dong = searchParams.get('dong');
     const lat = searchParams.get('lat');
     const lon = searchParams.get('lon');
+    const buildingName = searchParams.get('buildingName');
 
     if (dong && lat && lon) {
       // 새로운 온보딩인 경우
-      setFormData(prev => ({ ...prev, dong }));
+      setFormData(prev => ({ ...prev, dong, building: buildingName || '' }));
       setLocationData({ lat: parseFloat(lat), lon: parseFloat(lon) });
     } else {
       // 프로필 편집인 경우 - 기존 데이터 불러오기
@@ -127,7 +128,7 @@ function ProfileSetupComponent() {
         longitude: locationData.lon,
       };
 
-      const response = await authApi.updateUser(payload);
+      const response = await authApi.setProfileInfo(payload);
       console.log('프로필 업데이트 응답:', response);
       
       // localStorage에도 저장하여 프로필 페이지에서 사용할 수 있도록 함
