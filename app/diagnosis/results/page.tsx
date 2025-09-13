@@ -194,18 +194,103 @@ export default function DiagnosisResultsPage() {
               <h3 className="text-2xl font-bold mb-6 text-gray-900">💡 개선 제안</h3>
               
               <div className="space-y-4">
+                {/* 시설 개선 우선순위 - 실제 데이터 기반 */}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
                   <h4 className="text-lg font-bold text-blue-800 mb-3">시설 개선 우선순위</h4>
-                  <p className="text-gray-700">
-                    낮은 점수를 받은 항목들을 우선적으로 개선하여 거주 만족도를 높일 수 있습니다.
-                  </p>
+                  {(() => {
+                    const categoryNames = ['소음', '수압', '채광', '주차', '난방', '환기', '보안', '관리', '편의성', '인터넷'];
+                    const lowScoreCategories = diagnosisResult.categoryDetails
+                      ?.filter((category: any) => category.myScore < 60)
+                      ?.sort((a: any, b: any) => a.myScore - b.myScore)
+                      ?.slice(0, 3) || [];
+                    
+                    if (lowScoreCategories.length > 0) {
+                      return (
+                        <div>
+                          <p className="text-gray-700 mb-3">
+                            다음 항목들이 건물 평균보다 낮은 점수를 받았습니다. 우선적으로 개선을 요구하세요:
+                          </p>
+                          <div className="space-y-2">
+                            {lowScoreCategories.map((category: any, index: number) => {
+                              const categoryName = categoryNames[category.categoryId - 1] || `카테고리 ${category.categoryId}`;
+                              const gap = (category.buildingAverage || 0) - (category.myScore || 0);
+                              return (
+                                <div key={category.categoryId} className="bg-white rounded-lg p-3 border border-blue-100">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-medium text-gray-800">{categoryName}</span>
+                                    <div className="text-right">
+                                      <span className="text-sm text-red-600 font-semibold">
+                                        내 점수: {category.myScore}점
+                                      </span>
+                                      <span className="text-xs text-gray-500 ml-2">
+                                        (건물 평균 대비 -{gap.toFixed(1)}점)
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <p className="text-gray-700">
+                          모든 항목에서 건물 평균 이상의 점수를 받았습니다! 현재 거주 환경이 양호한 상태입니다.
+                        </p>
+                      );
+                    }
+                  })()}
                 </div>
                 
+                {/* 협상 전략 - 실제 데이터 기반 */}
                 <div className="bg-green-50 border border-green-200 rounded-xl p-6">
                   <h4 className="text-lg font-bold text-green-800 mb-3">협상 전략</h4>
-                  <p className="text-gray-700">
-                    이 데이터를 바탕으로 임대인과의 협상에서 객관적 근거를 제시할 수 있습니다.
-                  </p>
+                  {(() => {
+                    const categoryNames = ['소음', '수압', '채광', '주차', '난방', '환기', '보안', '관리', '편의성', '인터넷'];
+                    const lowScoreCategories = diagnosisResult.categoryDetails
+                      ?.filter((category: any) => category.myScore < 60)
+                      ?.sort((a: any, b: any) => a.myScore - b.myScore)
+                      ?.slice(0, 3) || [];
+                    
+                    if (lowScoreCategories.length > 0) {
+                      const worstCategory = lowScoreCategories[0];
+                      const categoryName = categoryNames[worstCategory.categoryId - 1] || `카테고리 ${worstCategory.categoryId}`;
+                      const gap = (worstCategory.buildingAverage || 0) - (worstCategory.myScore || 0);
+                      
+                      return (
+                        <div>
+                          <p className="text-gray-700 mb-3">
+                            <strong>{categoryName}</strong> 항목에서 건물 평균 대비 <strong>{gap.toFixed(1)}점 낮은 점수</strong>를 받았습니다.
+                          </p>
+                          <div className="bg-white rounded-lg p-4 border border-green-100">
+                            <h5 className="font-semibold text-gray-800 mb-2">협상 포인트:</h5>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              <li>• "{categoryName} 항목에서 건물 평균({worstCategory.buildingAverage?.toFixed(1)}점)보다 {gap.toFixed(1)}점 낮은 점수를 받았습니다"</li>
+                              <li>• "이웃 {diagnosisResult.statistics?.participantCount || 0}명의 객관적 데이터를 바탕으로 개선이 필요합니다"</li>
+                              <li>• "주택임대차보호법 제20조에 따른 수선의무에 해당할 수 있습니다"</li>
+                            </ul>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div>
+                          <p className="text-gray-700 mb-3">
+                            모든 항목에서 건물 평균 이상의 점수를 받았습니다.
+                          </p>
+                          <div className="bg-white rounded-lg p-4 border border-green-100">
+                            <h5 className="font-semibold text-gray-800 mb-2">협상 포인트:</h5>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              <li>• "현재 거주 환경이 건물 평균보다 우수합니다"</li>
+                              <li>• "이웃 {diagnosisResult.statistics?.participantCount || 0}명의 데이터로 검증된 양호한 상태입니다"</li>
+                              <li>• "현재 조건 유지 또는 적정한 인상률을 요구할 수 있습니다"</li>
+                            </ul>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })()}
                 </div>
               </div>
             </div>
