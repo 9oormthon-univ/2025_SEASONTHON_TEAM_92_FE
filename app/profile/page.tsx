@@ -32,16 +32,16 @@ export default function ProfilePage() {
   const [tempProfile, setTempProfile] = useState<ProfileState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 프로필 페이지 임시 비활성화
-  useEffect(() => {
-    toast('프로필 페이지는 현재 개발 중입니다. 곧 이용하실 수 있습니다.', {
-      icon: '🚧',
-      duration: 4000,
-    });
-    setTimeout(() => {
-      router.push('/');
-    }, 2000);
-  }, [router]);
+  // 프로필 페이지 활성화
+  // useEffect(() => {
+  //   toast('프로필 페이지는 현재 개발 중입니다. 곧 이용하실 수 있습니다.', {
+  //     icon: '🚧',
+  //     duration: 4000,
+  //   });
+  //   setTimeout(() => {
+  //     router.push('/');
+  //   }, 2000);
+  // }, [router]);
 
   const loadUserProfile = useCallback(async () => {
     setIsLoading(true);
@@ -65,8 +65,8 @@ export default function ProfilePage() {
       let userProfile: Partial<ProfileState> = {};
 
       // 사용자 프로필 처리
-      if (userRes.status === 'fulfilled' && userRes.value.success) {
-        const userData = userRes.value.data;
+      if (userRes.status === 'fulfilled' && userRes.value) {
+        const userData = userRes.value;
         userProfile = {
           email: userData.email,
           name: userData.name,
@@ -109,8 +109,8 @@ export default function ProfilePage() {
       }
 
       // 진단 결과 처리
-      if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value.success) {
-        const diagnosisData = diagnosisRes.value.data;
+      if (diagnosisRes.status === 'fulfilled' && diagnosisRes.value) {
+        const diagnosisData = diagnosisRes.value;
         // 진단 결과가 있고 점수가 0보다 크면 완료된 것으로 간주
         if (diagnosisData.summary && diagnosisData.summary.totalScore > 0) {
           userProfile.diagnosisCompleted = true;
