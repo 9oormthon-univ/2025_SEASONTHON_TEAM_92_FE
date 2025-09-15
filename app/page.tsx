@@ -17,6 +17,7 @@ export default function HomePage() {
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
 
+  // 스크롤 이벤트 처리 (API 호출과 분리)
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -40,25 +41,43 @@ export default function HomePage() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
-    // Check login status
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const userEmail = localStorage.getItem('userEmail') || '';
-    setIsLoggedIn(loggedIn);
-    if (loggedIn && userEmail) {
-      // Extract name from email or use nickname if available
-      const nickname = localStorage.getItem('userNickname');
-      if (nickname) {
-        setUserName(nickname);
-      } else {
-        const emailName = userEmail.split('@')[0];
-        setUserName(emailName);
+  // 사용자 메뉴 외부 클릭 이벤트 처리
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const userMenuElement = document.getElementById('user-menu');
+      if (userMenuElement && !userMenuElement.contains(event.target as Node)) {
+        setShowUserMenu(false);
       }
-    }
+    };
 
-    const fetchAndSetUserData = async () => {
-      if (loggedIn) {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 초기 로딩 시 한 번만 실행되는 사용자 데이터 로딩
+  useEffect(() => {
+    const initializeUserData = async () => {
+      // Check login status
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const userEmail = localStorage.getItem('userEmail') || '';
+      
+      setIsLoggedIn(loggedIn);
+      
+      if (loggedIn && userEmail) {
+        // Extract name from email or use nickname if available
+        const nickname = localStorage.getItem('userNickname');
+        if (nickname) {
+          setUserName(nickname);
+        } else {
+          const emailName = userEmail.split('@')[0];
+          setUserName(emailName);
+        }
+
         try {
+          // API는 한 번만 호출
           const profile = await authApi.getCurrentUser();
           
           // Check if user just completed onboarding
@@ -88,23 +107,9 @@ export default function HomePage() {
       }
     };
 
-    fetchAndSetUserData();
-
-    // Close user menu when clicking outside
-    const handleClickOutside = (event: MouseEvent) => {
-      const userMenuElement = document.getElementById('user-menu');
-      if (userMenuElement && !userMenuElement.contains(event.target as Node)) {
-        setShowUserMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [lastScrollY]);
+    // 컴포넌트 마운트 시 한 번만 실행
+    initializeUserData();
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -309,13 +314,7 @@ export default function HomePage() {
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#9333EA]">
                   <i className="ri-home-line text-white text-xl"></i>
                 </div>
-                <h1
-                  className="text-2xl font-bold text-gray-900"
-                  style={{
-                    fontFamily:
-                      'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif',
-                  }}
-                >
+                <h1 className="text-2xl font-bold text-gray-900 font-display">
                   월세의 정석
                 </h1>
               </div>
@@ -324,10 +323,6 @@ export default function HomePage() {
               <a
                 href="#features"
                 className="font-medium transition-colors cursor-pointer hover:text-[#9333EA] text-gray-700"
-                style={{
-                  fontFamily:
-                    'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif',
-                }}
               >
                 기능
               </a>
@@ -335,10 +330,6 @@ export default function HomePage() {
               <a
                 href="#usage"
                 className="font-medium transition-colors cursor-pointer hover:text-[#9333EA] text-gray-700"
-                style={{
-                  fontFamily:
-                    'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif',
-                }}
               >
                 사용법
               </a>
@@ -358,10 +349,6 @@ export default function HomePage() {
                       </div>
                       <span
                         className="font-medium text-white"
-                        style={{
-                          fontFamily:
-                            'Pretendard, -apple-system, BlinkMacSystemFile, system-ui, Roboto, "Helvetica Neue", "Segue UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segue UI Emoji", "Segue UI Symbol", sans-serif',
-                        }}
                       >
                         {userName} 님
                       </span>
@@ -406,10 +393,6 @@ export default function HomePage() {
                   <Link
                     href="/auth/login"
                     className="px-4 py-2 font-medium rounded-lg transition-all cursor-pointer hover:text-[#9333EA] text-gray-700"
-                    style={{
-                      fontFamily:
-                        'Pretendard, -apple-system, BlinkMacSystemFile, system-ui, Roboto, "Helvetica Neue", "Segue UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segue UI Emoji", "Segue UI Symbol", sans-serif',
-                    }}
                   >
                     로그인
                   </Link>
@@ -417,10 +400,6 @@ export default function HomePage() {
                   <Link
                     href="/auth/register"
                     className="px-6 py-2 rounded-lg font-medium hover:bg-[#7C3AED] transition-all whitespace-nowrap cursor-pointer bg-[#9333EA] text-white"
-                    style={{
-                      fontFamily:
-                        'Pretendard, -apple-system, BlinkMacSystemFile, system-ui, Roboto, "Helvetica Neue", "Segue UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segue UI Emoji", "Segue UI Symbol", sans-serif',
-                    }}
                   >
                     회원가입
                   </Link>
@@ -450,16 +429,13 @@ export default function HomePage() {
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-bold mb-10 leading-[1.8] text-gray-900" style={{ fontFamily: 'NanumSquare, sans-serif', fontWeight: 900 }}>
+              <h1 className="text-5xl md:text-6xl font-black mb-10 leading-[1.8] text-gray-900 font-display">
                 혹시 나만<br />
                 <span className="text-[#9333EA]">월세를 비싸게</span><br />
                 내고 있나요?
               </h1>
 
-              <p className="text-xl mb-12 leading-relaxed text-gray-600" style={{
-                fontFamily:
-                  'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segue UI Emoji", "Segue UI Symbol", sans-serif',
-              }}>
+              <p className="text-xl mb-12 leading-relaxed text-gray-600">
                 AI 분석과 그룹 협상으로 합리적인 월세를 만들어가는<br />
                 <span className="font-semibold text-[#9333EA]">20대를 위한 스마트한 월세 협상 플랫폼</span>
               </p>

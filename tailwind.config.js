@@ -4,6 +4,11 @@ module.exports = {
     content: ["./{app,components,libs,pages,hooks}/**/*.{html,js,ts,jsx,tsx}"],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-ibm-plex)', 'var(--font-inter)', '"IBM Plex Sans KR"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+  			display: ['var(--font-ibm-plex)', '"IBM Plex Sans KR"', 'Pretendard', 'sans-serif'],
+  			data: ['var(--font-ibm-plex)', 'var(--font-inter)', '"IBM Plex Sans KR"', 'monospace'],
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

@@ -1,11 +1,9 @@
-
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authApi } from '../../../lib/api';
-import toast from 'react-hot-toast';
 
 function ProfileSetupComponent() {
   const router = useRouter();
@@ -67,12 +65,12 @@ function ProfileSetupComponent() {
         // 기본 위치 설정 (서울 강남구)
         setLocationData({ lat: 37.5665, lon: 126.9780 });
       } else {
-        toast.error('기존 프로필 정보를 찾을 수 없습니다. 위치 인증부터 다시 진행해주세요.');
+        setError('기존 프로필 정보를 찾을 수 없습니다. 위치 인증부터 다시 진행해주세요.');
         router.push('/onboarding/location');
       }
     } catch (error) {
       console.error('기존 프로필 로드 실패:', error);
-      toast.error('프로필 정보를 불러오는데 실패했습니다.');
+      setError('프로필 정보를 불러오는데 실패했습니다.');
       router.push('/onboarding/location');
     }
   };
@@ -98,20 +96,23 @@ function ProfileSetupComponent() {
     return parseInt(number).toLocaleString();
   };
 
-  const handleNumberChange = (field: keyof typeof formData, value: string) => {
+  const handleNumberChange = (field: string, value: string) => {
     const formatted = formatNumber(value);
-    setFormData(prev => ({ ...prev, [field]: formatted }));
+    setFormData({...formData, [field]: formatted});
   };
 
   const isFormValid = () => {
-    return formData.dong && formData.building && formData.buildingType && formData.contractType && formData.security;
+    return formData.dong && 
+           formData.building &&
+           formData.buildingType && 
+           formData.security && 
+           (formData.contractType === '전세' || formData.rent);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) {
-      setError('필수 필드를 모두 입력해주세요.');
-      toast.error('필수 필드를 모두 입력해주세요.');
+      setError('모든 필수 필드를 입력해주세요.');
       return;
     }
 
@@ -119,19 +120,21 @@ function ProfileSetupComponent() {
     setError('');
 
     try {
-      const payload = {
-        ...formData,
+      const profileData = {
+        dong: formData.dong,
+        building: formData.building,
+        buildingType: formData.buildingType,
+        contractType: formData.contractType,
         security: parseNumber(formData.security),
         rent: parseNumber(formData.rent),
         maintenanceFee: parseNumber(formData.maintenanceFee),
         latitude: locationData.lat,
-        longitude: locationData.lon,
+        longitude: locationData.lon
       };
 
-      const response = await authApi.setProfileInfo(payload);
-      console.log('프로필 업데이트 응답:', response);
+      await authApi.setProfileInfo(profileData);
       
-      // localStorage에도 저장하여 프로필 페이지에서 사용할 수 있도록 함
+      // 프로필 정보를 localStorage에 저장
       localStorage.setItem('userDong', formData.dong);
       localStorage.setItem('userBuilding', formData.building);
       localStorage.setItem('userBuildingType', formData.buildingType);
@@ -140,122 +143,376 @@ function ProfileSetupComponent() {
       localStorage.setItem('userRent', formData.rent);
       localStorage.setItem('userMaintenanceFee', formData.maintenanceFee);
       
-      // 온보딩 완료 플래그 설정 (로컬)
+      // 온보딩 완료 플래그 설정
       localStorage.setItem('onboarding_completed', 'true');
       
-      // 백엔드에 온보딩 완료 상태 저장
-      try {
-        await authApi.updateUser({ onboardingCompleted: true });
-        console.log('온보딩 완료 상태가 백엔드에 저장되었습니다.');
-      } catch (error) {
-        console.error('온보딩 완료 상태 저장 실패:', error);
-        // 백엔드 저장 실패해도 로컬은 저장되어 있으므로 계속 진행
-      }
-      
-      toast.success('프로필이 성공적으로 저장되었습니다!');
-      
-      // 진단 페이지로 이동
-      router.push('/diagnosis');
-
+      // 메인 페이지로 이동
+      router.push('/');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || '프로필 설정 중 오류가 발생했습니다.';
+      console.error('Profile setup error:', err);
+      const errorMessage = err.response?.data?.message || err.message || '프로필 설정 중 오류가 발생했습니다.';
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4">
-      <div className="max-w-lg w-full space-y-8">
-        <div className="text-center">
-          <Link href="/">
-            <h1 className="text-4xl font-bold text-gray-800 cursor-pointer mb-2">월세의 정석</h1>
-          </Link>
-          <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            거주 프로필 입력
-          </h2>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            정확한 분석을 위한 거주 정보를 입력해주세요
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden" 
+         style={{background: 'linear-gradient(135deg, #E9D5FF 0%, #C084FC 50%, #9333EA 100%)'}}>
+      
+      {/* Background Decorative Cloud-like Elements */}
+      <div className="absolute inset-0">
+        {/* Large cloud shapes with more natural cloud-like appearance */}
+        <div className="absolute top-10 left-10" style={{
+          width: '220px',
+          height: '140px',
+          background: 'linear-gradient(135deg, #9333EA 0%, #C084FC 100%)',
+          borderRadius: '120px 80px 100px 60px / 80px 120px 60px 100px',
+          opacity: 0.6,
+          transform: 'rotate(-8deg)'
+        }}></div>
+        
+        <div className="absolute top-40 right-20" style={{
+          width: '180px',
+          height: '120px',
+          background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+          borderRadius: '90px 120px 70px 110px / 60px 80px 90px 70px',
+          opacity: 0.4,
+          transform: 'rotate(15deg)'
+        }}></div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* 거주지 주소 섹션 */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">거주지 정보</label>
+        <div className="absolute bottom-20 left-20" style={{
+          width: '200px',
+          height: '130px',
+          background: 'linear-gradient(135deg, #C084FC 0%, #DDD6FE 100%)',
+          borderRadius: '100px 80px 120px 90px / 70px 100px 50px 90px',
+          opacity: 0.5,
+          transform: 'rotate(-12deg)'
+        }}></div>
+
+        <div className="absolute bottom-40 right-10" style={{
+          width: '160px',
+          height: '100px',
+          background: 'linear-gradient(135deg, #9333EA 0%, #E9D5FF 100%)',
+          borderRadius: '80px 60px 90px 70px / 50px 80px 40px 70px',
+          opacity: 0.3,
+          transform: 'rotate(18deg)'
+        }}></div>
+
+        {/* Medium sized cloud elements */}
+        <div className="absolute top-60 left-40" style={{
+          width: '130px',
+          height: '80px',
+          background: 'white',
+          borderRadius: '65px 40px 70px 50px / 40px 65px 30px 50px',
+          opacity: 0.7,
+          transform: 'rotate(-5deg)'
+        }}></div>
+
+        <div className="absolute top-80 right-60" style={{
+          width: '140px',
+          height: '90px',
+          background: 'linear-gradient(135deg, #DDD6FE 0%, white 100%)',
+          borderRadius: '70px 50px 80px 60px / 45px 70px 35px 60px',
+          opacity: 0.6,
+          transform: 'rotate(12deg)'
+        }}></div>
+
+        {/* Small cloud details */}
+        <div className="absolute top-32 right-40" style={{
+          width: '90px',
+          height: '55px',
+          background: 'rgba(255, 255, 255, 0.8)',
+          borderRadius: '45px 25px 40px 30px / 28px 45px 20px 35px',
+          opacity: 0.8,
+          transform: 'rotate(-10deg)'
+        }}></div>
+
+        <div className="absolute bottom-60 left-60" style={{
+          width: '110px',
+          height: '70px',
+          background: 'linear-gradient(135deg, #A855F7 0%, #DDD6FE 100%)',
+          borderRadius: '55px 35px 60px 40px / 35px 55px 25px 45px',
+          opacity: 0.4,
+          transform: 'rotate(20deg)'
+        }}></div>
+      </div>
+
+      <div className="max-w-6xl w-full flex items-center justify-center relative z-10">
+        <div className="flex bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[800px] w-full max-w-5xl">
+          
+          {/* Left Side - Welcome Section */}
+          <div className="flex-1 p-12 flex flex-col justify-center relative"
+               style={{background: 'linear-gradient(135deg, #A855F7 0%, #9333EA 100%)'}}>
+            <div className="text-white">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-8">
+                <div className="w-8 h-8 bg-purple-200 rounded-lg flex items-center justify-center">
+                  <i className="ri-user-settings-fill text-purple-700 text-lg"></i>
+                </div>
+              </div>
+              
+              <h1 className="text-4xl font-bold mb-6 leading-tight">
+                프로필 설정
+              </h1>
+              
+              <p className="text-white/90 text-xl leading-relaxed mb-8 max-w-md">
+                거주 정보와 계약 조건을<br />
+                입력해서 맞춤 분석을 받아보세요
+              </p>
+              
               <div className="space-y-3">
-                <div>
-                  <label htmlFor="dong" className="block text-xs text-gray-500 mb-1">구/동 (GPS 인증 완료)</label>
-                  <input id="dong" name="dong" type="text" readOnly value={formData.dong} className="appearance-none block w-full px-4 py-3 border border-gray-200 text-gray-500 rounded-lg bg-gray-100 text-sm cursor-not-allowed" />
+                <div className="flex items-center text-white/80">
+                  <div className="w-5 h-5 flex items-center justify-center mr-3">
+                    <i className="ri-shield-check-line text-purple-200"></i>
+                  </div>
+                  <span>개인정보는 암호화되어 보호됩니다</span>
                 </div>
-                <div>
-                  <label htmlFor="building" className="block text-xs text-gray-500 mb-1">건물명 *</label>
-                  <input id="building" name="building" type="text" required value={formData.building} onChange={(e) => setFormData({...formData, building: e.target.value})} className="appearance-none block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: OO빌라, XX아파트" />
+                <div className="flex items-center text-white/80">
+                  <div className="w-5 h-5 flex items-center justify-center mr-3">
+                    <i className="ri-bar-chart-line text-purple-200"></i>
+                  </div>
+                  <span>정확한 월세 비교 분석 제공</span>
                 </div>
-                 <div>
-                  <label htmlFor="detailAddress" className="block text-xs text-gray-500 mb-1">상세 주소 (선택)</label>
-                  <input id="detailAddress" name="detailAddress" type="text" value={formData.detailAddress} onChange={(e) => setFormData({...formData, detailAddress: e.target.value})} className="appearance-none block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 101동 202호" />
+                <div className="flex items-center text-white/80">
+                  <div className="w-5 h-5 flex items-center justify-center mr-3">
+                    <i className="ri-lightbulb-line text-purple-200"></i>
+                  </div>
+                  <span>맞춤형 협상 전략 추천</span>
                 </div>
               </div>
             </div>
+            
+            {/* Decorative elements */}
+            <div className="absolute -bottom-10 -left-10" style={{
+              width: '150px',
+              height: '90px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '75px 50px 80px 60px / 45px 75px 35px 65px',
+              filter: 'blur(20px)',
+              transform: 'rotate(-8deg)'
+            }}></div>
+            <div className="absolute -top-5 -right-5" style={{
+              width: '120px',
+              height: '70px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '60px 40px 70px 45px / 35px 60px 25px 50px',
+              filter: 'blur(15px)',
+              transform: 'rotate(12deg)'
+            }}></div>
+          </div>
 
-            {/* 건물 유형 */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">건물 유형 *</label>
-              <div className="grid grid-cols-3 gap-3">
-                {buildingTypes.map((type) => (
-                  <button key={type.value} type="button" onClick={() => setFormData({...formData, buildingType: type.value})} className={`px-3 py-3 text-sm font-medium rounded-lg border-2 transition-colors whitespace-nowrap cursor-pointer ${formData.buildingType === type.value ? 'border-gray-500 bg-gray-50 text-gray-800 font-bold' : 'border-gray-200 hover:border-gray-300 text-gray-700'}`}>
-                    {type.label}
-                  </button>
-                ))}
+          {/* Right Side - Profile Form */}
+          <div className="flex-1 p-12 flex flex-col justify-center bg-white overflow-y-auto">
+            <div className="max-w-sm w-full mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">거주 정보 입력</h2>
+                <p className="text-gray-600">계약 정보를 입력해주세요</p>
               </div>
-            </div>
-
-            {/* 계약 유형 */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">계약 유형 *</label>
-              <div className="grid grid-cols-3 gap-3">
-                {contractTypes.map((type) => (
-                  <button key={type.value} type="button" onClick={() => setFormData({...formData, contractType: type.value})} className={`px-3 py-3 text-sm font-medium rounded-lg border-2 transition-colors whitespace-nowrap cursor-pointer ${formData.contractType === type.value ? 'border-gray-500 bg-gray-50 text-gray-800 font-bold' : 'border-gray-200 hover:border-gray-300 text-gray-700'}`}>
-                    {type.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 계약 조건 */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">계약 조건 *</label>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="security" className="block text-xs text-gray-500 mb-1">보증금 (만원)</label>
-                  <div className="relative"><input id="security" name="security" type="text" required value={formData.security} onChange={(e) => handleNumberChange('security', e.target.value)} className="appearance-none block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 500" /><span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">만원</span></div>
-                </div>
-                {formData.contractType === '월세' && (
+              
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {/* Address Display */}
+                {formData.dong && (
                   <div>
-                    <label htmlFor="rent" className="block text-xs text-gray-500 mb-1">월세 (만원)</label>
-                    <div className="relative"><input id="rent" name="rent" type="text" required={formData.contractType === '월세'} value={formData.rent} onChange={(e) => handleNumberChange('rent', e.target.value)} className="appearance-none block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 50" /><span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">만원</span></div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
+                      <div className="flex items-center">
+                        <div className="w-5 h-5 flex items-center justify-center mr-2">
+                          <i className="ri-map-pin-line text-purple-500"></i>
+                        </div>
+                        현재 거주 지역
+                      </div>
+                    </label>
+                    <div className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-700">
+                      {formData.dong}
+                    </div>
                   </div>
                 )}
+
+                {/* Building Name */}
                 <div>
-                  <label htmlFor="maintenanceFee" className="block text-xs text-gray-500 mb-1">관리비 (만원, 선택)</label>
-                  <div className="relative"><input id="maintenanceFee" name="maintenanceFee" type="text" value={formData.maintenanceFee} onChange={(e) => handleNumberChange('maintenanceFee', e.target.value)} className="appearance-none block w-full px-4 py-3 pr-12 border border-gray-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm bg-gray-50 focus:bg-white" placeholder="예: 5" /><span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">만원</span></div>
+                  <label htmlFor="building" className="block text-sm font-medium mb-2 text-gray-700">
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 flex items-center justify-center mr-2">
+                        <i className="ri-building-line text-purple-500"></i>
+                      </div>
+                      건물명 *
+                    </div>
+                  </label>
+                  <input
+                    id="building"
+                    type="text"
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors"
+                    placeholder="예: OO아파트, OO빌딩"
+                    value={formData.building}
+                    onChange={(e) => setFormData({...formData, building: e.target.value})}
+                  />
                 </div>
-              </div>
-            </div>
 
-            {error && <div className="bg-red-50 border-l-4 border-red-400 rounded-lg p-4"><p className="text-red-600 text-sm font-medium">{error}</p></div>}
+                {/* Building Type */}
+                <div>
+                  <label htmlFor="buildingType" className="block text-sm font-medium mb-2 text-gray-700">
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 flex items-center justify-center mr-2">
+                        <i className="ri-home-line text-purple-500"></i>
+                      </div>
+                      건물 유형 *
+                    </div>
+                  </label>
+                  <select
+                    id="buildingType"
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors"
+                    value={formData.buildingType}
+                    onChange={(e) => setFormData({...formData, buildingType: e.target.value})}
+                  >
+                    <option value="">선택해주세요</option>
+                    {buildingTypes.map(type => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="pt-4">
-              <button type="submit" disabled={isLoading || !isFormValid()} className="group w-full flex justify-center py-4 px-6 border border-transparent text-sm font-semibold rounded-xl text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                {isLoading ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div> 저장 중...</> : '프로필 저장 및 서비스 시작'}
-              </button>
+                {/* Contract Type */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 flex items-center justify-center mr-2">
+                        <i className="ri-file-text-line text-purple-500"></i>
+                      </div>
+                      계약 유형 *
+                    </div>
+                  </label>
+                  <div className="flex space-x-3">
+                    {contractTypes.map(type => (
+                      <label key={type.value} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="contractType"
+                          value={type.value}
+                          checked={formData.contractType === type.value}
+                          onChange={(e) => setFormData({...formData, contractType: e.target.value})}
+                          className="mr-2 h-4 w-4 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm text-gray-700">{type.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Security Deposit */}
+                <div>
+                  <label htmlFor="security" className="block text-sm font-medium mb-2 text-gray-700">
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 flex items-center justify-center mr-2">
+                        <i className="ri-safe-line text-purple-500"></i>
+                      </div>
+                      보증금 * (만원)
+                    </div>
+                  </label>
+                  <input
+                    id="security"
+                    type="text"
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors"
+                    placeholder="예: 1,000"
+                    value={formData.security}
+                    onChange={(e) => handleNumberChange('security', e.target.value)}
+                  />
+                </div>
+
+                {/* Monthly Rent - Only for 월세 */}
+                {formData.contractType === '월세' && (
+                  <div>
+                    <label htmlFor="rent" className="block text-sm font-medium mb-2 text-gray-700">
+                      <div className="flex items-center">
+                        <div className="w-5 h-5 flex items-center justify-center mr-2">
+                          <i className="ri-money-dollar-circle-line text-purple-500"></i>
+                        </div>
+                        월세 * (만원)
+                      </div>
+                    </label>
+                    <input
+                      id="rent"
+                      type="text"
+                      required={formData.contractType === '월세'}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors"
+                      placeholder="예: 50"
+                      value={formData.rent}
+                      onChange={(e) => handleNumberChange('rent', e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {/* Maintenance Fee */}
+                <div>
+                  <label htmlFor="maintenanceFee" className="block text-sm font-medium mb-2 text-gray-700">
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 flex items-center justify-center mr-2">
+                        <i className="ri-tools-line text-purple-500"></i>
+                      </div>
+                      관리비 (만원, 선택)
+                    </div>
+                  </label>
+                  <input
+                    id="maintenanceFee"
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm bg-gray-50 focus:bg-white transition-colors"
+                    placeholder="예: 10"
+                    value={formData.maintenanceFee}
+                    onChange={(e) => handleNumberChange('maintenanceFee', e.target.value)}
+                  />
+                </div>
+
+                {error && (
+                  <div className="rounded-xl p-3 bg-red-50 border border-red-200">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={isLoading || !isFormValid()}
+                    className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer transition-all"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        저장 중...
+                      </div>
+                    ) : (
+                      '프로필 설정 완료'
+                    )}
+                  </button>
+                </div>
+
+                {/* Skip Option */}
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/')}
+                    className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer transition-colors"
+                  >
+                    나중에 설정하기
+                  </button>
+                </div>
+
+                {/* Info */}
+                <div className="mt-6 p-4 rounded-xl bg-purple-50 border border-purple-200">
+                  <h3 className="text-sm font-medium mb-2 text-purple-800">입력한 정보는 어떻게 사용되나요?</h3>
+                  <div className="text-xs space-y-1 text-purple-700">
+                    <p>• 주변 지역 월세 시세와 비교 분석</p>
+                    <p>• 맞춤형 협상 전략 및 리포트 제공</p>
+                    <p>• 익명으로 처리되어 개인정보 보호</p>
+                  </div>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
@@ -263,9 +520,9 @@ function ProfileSetupComponent() {
 }
 
 export default function ProfileSetupPage() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <ProfileSetupComponent />
-        </Suspense>
-    )
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProfileSetupComponent />
+    </Suspense>
+  );
 }
