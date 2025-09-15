@@ -287,7 +287,7 @@ export const infoCardApi = {
 
 export const missionApi = {
   getCurrentMission: async (): Promise<ApiResponse<any>> => {
-    const response = await api.get('/mission/weekly/active');
+    const response = await api.get('/mission/weekly/current');
     return response.data;
   },
   participateInMission: async (missionId: number, answers: any): Promise<ApiResponse<any>> => {
