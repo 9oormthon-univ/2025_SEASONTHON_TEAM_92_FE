@@ -84,20 +84,20 @@ export default function DiagnosisResultsPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1>
+            <h1 className="text-3xl font-bold text-purple-600 cursor-pointer mb-2 font-['Roboto']">월세의 정석</h1>
           </Link>
-          <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
+          <div className="w-16 h-1 bg-purple-600 rounded-full mx-auto mb-6"></div>
           
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 mb-8">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-circle-fill text-4xl text-green-600"></i>
+            <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-check-circle-fill text-4xl text-purple-600"></i>
             </div>
-            <h2 className="text-3xl font-bold mb-3 text-gray-900">진단 완료! 🎉</h2>
+            <h2 className="text-3xl font-bold mb-3 text-gray-800">진단 완료! 🎉</h2>
             <p className="text-lg text-gray-600 mb-4">우리 집 거주 환경을 분석했습니다</p>
             
             {diagnosisResult && (
-              <div className="bg-blue-50 rounded-xl p-4">
-                <div className="flex items-center justify-center text-blue-800">
+              <div className="bg-purple-50 rounded-xl p-4">
+                <div className="flex items-center justify-center text-purple-800">
                   <i className="ri-bar-chart-line mr-2"></i>
                   <span className="font-medium">
                     {diagnosisResult.statistics?.participantCount || 0}명의 이웃 데이터와 비교 분석
@@ -113,36 +113,36 @@ export default function DiagnosisResultsPage() {
           <div className="space-y-8">
             {/* Overall Score */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-gray-900">📊 종합 만족도</h3>
+              <h3 className="text-2xl font-bold mb-6 text-gray-800">📊 종합 만족도</h3>
               
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-blue-600">
+                  <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-purple-600">
                       {diagnosisResult.summary?.totalScore || 0}
                     </span>
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1">내 점수</h4>
+                  <h4 className="font-bold text-gray-800 mb-1">내 점수</h4>
                   <p className="text-sm text-gray-600">종합 만족도</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-green-600">
+                  <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-purple-600">
                       {(diagnosisResult.summary?.buildingAverage || 0).toFixed(2)}
                     </span>
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1">건물 평균</h4>
+                  <h4 className="font-bold text-gray-800 mb-1">건물 평균</h4>
                   <p className="text-sm text-gray-600">같은 건물 이웃들</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-orange-600">
+                  <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-purple-600">
                       {(diagnosisResult.summary?.neighborhoodAverage || 0).toFixed(2)}
                     </span>
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1">동네 평균</h4>
+                  <h4 className="font-bold text-gray-800 mb-1">동네 평균</h4>
                   <p className="text-sm text-gray-600">같은 동네 이웃들</p>
                 </div>
               </div>
@@ -151,7 +151,7 @@ export default function DiagnosisResultsPage() {
             {/* Category Breakdown */}
             {diagnosisResult.categoryDetails && (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-                <h3 className="text-2xl font-bold mb-6 text-gray-900">📋 카테고리별 분석</h3>
+                <h3 className="text-2xl font-bold mb-6 text-gray-800">📋 카테고리별 분석</h3>
                 
                 <div className="space-y-4">
                   {diagnosisResult.categoryDetails.map((category: any, index: number) => {
@@ -159,11 +159,11 @@ export default function DiagnosisResultsPage() {
                     const categoryName = categoryNames[category.categoryId - 1] || `카테고리 ${category.categoryId}`;
                     
                     return (
-                      <div key={category.categoryId} className="bg-gray-50 rounded-xl p-6">
+                      <div key={category.categoryId} className="bg-purple-50 rounded-xl p-6">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-lg font-bold text-gray-900">{categoryName}</h4>
+                          <h4 className="text-lg font-bold text-gray-800">{categoryName}</h4>
                           <div className="text-right">
-                            <div className="text-xl font-bold text-blue-600">{category.myScore || 0}</div>
+                            <div className="text-xl font-bold text-purple-600">{category.myScore || 0}</div>
                             <div className="text-sm text-gray-600">내 점수</div>
                           </div>
                         </div>
@@ -172,13 +172,13 @@ export default function DiagnosisResultsPage() {
                           <div className="bg-white rounded-lg p-4">
                             <div className="flex justify-between items-center">
                               <span className="text-gray-600">건물 평균</span>
-                              <span className="font-semibold text-green-600">{(category.buildingAverage || 0).toFixed(2)}</span>
+                              <span className="font-semibold text-purple-600">{(category.buildingAverage || 0).toFixed(2)}</span>
                             </div>
                           </div>
                           <div className="bg-white rounded-lg p-4">
                             <div className="flex justify-between items-center">
                               <span className="text-gray-600">동네 평균</span>
-                              <span className="font-semibold text-orange-600">{(category.neighborhoodAverage || 0).toFixed(2)}</span>
+                              <span className="font-semibold text-purple-600">{(category.neighborhoodAverage || 0).toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
@@ -191,12 +191,12 @@ export default function DiagnosisResultsPage() {
 
             {/* Recommendations */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-gray-900">💡 개선 제안</h3>
+              <h3 className="text-2xl font-bold mb-6 text-gray-800">💡 개선 제안</h3>
               
               <div className="space-y-4">
                 {/* 시설 개선 우선순위 - 실제 데이터 기반 */}
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                  <h4 className="text-lg font-bold text-blue-800 mb-3">시설 개선 우선순위</h4>
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                  <h4 className="text-lg font-bold text-purple-800 mb-3">시설 개선 우선순위</h4>
                   {(() => {
                     const categoryNames = ['소음', '수압', '채광', '주차', '난방', '환기', '보안', '관리', '편의성', '인터넷'];
                     const lowScoreCategories = diagnosisResult.categoryDetails
@@ -244,8 +244,8 @@ export default function DiagnosisResultsPage() {
                 </div>
                 
                 {/* 협상 전략 - 실제 데이터 기반 */}
-                <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-                  <h4 className="text-lg font-bold text-green-800 mb-3">협상 전략</h4>
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                  <h4 className="text-lg font-bold text-purple-800 mb-3">협상 전략</h4>
                   {(() => {
                     const categoryNames = ['소음', '수압', '채광', '주차', '난방', '환기', '보안', '관리', '편의성', '인터넷'];
                     const lowScoreCategories = diagnosisResult.categoryDetails
@@ -300,13 +300,13 @@ export default function DiagnosisResultsPage() {
         {/* Action Buttons */}
         <div className="mt-12 text-center">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">다음 단계</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-800">다음 단계</h3>
             <p className="text-gray-600 mb-6">진단 결과를 바탕으로 다음 단계를 진행해보세요</p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={handleGoToDashboard}
-                className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors cursor-pointer whitespace-nowrap"
+                className="bg-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-purple-700 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <div className="flex items-center justify-center">
                   <i className="ri-file-text-line mr-2"></i>
@@ -316,7 +316,7 @@ export default function DiagnosisResultsPage() {
               
               <button
                 onClick={handleGoToWeeklyMission}
-                className="bg-green-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-green-700 transition-colors cursor-pointer whitespace-nowrap"
+                className="bg-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-purple-700 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <div className="flex items-center justify-center">
                   <i className="ri-task-line mr-2"></i>

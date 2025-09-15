@@ -216,15 +216,15 @@ export default function DiagnosisPage() {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
             <Link href="/">
-              <h1 className="text-4xl font-bold text-gray-800 cursor-pointer mb-2 font-['Pacifico']">월세의 정석</h1>
+              <h1 className="text-3xl font-bold text-purple-600 cursor-pointer mb-2 font-['Roboto']">월세의 정석</h1>
             </Link>
-            <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
+            <div className="w-16 h-1 bg-purple-600 rounded-full mx-auto mb-6"></div>
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-3 text-gray-900">우리 집 종합 진단</h2>
+            <h2 className="text-2xl font-bold mb-3 text-gray-800">우리 집 종합 진단</h2>
             <p className="mb-4 text-gray-600">거주 환경을 평가하여 이웃들과 비교 분석해드립니다</p>
             
-            <div className="bg-blue-50 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2 text-blue-800">
+            <div className="bg-purple-50 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2 text-gray-700">
                 <span className="text-sm font-semibold">진행 상황</span>
                 <span className="text-sm font-semibold">{completedQuestions}/{totalQuestions} 문항 완료</span>
               </div>
@@ -235,7 +235,7 @@ export default function DiagnosisPage() {
         <div className="space-y-12">
           {categories.map((category, categoryIndex) => (
             <div key={category.categoryId} id={`category-${category.categoryId}`} className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-              <div className="px-6 py-6 bg-blue-600">
+              <div className="px-6 py-6 bg-gradient-to-r from-purple-600 to-violet-600">
                  <div className="flex items-center justify-between text-white mb-3">
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
@@ -243,12 +243,12 @@ export default function DiagnosisPage() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold">{category.title}</h3>
-                      <p className="text-sm text-blue-100">{category.description}</p>
+                      <p className="text-sm text-purple-100">{category.description}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold">{categoryIndex + 1}</div>
-                    <div className="text-xs text-blue-100">/ {categories.length}</div>
+                    <div className="text-xs text-purple-100">/ {categories.length}</div>
                   </div>
                 </div>
               </div>
@@ -257,8 +257,8 @@ export default function DiagnosisPage() {
                 <div className="space-y-8">
                   {category.questions.map((question, qIndex) => (
                     <div key={question.questionId} className="space-y-4">
-                      <div className="bg-blue-50 rounded-xl p-6">
-                        <h4 className="text-lg font-bold mb-2 text-gray-900">Q{qIndex + 1}. {question.questionText}</h4>
+                      <div className="bg-purple-50 rounded-xl p-6">
+                        <h4 className="text-lg font-bold mb-2 text-gray-800">Q{qIndex + 1}. {question.questionText}</h4>
                         <p className="text-sm mb-4 text-gray-600"><i className="ri-information-line mr-1"></i>{question.subText}</p>
                         <div className="grid grid-cols-5 gap-3">
                           {[1, 2, 3, 4, 5].map((value) => (
@@ -270,7 +270,7 @@ export default function DiagnosisPage() {
                                   setTimeout(() => scrollToNextCategory(categoryIndex), 300);
                                 }
                               }}
-                              className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${responses[question.questionId] === value ? 'bg-blue-600 text-white shadow-lg border-blue-600' : 'border-gray-200 hover:bg-gray-50'}`}>
+                              className={`p-4 text-center rounded-xl border-2 transition-all duration-200 cursor-pointer group ${responses[question.questionId] === value ? 'bg-purple-600 text-white shadow-lg border-purple-600' : 'border-stone-300 hover:bg-gray-50'}`}>
                               <div className={`text-2xl font-bold mb-1 ${responses[question.questionId] === value ? 'text-white' : 'text-gray-900'}`}>{value}</div>
                               <div className={`text-xs ${responses[question.questionId] === value ? 'text-white' : 'text-gray-600'}`}>
                                 {getScoreLabel(question.subText, value)}
@@ -291,14 +291,14 @@ export default function DiagnosisPage() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
             {isAllComplete() ? (
               <div className="mb-6">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4"><i className="ri-check-circle-fill text-3xl text-white"></i></div>
-                <h3 className="text-2xl font-bold mb-2 text-gray-900">진단 완료!</h3>
+                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4"><i className="ri-check-circle-fill text-3xl text-white"></i></div>
+                <h3 className="text-2xl font-bold mb-2 text-gray-800">진단 완료!</h3>
                 <p className="text-gray-600">모든 카테고리 평가가 완료되었습니다</p>
               </div>
             ) : (
               <div className="mb-6">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4"><i className="ri-clipboard-line text-3xl text-gray-600"></i></div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">진단 진행 중</h3>
+                <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4"><i className="ri-clipboard-line text-3xl text-purple-600"></i></div>
+                <h3 className="text-xl font-bold mb-2 text-gray-800">진단 진행 중</h3>
                 <p className="text-gray-600">{totalQuestions - completedQuestions}개 문항이 더 남았습니다</p>
               </div>
             )}
