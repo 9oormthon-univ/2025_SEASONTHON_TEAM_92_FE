@@ -331,7 +331,7 @@ export const policyApi = {
 // 공공 데이터 (오피스텔) API
 export const officetelApi = {
   getTransactions: async (lawdCd: string): Promise<ApiResponse<any>> => {
-    const response = await api.get(`/api/officetel/transactions?lawdCd=${lawdCd}`);
+    const response = await api.get(`/api/officetel/rent-data?lawdCd=${lawdCd}`);
     return response.data;
   },
   getJeonseMarket: async (lawdCd: string): Promise<ApiResponse<any>> => {

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { ReportTemplate } from '@/types';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { reportApi, policyApi, disputeAgencyApi, rentalLawApi } from '@/lib/api';
+import MarketDataComparison from './MarketDataComparison';
 import VerificationBadge from './VerificationBadge';
 import toast from 'react-hot-toast';
 
@@ -81,6 +82,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
     }
   };
 
+
   useEffect(() => {
     // 정책 정보와 분쟁 해결 가이드 로드
     loadPolicyInfo();
@@ -109,6 +111,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
       </div>
     );
   }
+
   // 차트 데이터 준비
   const radarData = [
     { category: '채광', myScore: reportData.subjectiveMetrics.categories.lighting.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.lighting.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.lighting.buildingAvg },
@@ -253,83 +256,11 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
           </div>
         </section>
 
-        {/* 4. 객관적 지표 */}
-        {reportData.objectiveMetrics && (
-          <section className="bg-green-50 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">객관적 지표 (공공 데이터 기반)</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* 시세 비교 */}
-              <div className="bg-white rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">시세 비교</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">국토부 실거래가 평균:</span>
-                    <span className="font-semibold">{reportData.objectiveMetrics.marketPrice.nationalAverage}만원</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">내 계약:</span>
-                    <span className="font-semibold">{reportData.objectiveMetrics.marketPrice.myContract}만원</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className={`font-semibold ${reportData.objectiveMetrics.marketPrice.differencePercent < 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      차이: {reportData.objectiveMetrics.marketPrice.differencePercent > 0 ? '+' : ''}{reportData.objectiveMetrics.marketPrice.differencePercent}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 관리비 비교 */}
-              <div className="bg-white rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">관리비 비교</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">공동주택 평균:</span>
-                    <span className="font-semibold">{reportData.objectiveMetrics.managementFee.nationalAverage}만원</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">내 입력값:</span>
-                    <span className="font-semibold">{reportData.objectiveMetrics.managementFee.myContract}만원</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">상태:</span>
-                    <span className={`px-2 py-1 rounded-full text-sm ${
-                      reportData.objectiveMetrics.managementFee.status === 'normal' ? 'bg-green-100 text-green-800' :
-                      reportData.objectiveMetrics.managementFee.status === 'high' ? 'bg-red-100 text-red-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {reportData.objectiveMetrics.managementFee.status === 'normal' ? '정상 범위' :
-                       reportData.objectiveMetrics.managementFee.status === 'high' ? '높음' : '낮음'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 소음/환경 */}
-              <div className="bg-white rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">소음/환경</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">환경부 평균:</span>
-                    <span className="font-semibold">{reportData.objectiveMetrics.noise.nationalAverage}dB</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">사용자 응답:</span>
-                    <span className="font-semibold">{reportData.objectiveMetrics.noise.userReported}dB</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">일치 여부:</span>
-                    <span className={`px-2 py-1 rounded-full text-sm ${
-                      reportData.objectiveMetrics.noise.match ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {reportData.objectiveMetrics.noise.match ? '일치' : '불일치'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* 4. 객관적 지표 - 실거래가 기반 시세 분석 */}
+        <MarketDataComparison 
+          userRent={reportData.contractInfo?.monthlyRent || 0}
+          userAddress={reportData.contractInfo?.address}
+        />
 
         {/* 5. 협상 카드 */}
         <section className="bg-yellow-50 rounded-lg p-6">

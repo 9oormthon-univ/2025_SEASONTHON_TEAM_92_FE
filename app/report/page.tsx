@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { reportApi, diagnosisApi } from '../../lib/api';
 import toast from 'react-hot-toast';
@@ -19,6 +19,8 @@ export default function ReportPage() {
   const [showComprehensiveReport, setShowComprehensiveReport] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState<'comprehensive' | 'premium' | null>(null);
   const router = useRouter();
+
+
 
   const handleGenerateComprehensiveReport = async () => {
     setIsLoading(true);
@@ -203,8 +205,8 @@ export default function ReportPage() {
           </div>
 
           {/* 메인 컨텐트 카드 */}
-          <div className="w-[1152px] h-[931.75px] p-px bg-white rounded-2xl shadow-xl shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-violet-200 flex flex-col justify-start items-start overflow-hidden">
-            <div className="w-[1150px] h-[929.75px] p-8 flex flex-col justify-start items-start">
+          <div className="w-[1152px] min-h-[931.75px] p-px bg-white rounded-2xl shadow-xl shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-violet-200 flex flex-col justify-start items-start">
+            <div className="w-[1150px] min-h-[929.75px] p-8 flex flex-col justify-start items-start">
               
               {/* 리포트 타입 선택 */}
               <div className=" pb-8 inline-flex justify-start items-start">
@@ -510,7 +512,6 @@ export default function ReportPage() {
                 </div>
               </div>
 
-              
 
               {/* 에러 메시지 표시 */}
               {error && (
