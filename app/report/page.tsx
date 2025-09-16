@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { reportApi, diagnosisApi } from '../../lib/api';
 import toast from 'react-hot-toast';
-import ComprehensiveReport from '../../components/ComprehensiveReport';
+import ComprehensiveReport from '@/components/ComprehensiveReport';
 
 export default function ReportPage() {
   const [reportContent, setReportContent] = useState('');
