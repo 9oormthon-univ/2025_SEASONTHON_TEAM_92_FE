@@ -171,27 +171,27 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">주소/건물명:</span>
-                <span className="text-gray-900">{reportData.contractInfo.address} {reportData.contractInfo.buildingName}</span>
+                <span className="text-gray-900">{reportData.contractInfo?.address || '주소 정보 없음'} {reportData.contractInfo?.buildingName || ''}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">건물 유형:</span>
-                <span className="text-gray-900">{reportData.contractInfo.buildingType}</span>
+                <span className='text-gray-900'>{reportData.contractInfo?.buildingType || '정보 없음'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">계약 유형:</span>
-                <span className="text-gray-900">{reportData.contractInfo.contractType}</span>
+                <span className='text-gray-900'>{reportData.contractInfo?.contractType || '정보 없음'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-gray-700">조건:</span>
-                <span className="text-gray-900">보증금 {reportData.contractInfo.deposit}만원 / 월세 {reportData.contractInfo.monthlyRent}만원 / 관리비 {reportData.contractInfo.managementFee}만원</span>
+                <span className='text-gray-900'>보증금 {reportData.contractInfo?.deposit || '미입력'}만원 / 월세 {reportData.contractInfo?.monthlyRent || '미입력'}만원 / 관리비 {reportData.contractInfo?.managementFee || '미입력'}만원</span>
               </div>
             </div>
             <div className="space-y-3">
               <div>
                 <span className="font-semibold text-gray-700 block mb-2">인증 상태:</span>
                 <VerificationBadge 
-                  gpsVerified={reportData.contractInfo.gpsVerified}
-                  contractVerified={reportData.contractInfo.contractVerified}
+                  gpsVerified={reportData.contractInfo?.gpsVerified || false}
+                  contractVerified={reportData.contractInfo?.contractVerified || false}
                 />
               </div>
             </div>

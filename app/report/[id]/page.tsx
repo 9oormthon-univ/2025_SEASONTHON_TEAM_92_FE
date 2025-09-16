@@ -34,8 +34,28 @@ export default function ReportPage({ params }: ReportPageProps) {
                 // 백엔드 응답 구조에 맞게 수정
                 setReport(response.data);
                 
-                // 백엔드 데이터를 템플릿 형태로 변환
-                setReportTemplate(response.data);
+                // 계약 조건 문자열 파싱 (예: "보증금 1000 / 월세 60 / 관리비 10")
+                const conditions = response.data.contractSummary?.conditions || '';
+                const depositMatch = conditions.match(/보증금 (\d+)/);
+                const rentMatch = conditions.match(/월세 (\d+)/);
+                const feeMatch = conditions.match(/관리비 (\d+)/);
+                
+                // 백엔드 데이터를 템플릿 형태로 변환 (contractSummary -> contractInfo)
+                const transformedData = {
+                  ...response.data,
+                  contractInfo: {
+                    address: response.data.contractSummary?.address || '주소 정보 없음',
+                    buildingName: '',
+                    buildingType: response.data.contractSummary?.buildingType || '정보 없음',
+                    contractType: response.data.contractSummary?.contractType || '정보 없음',
+                    deposit: depositMatch ? parseInt(depositMatch[1]) : 0,
+                    monthlyRent: rentMatch ? parseInt(rentMatch[1]) : 0,
+                    managementFee: feeMatch ? parseInt(feeMatch[1]) : 0,
+                    gpsVerified: response.data.contractSummary?.gpsVerified || false,
+                    contractVerified: response.data.contractSummary?.contractVerified || false,
+                  }
+                };
+                setReportTemplate(transformedData);
               } else {
                 setError('Report data not found.');
               }

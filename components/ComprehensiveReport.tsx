@@ -248,7 +248,7 @@ export default function ComprehensiveReport({
   );
 
   // 리포트 데이터 구조 안전성 강화
-  if (!reportData.contractSummary) {
+  if (!reportData || !reportData.contractSummary) {
     console.error('Report data missing contractSummary:', reportData);
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-100 to-purple-200">
@@ -263,12 +263,12 @@ export default function ComprehensiveReport({
 
   // contractSummary의 필수 필드들 안전성 체크
   const safeContractSummary = {
-    address: reportData.contractSummary.address || '주소 정보 없음',
-    buildingType: reportData.contractSummary.buildingType || '정보 없음',
-    contractType: reportData.contractSummary.contractType || '정보 없음',
-    conditions: reportData.contractSummary.conditions || '정보 없음',
-    gpsVerified: reportData.contractSummary.gpsVerified || false,
-    contractVerified: reportData.contractSummary.contractVerified || false
+    address: reportData.contractSummary?.address || '주소 정보 없음',
+    buildingType: reportData.contractSummary?.buildingType || '정보 없음',
+    contractType: reportData.contractSummary?.contractType || '정보 없음',
+    conditions: reportData.contractSummary?.conditions || '정보 없음',
+    gpsVerified: reportData.contractSummary?.gpsVerified || false,
+    contractVerified: reportData.contractSummary?.contractVerified || false
   };
 
   const conditions = safeContractSummary.conditions;

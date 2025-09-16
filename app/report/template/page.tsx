@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 // 백엔드 DTO와 프론트엔드 타입 간의 데이터 변환 함수
 const transformData = (backendData: any): ReportTemplateType => {
   // 계약 조건 문자열 파싱 (예: "보증금 1000 / 월세 60 / 관리비 10")
-  const conditions = backendData.contractSummary.conditions || '';
+  const conditions = backendData.contractSummary?.conditions || '';
   const depositMatch = conditions.match(/보증금 (\d+)/);
   const rentMatch = conditions.match(/월세 (\d+)/);
   const feeMatch = conditions.match(/관리비 (\d+)/);
@@ -41,15 +41,15 @@ const transformData = (backendData: any): ReportTemplateType => {
       },
     },
     contractInfo: {
-      address: backendData.contractSummary.address,
+      address: backendData.contractSummary?.address || '주소 정보 없음',
       buildingName: '', // 백엔드 응답에 buildingName이 따로 없으므로 주소에서 파싱하거나 비워둠
-      buildingType: backendData.contractSummary.buildingType,
-      contractType: backendData.contractSummary.contractType,
+      buildingType: backendData.contractSummary?.buildingType || '정보 없음',
+      contractType: backendData.contractSummary?.contractType || '정보 없음',
       deposit: depositMatch ? parseInt(depositMatch[1]) : 0,
       monthlyRent: rentMatch ? parseInt(rentMatch[1]) : 0,
       managementFee: feeMatch ? parseInt(feeMatch[1]) : 0,
-      gpsVerified: backendData.contractSummary.gpsVerified,
-      contractVerified: backendData.contractSummary.contractVerified,
+      gpsVerified: backendData.contractSummary?.gpsVerified || false,
+      contractVerified: backendData.contractSummary?.contractVerified || false,
     },
     subjectiveMetrics: {
       overallScore: backendData.subjectiveMetrics.overallScore.myScore,
