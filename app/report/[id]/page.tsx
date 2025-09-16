@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { reportApi } from '@/lib/api';
 import { ReportResponse } from '@/types';
 import ReportTemplate from '@/components/ReportTemplate';
-import { mockReportData } from '@/lib/mockData';
+import { mockReportData, mockFreeReportData } from '@/lib/mockData';
 
 interface ReportPageProps {
   params: Promise<{ id: string }>;
@@ -101,7 +101,9 @@ export default function ReportPage({ params }: ReportPageProps) {
               console.error('Failed to fetch report:', err);
               setError(err.message || 'Failed to load report.');
               // Even if API fails, show mock template for demonstration
-              setReportTemplate(mockReportData);
+              // ID에 따라 프리미엄 또는 무료 리포트 표시
+              const isPremiumReport = id.includes('premium') || Math.random() > 0.5;
+              setReportTemplate(isPremiumReport ? mockReportData : mockFreeReportData);
             } finally {
               setLoading(false);
             }

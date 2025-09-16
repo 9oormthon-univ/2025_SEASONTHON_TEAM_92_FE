@@ -276,6 +276,10 @@ export interface NegotiationCard {
   title: string;
   content: string;
   recommendedMent: string;
+  // 프리미엄 전용 필드
+  successProbability?: number; // 성공 확률 (0-100)
+  alternativeStrategy?: string; // 대체 전략
+  expertTip?: string; // 전문가 팁
 }
 
 export interface PolicyInfo {
@@ -283,15 +287,36 @@ export interface PolicyInfo {
   description: string;
   eligibility: string;
   link: string;
+  // 프리미엄 전용 필드
+  isEligible?: boolean; // 자동 매칭 결과
+  applicationDeadline?: string; // 신청 마감일
+  requiredDocuments?: string[]; // 필요 서류
 }
 
 export interface DisputeGuide {
   relatedLaw: string;
   committeeContact: string;
   templateDownload: string;
+  // 프리미엄 전용 필드
+  disputeRoadmap?: Array<{
+    step: number;
+    title: string;
+    description: string;
+    estimatedTime: string;
+    cost: string;
+  }>; // 분쟁 해결 로드맵
+  expertConsultation?: {
+    available: boolean;
+    price: number;
+    duration: string;
+    contactInfo: string;
+  }; // 전문가 상담 정보
 }
 
 export interface ReportTemplate {
+  // 리포트 타입 (무료/프리미엄)
+  reportType: 'free' | 'premium';
+  
   // 1. 리포트 헤더
   header: {
     title: string;
@@ -326,6 +351,46 @@ export interface ReportTemplate {
   updateInfo: {
     autoUpdate: boolean;
     dataValidityPeriod: string;
+  };
+  
+  // 프리미엄 전용 기능들
+  premiumFeatures?: {
+    // 스마트 진단 데이터
+    smartDiagnosis?: {
+      noiseLevel: number;
+      floorLevel: number;
+      lightIntensity: number;
+      measuredAt: string;
+    };
+    
+    // 시계열 분석 데이터
+    timeSeriesAnalysis?: {
+      rentTrend: Array<{ month: string; averageRent: number }>;
+      marketVolatility: number;
+      predictionConfidence: number;
+    };
+    
+    // 문서 생성 기능
+    documentGeneration?: {
+      demandLetter: boolean;
+      certifiedMail: boolean;
+      legalNotice: boolean;
+    };
+    
+    // 전문가 상담
+    expertConsultation?: {
+      available: boolean;
+      nextAvailableSlot: string;
+      consultationFee: number;
+    };
+    
+    // 공유 및 다운로드
+    sharingOptions?: {
+      pdfDownload: boolean;
+      emailShare: boolean;
+      kakaoShare: boolean;
+      watermark: boolean;
+    };
   };
 }
 
