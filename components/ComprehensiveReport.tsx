@@ -96,8 +96,10 @@ export default function ComprehensiveReport({
   smartDiagnosisData?: any;
 }) {
   const searchParams = useSearchParams();
-  const reportType = searchParams.get('type');
-  const isPremium = reportType === 'premium';
+  const urlReportType = searchParams.get('type');
+  
+  // 백엔드에서 받은 reportType과 URL 파라미터를 모두 확인
+  const [isPremium, setIsPremium] = useState(false);
 
   const [reportData, setReportData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -119,8 +121,20 @@ export default function ComprehensiveReport({
           console.log('API Response:', response);
           console.log('Report Data:', response.data);
           setReportData(response.data);
+          
+          // 백엔드에서 받은 reportType과 URL 파라미터를 모두 확인
+          const backendReportType = response.data.reportType;
+          const finalIsPremium = backendReportType === 'premium' || urlReportType === 'premium';
+          setIsPremium(finalIsPremium);
+          
+          console.log('프리미엄 타입 확인:', {
+            backendReportType,
+            urlReportType,
+            finalIsPremium
+          });
+          
           const url = initialReportId 
-            ? `${window.location.origin}/report/${initialReportId}${isPremium ? '?type=premium' : ''}`
+            ? `${window.location.origin}/report/${initialReportId}${finalIsPremium ? '?type=premium' : ''}`
             : window.location.href;
           setShareUrl(url);
         } else {
@@ -661,7 +675,12 @@ export default function ComprehensiveReport({
 
           {/* 6. 협상 카드 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">협상 카드 (자동 생성)</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              협상 카드 (자동 생성)
+              {isPremium && (
+                <span className="ml-2 text-sm text-purple-600 font-normal">+ 성공 확률 & 전문가 팁</span>
+              )}
+            </h2>
             <div className="space-y-6">
               {(reportData?.negotiationCards || []).map((card: any, index: number) => {
                 const colors = [
@@ -673,18 +692,45 @@ export default function ComprehensiveReport({
                 
                 return (
                   <div key={index} className={`${color.bg} ${color.border} border-2 rounded-xl p-6`}>
-                    <div className="flex items-center mb-4">
-                      <div className={`w-8 h-8 ${color.accent} rounded-full flex items-center justify-center text-white font-bold mr-3`}>
-                        {card.priority}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <div className={`w-8 h-8 ${color.accent} rounded-full flex items-center justify-center text-white font-bold mr-3`}>
+                          {card.priority}
+                        </div>
+                        <h3 className={`text-xl font-bold ${color.text}`}>{card.priority}순위: {card.title}</h3>
                       </div>
-                      <h3 className={`text-xl font-bold ${color.text}`}>{card.priority}순위: {card.title}</h3>
+                      {isPremium && card.successProbability && (
+                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                          성공률 {card.successProbability}%
+                        </span>
+                      )}
                     </div>
                     <div className={`${color.accent} text-white p-4 rounded-lg mb-4`}>
                       <p className="font-bold text-sm">{card.title}</p>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
                       <p className="text-gray-700 text-sm leading-relaxed">{card.recommendationScript}</p>
                     </div>
+                    
+                    {/* 프리미엄 전용 기능들 */}
+                    {isPremium && (
+                      <div className="space-y-3">
+                        {card.alternativeStrategy && (
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <p className="text-sm text-purple-800">
+                              <span className="font-semibold">🔄 대체 전략:</span> {card.alternativeStrategy}
+                            </p>
+                          </div>
+                        )}
+                        {card.expertTip && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <p className="text-sm text-yellow-800">
+                              <span className="font-semibold">💡 전문가 팁:</span> {card.expertTip}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -693,16 +739,54 @@ export default function ComprehensiveReport({
 
           {/* 7. 정책 정보 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">맞춤형 정책/지원 정보</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              맞춤형 정책/지원 정보
+              {isPremium && (
+                <span className="ml-2 text-sm text-purple-600 font-normal">+ 자동 매칭 & 신청 가이드</span>
+              )}
+            </h2>
             <div className="space-y-4">
               {(reportData?.policyInfos || []).map((policy: any, index: number) => (
                 <div key={index} className="bg-purple-100 border border-violet-200 rounded-xl p-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex items-center">
+                    <div className="flex items-center flex-1">
                       <i className="ri-government-line text-violet-500 text-xl mr-3"></i>
-                      <div>
-                        <h3 className="text-gray-800 font-bold">{policy.title}</h3>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-gray-800 font-bold">{policy.title}</h3>
+                          {isPremium && policy.isEligible !== undefined && (
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              policy.isEligible 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {policy.isEligible ? '✅ 대상자' : '❌ 비대상자'}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-gray-600 text-sm">{policy.description}</p>
+                        
+                        {/* 프리미엄 전용 정보 */}
+                        {isPremium && (
+                          <div className="mt-3 space-y-2">
+                            {policy.applicationDeadline && (
+                              <div className="bg-blue-50 p-2 rounded">
+                                <span className="text-xs font-semibold text-blue-800">신청 마감:</span>
+                                <p className="text-xs text-blue-600">{policy.applicationDeadline}</p>
+                              </div>
+                            )}
+                            {policy.requiredDocuments && (
+                              <div className="bg-yellow-50 p-2 rounded">
+                                <span className="text-xs font-semibold text-yellow-800">필요 서류:</span>
+                                <ul className="text-xs text-yellow-600 mt-1">
+                                  {policy.requiredDocuments.map((doc: string, docIndex: number) => (
+                                    <li key={docIndex}>• {doc}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <a 
