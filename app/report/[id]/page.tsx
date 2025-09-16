@@ -55,7 +55,9 @@ export default function ReportPage({ params }: ReportPageProps) {
                     contractVerified: response.data.contractSummary?.contractVerified || false,
                   },
                   subjectiveMetrics: {
-                    ...response.data.subjectiveMetrics,
+                    overallScore: response.data.subjectiveMetrics?.overallScore?.myScore || 0,
+                    neighborhoodAverage: response.data.subjectiveMetrics?.overallScore?.neighborhoodAverage || 0,
+                    buildingAverage: response.data.subjectiveMetrics?.overallScore?.buildingAverage || 0,
                     categories: {
                       lighting: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
                       soundproofing: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
@@ -74,7 +76,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                   }
                 };
                 
-                // categoryScores 배열을 categories 객체로 변환
+                // categoryScores 배열을 categories 객체로 변환하고 원본 제거
                 if (response.data.subjectiveMetrics?.categoryScores) {
                   response.data.subjectiveMetrics.categoryScores.forEach((cat: any) => {
                     const categoryKey = cat.category === '채광' ? 'lighting' : 
@@ -88,6 +90,8 @@ export default function ReportPage({ params }: ReportPageProps) {
                       };
                     }
                   });
+                  // 원본 categoryScores 배열 제거
+                  delete transformedData.subjectiveMetrics.categoryScores;
                 }
                 setReportTemplate(transformedData);
               } else {

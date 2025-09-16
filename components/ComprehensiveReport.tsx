@@ -316,6 +316,7 @@ export default function ComprehensiveReport({
     { category: '주차', myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 }
   ];
 
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-purple-200">
       <style jsx global>{`
