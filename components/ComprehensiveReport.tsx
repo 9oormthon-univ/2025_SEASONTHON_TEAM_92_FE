@@ -265,13 +265,16 @@ export default function ComprehensiveReport({
   const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
   const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
   
-  // 리포트 데이터 구조 안전성 확인
-  console.log('Report Data Structure:', {
-    reportData: reportData,
-    contractSummary: reportData?.contractSummary,
-    address: reportData?.contractSummary?.address,
-    buildingType: reportData?.contractSummary?.buildingType
-  });
+  // 리포트 데이터 구조 안전성 확인 - 상세 디버깅
+  console.log('=== REPORT DATA DEBUG ===');
+  console.log('Full reportData:', JSON.stringify(reportData, null, 2));
+  console.log('contractSummary exists:', !!reportData?.contractSummary);
+  console.log('contractSummary:', reportData?.contractSummary);
+  console.log('address exists:', !!reportData?.contractSummary?.address);
+  console.log('address value:', reportData?.contractSummary?.address);
+  console.log('buildingType exists:', !!reportData?.contractSummary?.buildingType);
+  console.log('buildingType value:', reportData?.contractSummary?.buildingType);
+  console.log('=== END DEBUG ===');
 
   // 디버깅을 위한 로그
   console.log('Report Data Structure:', {
@@ -530,7 +533,11 @@ export default function ComprehensiveReport({
           {/* 4. 시세 분석 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">객관적 지표 (공공 데이터 기반)</h2>
-            <MarketDataComparison userRent={userRent} userAddress={reportData?.contractSummary?.address || '주소 정보 없음'} isPremium={isPremium} />
+            <MarketDataComparison 
+              userRent={userRent} 
+              userAddress={reportData?.contractSummary?.address || '주소 정보 없음'} 
+              isPremium={isPremium} 
+            />
             
             {/* 시계열 추이 분석 (프리미엄 기능) */}
             {isPremium && (

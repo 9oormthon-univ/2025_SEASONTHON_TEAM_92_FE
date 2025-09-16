@@ -73,10 +73,17 @@ export interface Group {
 }
 
 // 진단 관련 타입 정의
+export interface ExperienceOption {
+  score: number;
+  text: string;
+  context: string;
+}
+
 export interface DiagnosisQuestion {
   questionId: number;
   questionText: string;
   subText: string;
+  experienceOptions?: ExperienceOption[];
 }
 
 export interface DiagnosisCategory {

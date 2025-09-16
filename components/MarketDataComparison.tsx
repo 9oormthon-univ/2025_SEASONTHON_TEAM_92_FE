@@ -31,8 +31,14 @@ interface TransactionData {
 }
 
 export default function MarketDataComparison({ userRent, userAddress }: MarketDataComparisonProps) {
-  // userAddress가 유효하지 않은 경우 처리
+  // userAddress가 유효하지 않은 경우 처리 - 상세 디버깅
+  console.log('MarketDataComparison - userAddress:', userAddress);
+  console.log('MarketDataComparison - userAddress type:', typeof userAddress);
+  console.log('MarketDataComparison - userAddress is undefined:', userAddress === undefined);
+  console.log('MarketDataComparison - userAddress is null:', userAddress === null);
+  
   const safeUserAddress = userAddress && userAddress.trim() !== '' ? userAddress : '주소 정보 없음';
+  console.log('MarketDataComparison - safeUserAddress:', safeUserAddress);
   
   const [marketData, setMarketData] = useState<{
     monthlyRentMarket: MarketData[];
