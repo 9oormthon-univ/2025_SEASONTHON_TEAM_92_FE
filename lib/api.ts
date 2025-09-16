@@ -9,19 +9,8 @@ const getBaseURL = () => {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
   
-  // 개발 환경
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:8080'; // 로컬 개발 서버
-  }
-  
-  // 프로덕션 환경 - 실제 백엔드 도메인으로 변경 필요
-  if (process.env.NODE_ENV === 'production') {
-    // 실제 백엔드 배포 URL (Railway 배포)
-    return 'https://2025seasonthonteam92be-production.up.railway.app';
-  }
-  
-  // 기본값 - 개발 환경으로 설정
-  return 'http://localhost:8080';
+  // 로컬/배포 환경 모두 Railway 배포 서버 사용
+  return 'https://2025seasonthonteam92be-production.up.railway.app';
 };
 
 const api = axios.create({

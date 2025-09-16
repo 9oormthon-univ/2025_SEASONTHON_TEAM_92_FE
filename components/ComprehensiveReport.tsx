@@ -7,14 +7,40 @@ import toast from 'react-hot-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
 import MarketDataComparison from './MarketDataComparison';
 
-interface ReportData {
+// --- 프리미엄 리포트용 확장 인터페이스 정의 ---
+
+// 스마트 진단 데이터 타입
+interface SmartDiagnosisData {
+  noise?: { value: number; average: number; };
+  level?: { value: number; average: number; };
+  lighting?: { value: number; average: number; };
+}
+
+// 유사 그룹 데이터 타입
+interface PeerGroupData {
+  id: string;
+  rent: number;
+  deposit: number;
+  area: number;
+  contractDate: string;
+}
+
+// 시계열 데이터 타입
+interface TimeSeriesData {
+  date: string; // 예: "2023-01"
+  rentPrice: number;
+}
+
+// 기존 ReportData를 확장한 PremiumReportData
+interface PremiumReportData {
   header: { 
     title: string; 
     generatedDate: string; 
     dataPeriod: string; 
     participantCount: number; 
     dataRecency: string; 
-    reliabilityScore: number; 
+    reliabilityScore: number;
+    verifiedUserRatio?: number; // 프리미엄 필드
   };
   contractSummary: { 
     address: string; 
@@ -22,38 +48,41 @@ interface ReportData {
     contractType: string; 
     conditions: string; 
     gpsVerified: boolean; 
-    contractVerified: boolean; 
+    contractVerified: boolean;
+    insight?: string; // 프리미엄 필드
   };
   subjectiveMetrics: { 
-    overallScore: { 
-      category: string; 
-      myScore: number; 
-      buildingAverage: number; 
-      neighborhoodAverage: number; 
-    }; 
-    categoryScores: Array<{ 
-      category: string; 
-      myScore: number; 
-      buildingAverage: number; 
-      neighborhoodAverage: number; 
-    }>; 
+    overallScore: { category: string; myScore: number; buildingAverage: number; neighborhoodAverage: number; }; 
+    categoryScores: Array<{ category: string; myScore: number; buildingAverage: number; neighborhoodAverage: number; }>; 
   };
   negotiationCards: Array<{ 
     priority: number; 
     title: string; 
-    recommendationScript: string; 
+    recommendationScript: string;
+    successProbability?: string; // 프리미엄 필드
+    strategy?: string; // 프리미엄 필드
   }>;
   policyInfos: Array<{ 
     title: string; 
     description: string; 
-    link: string; 
+    link: string;
+    isEligible?: boolean; // 프리미엄 필드
   }>;
   disputeGuide?: { 
     relatedLaw: string; 
     committeeInfo: string; 
-    formDownloadLink: string; 
+    formDownloadLink: string;
+    procedure?: { step: number; title: string; description: string; }[]; // 프리미엄 필드
   };
+
+  // 프리미엄 전용 신규 데이터 필드
+  smartDiagnosisData?: SmartDiagnosisData;
+  peerGroupData?: PeerGroupData[];
+  timeSeriesData?: TimeSeriesData[];
 }
+
+// ------------------------------------------
+
 
 export default function ComprehensiveReport({ reportId: initialReportId }: { reportId?: string }) {
   const searchParams = useSearchParams();
@@ -133,13 +162,15 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
   const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
 
   const barChartData = [
-    { name: '내 점수', value: reportData.subjectiveMetrics.overallScore.myScore },
-    { name: '동네 평균', value: reportData.subjectiveMetrics.overallScore.neighborhoodAverage },
-    { name: '건물 평균', value: reportData.subjectiveMetrics.overallScore.buildingAverage }
+    { name: '내 점수', value: reportData.subjectiveMetrics?.overallScore?.myScore || 0 },
+    { name: '동네 평균', value: reportData.subjectiveMetrics?.overallScore?.neighborhoodAverage || 0 },
+    { name: '건물 평균', value: reportData.subjectiveMetrics?.overallScore?.buildingAverage || 0 }
   ];
 
-  const radarChartData = reportData.subjectiveMetrics.categoryScores.map(c => ({ 
-    category: c.category, myScore: c.myScore, neighborhoodAvg: c.neighborhoodAverage 
+  const radarChartData = (reportData.subjectiveMetrics?.categoryScores || []).map(c => ({ 
+    category: c.category || '알 수 없음', 
+    myScore: c.myScore || 0, 
+    neighborhoodAvg: c.neighborhoodAverage || 0 
   }));
 
   return (
@@ -184,14 +215,14 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
                 <i className="ri-file-chart-line text-4xl text-white"></i>
               </div>
               <h1 className="text-2xl md:text-4xl font-bold mb-4">
-                {reportData.contractSummary.address} 임대차 협상 리포트
+                {reportData.contractSummary?.address || '주소 정보 없음'} 임대차 협상 리포트
                 {isPremium && ' 💎'}
               </h1>
               
               <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6 text-sm">
                 <div className="flex items-center">
                   <i className="ri-calendar-line mr-2"></i>
-                  생성일자: {reportData.header.generatedDate}
+                  생성일자: {reportData.header?.generatedDate || '알 수 없음'}
                 </div>
                 <div className="flex items-center">
                   <i className="ri-time-line mr-2"></i>
@@ -199,7 +230,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
                 </div>
               </div>
               
-              <p className="text-white/80 text-sm max-w-2xl mx-auto mb-8">{reportData.header.dataPeriod}</p>
+              <p className="text-white/80 text-sm max-w-2xl mx-auto mb-8">{reportData.header?.dataPeriod || '데이터 기간 정보가 없습니다.'}</p>
             </div>
             
             {/* 데이터 신뢰도 */}
@@ -212,15 +243,15 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div>
-                  <div className="text-3xl font-bold mb-2">{reportData.header.participantCount}명</div>
+                  <div className="text-3xl font-bold mb-2">{reportData.header?.participantCount || 0}명</div>
                   <div className="text-white/80 text-sm">참여 인원 수</div>
                 </div>
                 <div className="border-l border-r border-white/30 px-4">
-                  <div className="text-3xl font-bold mb-2">{reportData.header.dataRecency}</div>
+                  <div className="text-3xl font-bold mb-2">{reportData.header?.dataRecency || '알 수 없음'}</div>
                   <div className="text-white/80 text-sm">평균 응답 시점</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold mb-2">{reportData.header.reliabilityScore}/100</div>
+                  <div className="text-3xl font-bold mb-2">{reportData.header?.reliabilityScore || 0}/100</div>
                   <div className="text-white/80 text-sm">신뢰도 점수</div>
                 </div>
               </div>
@@ -237,21 +268,21 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
                   <i className="ri-map-pin-line text-violet-500 text-xl mr-3"></i>
                   <div>
                     <div className="text-gray-800 font-medium">주소</div>
-                    <div className="text-gray-600 text-sm">{reportData.contractSummary.address}</div>
+                    <div className="text-gray-600 text-sm">{reportData.contractSummary?.address || '주소 정보 없음'}</div>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <i className="ri-building-line text-violet-500 text-xl mr-3"></i>
                   <div>
                     <div className="text-gray-800 font-medium">건물 유형</div>
-                    <div className="text-gray-600 text-sm">{reportData.contractSummary.buildingType}</div>
+                    <div className="text-gray-600 text-sm">{reportData.contractSummary?.buildingType || '정보 없음'}</div>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <i className="ri-contract-line text-violet-500 text-xl mr-3"></i>
                   <div>
                     <div className="text-gray-800 font-medium">계약 유형</div>
-                    <div className="text-gray-600 text-sm">{reportData.contractSummary.contractType}</div>
+                    <div className="text-gray-600 text-sm">{reportData.contractSummary?.contractType || '정보 없음'}</div>
                   </div>
                 </div>
               </div>
@@ -260,23 +291,23 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
               <div className="bg-purple-50 rounded-lg p-6">
                 <h3 className="text-gray-800 font-bold mb-4">계약 조건</h3>
                 <div className="space-y-2">
-                  {reportData.contractSummary.conditions.split(' / ').map((condition, index) => (
+                  {(reportData.contractSummary?.conditions || '정보 없음').split(' / ').map((condition, index) => (
                     <div key={index} className="flex justify-between items-center">
-                      <span className="text-gray-700">{condition.split(' ')[0]}</span>
-                      <span className="text-gray-900 font-medium">{condition.split(' ').slice(1).join(' ')}</span>
+                      <span className="text-gray-700">{condition.split(' ')[0] || '항목'}</span>
+                      <span className="text-gray-900 font-medium">{condition.split(' ').slice(1).join(' ') || '정보 없음'}</span>
                     </div>
                   ))}
                 </div>
                 
                 {/* 인증 상태 */}
                 <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                  {reportData.contractSummary.gpsVerified && (
+                  {reportData.contractSummary?.gpsVerified && (
                     <div className="flex items-center text-emerald-600">
                       <i className="ri-checkbox-circle-line mr-2"></i>
                       GPS 위치 인증 완료
                     </div>
                   )}
-                  {reportData.contractSummary.contractVerified && (
+                  {reportData.contractSummary?.contractVerified && (
                     <div className="flex items-center text-emerald-600">
                       <i className="ri-file-check-line mr-2"></i>
                       계약서/고지서 인증 완료
@@ -317,7 +348,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
 
             {/* 카테고리별 상세 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {reportData.subjectiveMetrics.categoryScores.map((score, index) => {
+              {(reportData.subjectiveMetrics?.categoryScores || []).map((score, index) => {
                 const diff = score.neighborhoodAverage - score.myScore;
                 const isLower = diff > 0;
                 const cardColor = isLower ? 'red' : diff < -0.5 ? 'green' : 'yellow';
@@ -360,7 +391,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
                   동네 평균
                 </div>
                 <div className="ml-6 text-gray-600">
-                  평균: {reportData.subjectiveMetrics.overallScore.myScore.toFixed(1)}점 (5점 만점)
+                  평균: {(reportData.subjectiveMetrics?.overallScore?.myScore || 0).toFixed(1)}점 (5점 만점)
                 </div>
               </div>
             </div>
@@ -376,7 +407,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">협상 카드 (자동 생성)</h2>
             <div className="space-y-6">
-              {reportData.negotiationCards.map((card, index) => {
+              {(reportData.negotiationCards || []).map((card, index) => {
                 const colors = [
                   { bg: 'bg-pink-50', border: 'border-pink-200', accent: 'bg-pink-500', text: 'text-pink-800' },
                   { bg: 'bg-emerald-50', border: 'border-emerald-200', accent: 'bg-emerald-500', text: 'text-emerald-800' },
@@ -408,7 +439,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">맞춤형 정책/지원 정보</h2>
             <div className="space-y-4">
-              {reportData.policyInfos.map((policy, index) => (
+              {(reportData.policyInfos || []).map((policy, index) => (
                 <div key={index} className="bg-purple-100 border border-violet-200 rounded-xl p-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center">

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { authApi } from '../lib/api';
+import { authApi, diagnosisApi } from '../lib/api';
 
 export default function HomePage() {
   const router = useRouter();
@@ -77,28 +77,44 @@ export default function HomePage() {
         }
 
         try {
-          // API는 한 번만 호출
+          // API로 사용자 프로필 정보 가져오기
           const profile = await authApi.getCurrentUser();
+          console.log('사용자 프로필:', profile);
           
-          // Check if user just completed onboarding
-          const onboardingCompleted = localStorage.getItem('onboarding_completed');
-          if (onboardingCompleted === 'true') {
-            setShowDiagnosisPrompt(true);
-            localStorage.removeItem('onboarding_completed');
-          }
-
-          // Check if user just completed diagnosis
-          const diagnosisCompleted = localStorage.getItem('diagnosis_completed');
-          if (diagnosisCompleted === 'true') {
-            setShowWeeklyMissionPrompt(true);
-            localStorage.removeItem('diagnosis_completed');
-          }
-
-          // Check if user just logged in - show surprise weekly mission immediately
-          const justLoggedIn = localStorage.getItem('just_logged_in');
-          if (justLoggedIn === 'true') {
-            setShowSurpriseWeeklyMission(true);
-            localStorage.removeItem('just_logged_in');
+          // 백엔드에서 받은 실제 상태 정보로 모달 표시 결정
+          if (profile && profile.data) {
+            const userData = profile.data;
+            
+            // 1. 온보딩 완료 여부 체크
+            if (!userData.onboardingCompleted) {
+              // 온보딩이 완료되지 않았다면 온보딩으로 리다이렉트
+              router.push('/onboarding/location');
+              return;
+            }
+            
+            // 2. 진단 완료 여부 체크 (localStorage 일시적 플래그도 함께 확인)
+            const justCompletedDiagnosis = localStorage.getItem('diagnosis_completed') === 'true';
+            if (justCompletedDiagnosis) {
+              setShowWeeklyMissionPrompt(true);
+              localStorage.removeItem('diagnosis_completed');
+            } else if (!userData.diagnosisCompleted) {
+              // 진단을 완료하지 않은 사용자에게 진단 프롬프트 표시 (단, 온보딩 직후가 아닌 경우)
+              const justCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+              if (justCompletedOnboarding) {
+                setShowDiagnosisPrompt(true);
+                localStorage.removeItem('onboarding_completed');
+              }
+            }
+            
+            // 3. 로그인 직후 서프라이즈 미션 (진단 완료한 사용자에게만)
+            const justLoggedIn = localStorage.getItem('just_logged_in');
+            if (justLoggedIn === 'true' && userData.diagnosisCompleted) {
+              setShowSurpriseWeeklyMission(true);
+              localStorage.removeItem('just_logged_in');
+            } else if (justLoggedIn === 'true') {
+              // 진단 완료하지 않은 사용자는 just_logged_in 플래그만 제거
+              localStorage.removeItem('just_logged_in');
+            }
           }
 
         } catch (error) {
