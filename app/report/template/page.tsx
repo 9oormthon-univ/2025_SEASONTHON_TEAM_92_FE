@@ -30,6 +30,7 @@ const transformData = (backendData: any): ReportTemplateType => {
   }
 
   return {
+    reportType: 'premium', // 백엔드에서 오는 데이터는 프리미엄 리포트로 간주
     header: {
       title: backendData?.header?.title || '리포트 제목',
       createdAt: backendData?.header?.generatedDate || '알 수 없음',
