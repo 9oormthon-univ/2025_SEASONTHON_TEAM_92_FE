@@ -317,7 +317,16 @@ export default function ComprehensiveReport({
   const safeBarChartData = barChartData.filter(item => typeof item.value === 'number' && !isNaN(item.value));
 
   const radarChartData = Object.entries(reportData?.subjectiveMetrics?.categories || {}).map(([categoryKey, score]: [string, any]) => ({ 
-    category: categoryKey === 'lighting' ? '채광' : categoryKey === 'soundproofing' ? '방음' : categoryKey === 'parking' ? '주차' : categoryKey, 
+    category: categoryKey === 'lighting' ? '채광' : 
+              categoryKey === 'soundproofing' ? '방음' : 
+              categoryKey === 'parking' ? '주차' :
+              categoryKey === 'waterPressure' ? '수압' :
+              categoryKey === 'heating' ? '난방' :
+              categoryKey === 'ventilation' ? '환기' :
+              categoryKey === 'security' ? '보안' :
+              categoryKey === 'management' ? '관리' :
+              categoryKey === 'convenience' ? '편의성' :
+              categoryKey === 'internet' ? '인터넷' : categoryKey, 
     myScore: score.myScore || 0, 
     neighborhoodAvg: score.neighborhoodAvg || 0,
     buildingAvg: score.buildingAvg || 0
@@ -525,7 +534,18 @@ export default function ComprehensiveReport({
                 return (
                   <div key={index} className={`p-4 bg-${cardColor}-50 rounded-xl border border-${cardColor}-200`}>
                     <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-gray-800 font-bold">{categoryKey === 'lighting' ? '채광' : categoryKey === 'soundproofing' ? '방음' : categoryKey === 'parking' ? '주차' : categoryKey}</h4>
+                      <h4 className="text-gray-800 font-bold">
+                        {categoryKey === 'lighting' ? '채광' : 
+                         categoryKey === 'soundproofing' ? '방음' : 
+                         categoryKey === 'parking' ? '주차' :
+                         categoryKey === 'waterPressure' ? '수압' :
+                         categoryKey === 'heating' ? '난방' :
+                         categoryKey === 'ventilation' ? '환기' :
+                         categoryKey === 'security' ? '보안' :
+                         categoryKey === 'management' ? '관리' :
+                         categoryKey === 'convenience' ? '편의성' :
+                         categoryKey === 'internet' ? '인터넷' : categoryKey}
+                      </h4>
                       <span className={`text-${cardColor}-600 font-bold`}>{score.myScore.toFixed(1)}점</span>
                     </div>
                     <p className="text-gray-600 text-sm">

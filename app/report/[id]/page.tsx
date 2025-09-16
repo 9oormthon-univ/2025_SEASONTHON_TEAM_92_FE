@@ -159,7 +159,14 @@ export default function ReportPage({ params }: ReportPageProps) {
                   response.data.subjectiveMetrics.categoryScores.forEach((cat: any) => {
                     const categoryKey = cat.category === '채광' ? 'lighting' : 
                                       cat.category === '소음' ? 'soundproofing' : 
-                                      cat.category === '주차' ? 'parking' : null;
+                                      cat.category === '주차' ? 'parking' :
+                                      cat.category === '수압' ? 'waterPressure' :
+                                      cat.category === '난방' ? 'heating' :
+                                      cat.category === '환기' ? 'ventilation' :
+                                      cat.category === '보안' ? 'security' :
+                                      cat.category === '관리' ? 'management' :
+                                      cat.category === '편의성' ? 'convenience' :
+                                      cat.category === '인터넷' ? 'internet' : null;
                     if (categoryKey) {
                       transformedData.subjectiveMetrics.categories[categoryKey] = {
                         myScore: cat.myScore || 0,
