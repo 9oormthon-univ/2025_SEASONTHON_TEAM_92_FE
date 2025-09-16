@@ -64,39 +64,18 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
         }
       }
       
-      // 최근 3개월 데이터 요청 (현재 월부터 역산)
-      const currentDate = new Date();
-      const months = [];
-      for (let i = 0; i < 3; i++) {
-        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-        months.push(date.toISOString().slice(0, 7).replace('-', ''));
-      }
-      
-      // 프록시를 통한 국토교통부 API 호출
-      const molitPromises = months.map(async (dealYmd) => {
-        try {
-          const response = await fetch(`/api/molit-proxy?dealYmd=${dealYmd}&lawdCd=${lawdCd}&numOfRows=100`);
-          const data = await response.json();
-          
-          if (data.response?.header?.resultCode === '00' && data.response?.body?.items?.itemList) {
-            return Array.isArray(data.response.body.items.itemList) 
-              ? data.response.body.items.itemList 
-              : [data.response.body.items.itemList];
-          }
-          return [];
-        } catch (err) {
-          console.error(`MOLIT API error for ${dealYmd}:`, err);
-          return [];
-        }
+      // 백엔드 API를 통한 실거래가 데이터 요청
+      const [monthlyRes, jeonseRes, transactionsRes] = await Promise.all([
+        officetelApi.getMonthlyRentMarket(lawdCd),
+        officetelApi.getJeonseMarket(lawdCd),
+        officetelApi.getTransactions(lawdCd)
+      ]);
+
+      setMarketData({
+        monthlyRentMarket: monthlyRes?.success ? monthlyRes.data : [],
+        jeonseMarket: jeonseRes?.success ? jeonseRes.data : [],
+        transactions: transactionsRes?.success ? transactionsRes.data : []
       });
-      
-      const molitResults = await Promise.all(molitPromises);
-      const allTransactions = molitResults.flat();
-      
-      // 데이터 가공
-      const processedData = processMolitData(allTransactions);
-      
-      setMarketData(processedData);
       toast.success('실거래가 데이터를 불러왔습니다.');
     } catch (err: any) {
       console.error('Market data load error:', err);

@@ -42,41 +42,15 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: T
         setIsLoading(true);
         setError('');
 
-        // 최근 N개월 데이터 요청
-        const currentDate = new Date();
-        const monthsData = [];
-        for (let i = 0; i < months; i++) {
-          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-          monthsData.push(date.toISOString().slice(0, 7).replace('-', ''));
+        const response = await realEstateApi.getTimeSeriesAnalysis(buildingType, lawdCd, months);
+        
+        if (response.success && response.data) {
+          setTimeSeriesData(response.data.timeSeries || []);
+          setAnalysis(response.data.analysis || null);
+          setIsMockData(response.data.isMockData || false);
+        } else {
+          throw new Error(response.message || '시계열 데이터를 불러올 수 없습니다.');
         }
-        
-        // 프록시를 통한 국토교통부 API 호출
-        const molitPromises = monthsData.map(async (dealYmd) => {
-          try {
-            const response = await fetch(`/api/molit-proxy?dealYmd=${dealYmd}&lawdCd=${lawdCd}&numOfRows=100`);
-            const data = await response.json();
-            
-            if (data.response?.header?.resultCode === '00' && data.response?.body?.items?.itemList) {
-              return Array.isArray(data.response.body.items.itemList) 
-                ? data.response.body.items.itemList 
-                : [data.response.body.items.itemList];
-            }
-            return [];
-          } catch (err) {
-            console.error(`MOLIT API error for ${dealYmd}:`, err);
-            return [];
-          }
-        });
-        
-        const molitResults = await Promise.all(molitPromises);
-        const allTransactions = molitResults.flat();
-        
-        // 시계열 데이터 가공
-        const processedData = processTimeSeriesData(allTransactions, monthsData);
-        
-        setTimeSeriesData(processedData.timeSeries);
-        setAnalysis(processedData.analysis);
-        setIsMockData(false);
         
       } catch (err: any) {
         console.error('Time series data fetch error:', err);
@@ -91,75 +65,6 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: T
       fetchTimeSeriesData();
     }
   }, [buildingType, lawdCd, months]);
-  
-  // 시계열 데이터 가공 함수 (올바른 필드명 사용)
-  const processTimeSeriesData = (transactions: any[], monthsData: string[]) => {
-    // 월별 데이터 그룹화
-    const monthlyGroups: {[key: string]: any[]} = {};
-    transactions.forEach(transaction => {
-      // 백엔드 DTO 구조에 맞게 필드명 수정
-      const year = transaction.year || '';
-      const month = String(transaction.month || '').padStart(2, '0');
-      const yearMonth = year + month; // YYYYMM 형식
-      
-      if (monthsData.includes(yearMonth)) {
-        if (!monthlyGroups[yearMonth]) {
-          monthlyGroups[yearMonth] = [];
-        }
-        monthlyGroups[yearMonth].push(transaction);
-      }
-    });
-    
-    // 시계열 데이터 생성
-    const timeSeries = monthsData.reverse().map(yearMonth => {
-      const monthTransactions = monthlyGroups[yearMonth] || [];
-      const monthlyRentTransactions = monthTransactions.filter(t => t.monthlyRent && parseInt(t.monthlyRent) > 0);
-      
-      const rents = monthlyRentTransactions.map(t => parseInt(t.monthlyRent)).filter(r => r > 0);
-      const averageRent = rents.length > 0 ? rents.reduce((a, b) => a + b, 0) / rents.length : 0;
-      
-      return {
-        period: yearMonth.substring(0, 4) + '-' + yearMonth.substring(4, 6),
-        yearMonth,
-        averageRent,
-        transactionCount: monthlyRentTransactions.length
-      };
-    });
-    
-    // 분석 데이터 생성
-    const validData = timeSeries.filter(item => item.averageRent > 0);
-    if (validData.length < 2) {
-      return {
-        timeSeries,
-        analysis: null
-      };
-    }
-    
-    const startRent = validData[0].averageRent;
-    const endRent = validData[validData.length - 1].averageRent;
-    const totalChangeRate = ((endRent - startRent) / startRent) * 100;
-    const monthlyChangeRate = totalChangeRate / validData.length;
-    
-    let trend = '보합';
-    if (totalChangeRate > 5) trend = '상승';
-    else if (totalChangeRate < -5) trend = '하락';
-    
-    const analysis = {
-      totalChangeRate: Math.round(totalChangeRate * 10) / 10,
-      monthlyChangeRate: Math.round(monthlyChangeRate * 10) / 10,
-      startPeriod: validData[0].period,
-      endPeriod: validData[validData.length - 1].period,
-      startRent,
-      endRent,
-      trend,
-      buildingType
-    };
-    
-    return {
-      timeSeries,
-      analysis
-    };
-  };
 
   if (isLoading) {
     return (

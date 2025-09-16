@@ -8,6 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import MarketDataComparison from './MarketDataComparison';
 import TimeSeriesChart from './TimeSeriesChart';
 import DocumentGenerator from './DocumentGenerator';
+import SmartDiagnosisModal from './SmartDiagnosisModal';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -106,6 +107,8 @@ export default function ComprehensiveReport({
   const [error, setError] = useState('');
   const [shareUrl, setShareUrl] = useState('');
   const [showDocumentGenerator, setShowDocumentGenerator] = useState(false);
+  const [showSmartDiagnosis, setShowSmartDiagnosis] = useState(false);
+  const [currentSmartDiagnosisData, setCurrentSmartDiagnosisData] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,6 +129,13 @@ export default function ComprehensiveReport({
           const backendReportType = response.data.reportType;
           const finalIsPremium = backendReportType === 'premium' || urlReportType === 'premium';
           setIsPremium(finalIsPremium);
+          
+          // 스마트 진단 데이터 설정 (백엔드에서 받은 데이터 또는 props로 받은 데이터)
+          if (response.data.smartDiagnosisData) {
+            setCurrentSmartDiagnosisData(response.data.smartDiagnosisData);
+          } else if (smartDiagnosisData) {
+            setCurrentSmartDiagnosisData(smartDiagnosisData);
+          }
           
           console.log('프리미엄 타입 확인:', {
             backendReportType,
@@ -627,24 +637,33 @@ export default function ComprehensiveReport({
           {/* 5. 스마트 진단 종합 분석 (프리미엄) */}
           {isPremium && (
             <section className="p-6 md:p-8 border-b border-purple-100">
-              <div className="flex items-center mb-6">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                  <i className="ri-crown-line text-white"></i>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                    <i className="ri-crown-line text-white"></i>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-800">🔬 스마트 진단 종합 분석</h2>
+                  <div className="ml-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    PREMIUM
+                  </div>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">🔬 스마트 진단 종합 분석</h2>
-                <div className="ml-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                  PREMIUM
-                </div>
+                <button 
+                  onClick={() => setShowSmartDiagnosis(true)}
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all flex items-center text-sm"
+                >
+                  <i className="ri-refresh-line mr-2"></i>
+                  재측정하기
+                </button>
               </div>
               
-              {smartDiagnosisData ? (
+              {currentSmartDiagnosisData ? (
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
                   <div className="text-center mb-6">
                     <div className="text-4xl font-bold text-blue-600 mb-2">
-                      종합 점수: {smartDiagnosisData.overallScore || 85}점
+                      종합 점수: {currentSmartDiagnosisData.overallScore || 85}점
                     </div>
                     <p className="text-blue-700 text-lg">
-                      {smartDiagnosisData.insights || "소음 환경이 매우 좋고 인터넷 속도가 우수합니다."}
+                      {currentSmartDiagnosisData.insights || "소음 환경이 매우 좋고 인터넷 속도가 우수합니다."}
                     </p>
                   </div>
                   
@@ -659,10 +678,10 @@ export default function ComprehensiveReport({
                         </tr>
                       </thead>
                       <tbody>
-                        {smartDiagnosisData.noise && (
+                        {currentSmartDiagnosisData.noise && (
                           <tr className="border-b border-gray-100">
                             <td className="px-4 py-3 font-medium">🔊 소음</td>
-                            <td className="px-4 py-3">{smartDiagnosisData.noise.value}dB</td>
+                            <td className="px-4 py-3">{currentSmartDiagnosisData.noise.value}dB</td>
                             <td className="px-4 py-3">
                               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                                 우수
@@ -671,10 +690,10 @@ export default function ComprehensiveReport({
                             <td className="px-4 py-3 text-green-600">15% 조용함</td>
                           </tr>
                         )}
-                        {smartDiagnosisData.level && (
+                        {currentSmartDiagnosisData.level && (
                           <tr className="border-b border-gray-100">
                             <td className="px-4 py-3 font-medium">📐 수평</td>
-                            <td className="px-4 py-3">{smartDiagnosisData.level.value}°</td>
+                            <td className="px-4 py-3">{currentSmartDiagnosisData.level.value}°</td>
                             <td className="px-4 py-3">
                               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                                 우수
@@ -683,10 +702,10 @@ export default function ComprehensiveReport({
                             <td className="px-4 py-3 text-green-600">상위 10% 수준</td>
                           </tr>
                         )}
-                        {smartDiagnosisData.internet && (
+                        {currentSmartDiagnosisData.internet && (
                           <tr>
                             <td className="px-4 py-3 font-medium">🚀 인터넷</td>
-                            <td className="px-4 py-3">{smartDiagnosisData.internet.downloadSpeed}Mbps</td>
+                            <td className="px-4 py-3">{currentSmartDiagnosisData.internet.downloadSpeed}Mbps</td>
                             <td className="px-4 py-3">
                               <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                                 매우 빠름
@@ -716,7 +735,7 @@ export default function ComprehensiveReport({
                   <p className="text-gray-600 mb-4">
                     현재 스마트 진단 데이터를 수집하고 있습니다. 잠시만 기다려주세요.
                   </p>
-                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="bg-white rounded-lg p-4 border border-gray-200 mb-4">
                     <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
                       <div className="flex items-center">
                         <div className="w-3 h-3 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
@@ -732,6 +751,13 @@ export default function ComprehensiveReport({
                       </div>
                     </div>
                   </div>
+                  <button 
+                    onClick={() => setShowSmartDiagnosis(true)}
+                    className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all flex items-center mx-auto"
+                  >
+                    <i className="ri-play-circle-line mr-2"></i>
+                    지금 측정하기
+                  </button>
                 </div>
               )}
             </section>
@@ -942,6 +968,16 @@ export default function ComprehensiveReport({
         reportData={reportData}
         isVisible={showDocumentGenerator}
         onClose={() => setShowDocumentGenerator(false)}
+      />
+
+      {/* 스마트 진단 모달 */}
+      <SmartDiagnosisModal
+        isVisible={showSmartDiagnosis}
+        onClose={() => setShowSmartDiagnosis(false)}
+        onComplete={(data) => {
+          setCurrentSmartDiagnosisData(data);
+          setShowSmartDiagnosis(false);
+        }}
       />
     </div>
   );
