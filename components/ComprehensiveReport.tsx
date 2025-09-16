@@ -302,7 +302,8 @@ export default function ComprehensiveReport({
   const radarChartData = (reportData?.subjectiveMetrics?.categoryScores || []).map((c: any) => ({ 
     category: c.category || '알 수 없음', 
     myScore: c.myScore || 0, 
-    neighborhoodAvg: c.neighborhoodAverage || 0 
+    neighborhoodAvg: c.neighborhoodAverage || 0,
+    buildingAvg: c.buildingAverage || 0
   }));
 
   return (
