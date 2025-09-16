@@ -112,11 +112,26 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
     );
   }
 
-  // 차트 데이터 준비
+  // 차트 데이터 준비 (안전한 접근)
   const radarData = [
-    { category: '채광', myScore: reportData.subjectiveMetrics.categories.lighting.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.lighting.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.lighting.buildingAvg },
-    { category: '방음', myScore: reportData.subjectiveMetrics.categories.soundproofing.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.soundproofing.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.soundproofing.buildingAvg },
-    { category: '주차', myScore: reportData.subjectiveMetrics.categories.parking.myScore, neighborhoodAvg: reportData.subjectiveMetrics.categories.parking.neighborhoodAvg, buildingAvg: reportData.subjectiveMetrics.categories.parking.buildingAvg }
+    { 
+      category: '채광', 
+      myScore: reportData.subjectiveMetrics.categories?.lighting?.myScore || 0, 
+      neighborhoodAvg: reportData.subjectiveMetrics.categories?.lighting?.neighborhoodAvg || 0, 
+      buildingAvg: reportData.subjectiveMetrics.categories?.lighting?.buildingAvg || 0 
+    },
+    { 
+      category: '방음', 
+      myScore: reportData.subjectiveMetrics.categories?.soundproofing?.myScore || 0, 
+      neighborhoodAvg: reportData.subjectiveMetrics.categories?.soundproofing?.neighborhoodAvg || 0, 
+      buildingAvg: reportData.subjectiveMetrics.categories?.soundproofing?.buildingAvg || 0 
+    },
+    { 
+      category: '주차', 
+      myScore: reportData.subjectiveMetrics.categories?.parking?.myScore || 0, 
+      neighborhoodAvg: reportData.subjectiveMetrics.categories?.parking?.neighborhoodAvg || 0, 
+      buildingAvg: reportData.subjectiveMetrics.categories?.parking?.buildingAvg || 0 
+    }
   ];
 
   const barData = [
@@ -220,8 +235,8 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
               <div className="bg-white rounded-lg p-4">
                 <div className="text-center">
                   <div className="text-lg font-semibold text-gray-800 mb-2">채광</div>
-                  <div className="text-2xl font-bold text-blue-600">{data.subjectiveMetrics.categories.lighting.myScore}</div>
-                  <div className="text-sm text-gray-600">동네 평균 {data.subjectiveMetrics.categories.lighting.neighborhoodAvg}</div>
+                  <div className="text-2xl font-bold text-blue-600">{data.subjectiveMetrics.categories?.lighting?.myScore || 0}</div>
+                  <div className="text-sm text-gray-600">동네 평균 {data.subjectiveMetrics.categories?.lighting?.neighborhoodAvg || 0}</div>
                 </div>
               </div>
               <div className="bg-white rounded-lg p-4">
