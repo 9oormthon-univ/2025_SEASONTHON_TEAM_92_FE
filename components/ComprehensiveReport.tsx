@@ -299,11 +299,11 @@ export default function ComprehensiveReport({
     { name: '건물 평균', value: reportData?.subjectiveMetrics?.overallScore?.buildingAverage || 0 }
   ];
 
-  const radarChartData = (reportData?.subjectiveMetrics?.categoryScores || []).map((c: any) => ({ 
-    category: c.category || '알 수 없음', 
-    myScore: c.myScore || 0, 
-    neighborhoodAvg: c.neighborhoodAverage || 0,
-    buildingAvg: c.buildingAverage || 0
+  const radarChartData = Object.entries(reportData?.subjectiveMetrics?.categories || {}).map(([categoryKey, score]: [string, any]) => ({ 
+    category: categoryKey === 'lighting' ? '채광' : categoryKey === 'soundproofing' ? '방음' : categoryKey === 'parking' ? '주차' : categoryKey, 
+    myScore: score.myScore || 0, 
+    neighborhoodAvg: score.neighborhoodAvg || 0,
+    buildingAvg: score.buildingAvg || 0
   }));
 
   return (
@@ -492,19 +492,19 @@ export default function ComprehensiveReport({
 
             {/* 카테고리별 상세 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {(reportData?.subjectiveMetrics?.categoryScores || []).map((score: any, index: number) => {
-                const diff = score.neighborhoodAverage - score.myScore;
+              {Object.entries(reportData?.subjectiveMetrics?.categories || {}).map(([categoryKey, score]: [string, any], index: number) => {
+                const diff = score.neighborhoodAvg - score.myScore;
                 const isLower = diff > 0;
                 const cardColor = isLower ? 'red' : diff < -0.5 ? 'green' : 'yellow';
                 
                 return (
                   <div key={index} className={`p-4 bg-${cardColor}-50 rounded-xl border border-${cardColor}-200`}>
                     <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-gray-800 font-bold">{score.category}</h4>
+                      <h4 className="text-gray-800 font-bold">{categoryKey === 'lighting' ? '채광' : categoryKey === 'soundproofing' ? '방음' : categoryKey === 'parking' ? '주차' : categoryKey}</h4>
                       <span className={`text-${cardColor}-600 font-bold`}>{score.myScore.toFixed(1)}점</span>
                     </div>
                     <p className="text-gray-600 text-sm">
-                      동네 평균 {score.neighborhoodAverage.toFixed(1)}점보다 {Math.abs(diff).toFixed(1)}점 {isLower ? '낮음' : '높음'}
+                      동네 평균 {score.neighborhoodAvg.toFixed(1)}점보다 {Math.abs(diff).toFixed(1)}점 {isLower ? '낮음' : '높음'}
                     </p>
                   </div>
                 );
