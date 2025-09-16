@@ -247,6 +247,20 @@ export default function ComprehensiveReport({
     </div>
   );
 
+  // 리포트 데이터 구조 안전성 강화
+  if (!reportData.contractSummary) {
+    console.error('Report data missing contractSummary:', reportData);
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-100 to-purple-200">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">데이터 오류</h2>
+          <p className="text-gray-600">리포트 데이터 구조에 문제가 있습니다.</p>
+          <p className="text-sm text-gray-500 mt-2">contractSummary 정보가 누락되었습니다.</p>
+        </div>
+      </div>
+    );
+  }
+
   const conditions = reportData?.contractSummary?.conditions || "";
   const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
   const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
