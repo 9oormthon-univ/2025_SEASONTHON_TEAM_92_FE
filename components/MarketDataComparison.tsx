@@ -145,7 +145,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
       
       <div className="space-y-6">
         {/* 주변 동네 월세 시세 비교 */}
-        {marketData.monthlyRentMarket.length > 0 && (
+        {(marketData?.monthlyRentMarket?.length || 0) > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-building-line mr-2 text-blue-600"></i>
@@ -205,7 +205,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
         )}
 
         {/* 최근 거래 동향 */}
-        {marketData.transactions.length > 0 && (
+        {(marketData?.transactions?.length || 0) > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-line-chart-line mr-2 text-green-600"></i>
@@ -259,8 +259,8 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
               <h4 className="font-semibold text-blue-800 mb-2">🎯 시세 분석 요약</h4>
               <div className="text-sm text-blue-700" dangerouslySetInnerHTML={{
                 __html: (() => {
-                  const avgMarketRent = marketData.monthlyRentMarket.length > 0 
-                    ? marketData.monthlyRentMarket[0]?.averagePrice || 0 
+                  const avgMarketRent = (marketData?.monthlyRentMarket?.length || 0) > 0 
+                    ? marketData?.monthlyRentMarket?.[0]?.averagePrice || 0 
                     : 0;
                   if (avgMarketRent === 0) return "시세 정보가 부족합니다.";
                   
@@ -268,11 +268,11 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
                   const percentDiff = (difference / avgMarketRent) * 100;
                   
                   if (percentDiff > 15) {
-                    return `최근 3개월 거래 ${marketData.transactions.length}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${percentDiff.toFixed(1)}% 높습니다 (${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-red-600">임대료 인하 협상의 강력한 근거가 될 수 있습니다.</strong>`;
+                    return `최근 3개월 거래 ${marketData?.transactions?.length || 0}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${percentDiff.toFixed(1)}% 높습니다 (${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-red-600">임대료 인하 협상의 강력한 근거가 될 수 있습니다.</strong>`;
                   } else if (percentDiff < -10) {
-                    return `최근 3개월 거래 ${marketData.transactions.length}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${Math.abs(percentDiff).toFixed(1)}% 낮습니다 (${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-green-600">현재 합리적인 수준으로 계약되어 있습니다.</strong>`;
+                    return `최근 3개월 거래 ${marketData?.transactions?.length || 0}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${Math.abs(percentDiff).toFixed(1)}% 낮습니다 (${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-green-600">현재 합리적인 수준으로 계약되어 있습니다.</strong>`;
                   } else {
-                    return `최근 3개월 거래 ${marketData.transactions.length}건 분석 결과, 회원님의 월세가 동네 평균과 비슷한 수준입니다 <strong>(차이: ${percentDiff.toFixed(1)}%, ${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-blue-600">현재 적정 수준이지만 다른 조건 개선을 요구할 수 있습니다.</strong>`;
+                    return `최근 3개월 거래 ${marketData?.transactions?.length || 0}건 분석 결과, 회원님의 월세가 동네 평균과 비슷한 수준입니다 <strong>(차이: ${percentDiff.toFixed(1)}%, ${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-blue-600">현재 적정 수준이지만 다른 조건 개선을 요구할 수 있습니다.</strong>`;
                   }
                 })()
               }} />
@@ -281,7 +281,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
         )}
 
         {/* 지역별 시세 비교 요약 카드 */}
-        {marketData.monthlyRentMarket.length > 0 && (
+        {(marketData?.monthlyRentMarket?.length || 0) > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-map-pin-line mr-2 text-purple-600"></i>

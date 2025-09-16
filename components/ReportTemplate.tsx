@@ -350,7 +350,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
           <div className="space-y-2 text-sm text-gray-600">
             <p>• 본 리포트는 새로운 참여자 데이터가 추가될 경우 자동 업데이트됩니다.</p>
             <p>• 이 리포트는 최근 3개월 내 데이터 기준으로 작성되었습니다.</p>
-            <p>• 데이터 신뢰도: {reportData.header.trustMetrics.trustScore}/100점</p>
+            <p>• 데이터 신뢰도: {reportData?.header?.trustMetrics?.trustScore || 0}/100점</p>
           </div>
         </section>
       </div>

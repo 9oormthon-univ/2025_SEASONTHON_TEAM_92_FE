@@ -35,7 +35,7 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const totalQuestions = categories.reduce((sum, cat) => sum + cat.questions.length, 0);
+  const totalQuestions = (categories || []).reduce((sum, cat) => sum + (cat?.questions?.length || 0), 0);
   const completedQuestions = Object.keys(responses).length;
 
   // 백엔드에서 질문 데이터 가져오기
@@ -249,7 +249,7 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
                                 onClick={() => {
                                   handleResponse(question.questionId.toString(), value);
                                   // 답변 후 잠시 기다린 다음 자동 스크롤 (마지막 질문이 아닌 경우)
-                                  if (qIndex === category.questions.length - 1 && categoryIndex < categories.length - 1) {
+                                  if (qIndex === (category?.questions?.length || 0) - 1 && categoryIndex < (categories?.length || 0) - 1) {
                                     setTimeout(() => {
                                       scrollToNextCategory(categoryIndex);
                                     }, 500);

@@ -63,7 +63,15 @@ export default function ReportPage({ params }: ReportPageProps) {
                     }
                   },
                   negotiationCards: response.data.negotiationCards || [],
-                  policyInfo: response.data.policyInfos || []
+                  policyInfo: response.data.policyInfos || [],
+                  header: {
+                    ...response.data.header,
+                    trustMetrics: {
+                      participantCount: response.data.header?.participantCount || 0,
+                      averageResponseDays: parseInt(response.data.header?.dataRecency?.match(/\d+/)?.[0] || '0'),
+                      trustScore: response.data.header?.reliabilityScore || 0
+                    }
+                  }
                 };
                 
                 // categoryScores 배열을 categories 객체로 변환
