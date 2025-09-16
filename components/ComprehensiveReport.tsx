@@ -299,12 +299,22 @@ export default function ComprehensiveReport({
     { name: '건물 평균', value: reportData?.subjectiveMetrics?.overallScore?.buildingAverage || 0 }
   ];
 
+  // 막대 차트 데이터도 안전하게 처리
+  const safeBarChartData = barChartData.filter(item => typeof item.value === 'number' && !isNaN(item.value));
+
   const radarChartData = Object.entries(reportData?.subjectiveMetrics?.categories || {}).map(([categoryKey, score]: [string, any]) => ({ 
     category: categoryKey === 'lighting' ? '채광' : categoryKey === 'soundproofing' ? '방음' : categoryKey === 'parking' ? '주차' : categoryKey, 
     myScore: score.myScore || 0, 
     neighborhoodAvg: score.neighborhoodAvg || 0,
     buildingAvg: score.buildingAvg || 0
   }));
+
+  // 차트 데이터가 비어있을 때 기본 데이터 제공
+  const safeRadarChartData = radarChartData.length > 0 ? radarChartData : [
+    { category: '채광', myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
+    { category: '방음', myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
+    { category: '주차', myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-purple-200">
@@ -471,7 +481,7 @@ export default function ComprehensiveReport({
               <h3 className="text-xl font-bold text-gray-800 text-center mb-6">거주 환경 종합 점수</h3>
               <div className="h-64 mb-4" style={{ width: '100%', height: '256px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData}>
+                  <BarChart data={safeBarChartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 5]} />
@@ -516,7 +526,7 @@ export default function ComprehensiveReport({
               <h3 className="text-xl font-bold text-gray-800 text-center mb-6">카테고리별 상세 분석</h3>
               <div className="h-80" style={{ width: '100%', height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarChartData}>
+                  <RadarChart data={safeRadarChartData}>
                     <PolarGrid />
                     <PolarAngleAxis dataKey="category" />
                     <Radar name="내 점수" dataKey="myScore" stroke="#9333EA" fill="#9333EA" fillOpacity={0.3} />
