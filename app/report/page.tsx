@@ -48,11 +48,12 @@ export default function ReportPage() {
   };
 
   const handleGeneratePremiumReport = async () => {
-    if (!reportContent.trim()) {
-      setError('협상 요구사항을 입력해주세요.');
-      toast.error('협상 요구사항을 입력해주세요.');
-      return;
-    }
+    // 협상 요구사항 필수 입력 제거
+    // if (!reportContent.trim()) {
+    //   setError('협상 요구사항을 입력해주세요.');
+    //   toast.error('협상 요구사항을 입력해주세요.');
+    //   return;
+    // }
 
     setIsLoading(true);
     setError('');
@@ -81,7 +82,7 @@ export default function ReportPage() {
           'Authorization': `Bearer ${jwtToken}`
         },
         body: JSON.stringify({
-          reportContent: reportContent,
+          reportContent: reportContent || '', // 빈 문자열로 전송
           reportType: 'premium'
         }),
       });
@@ -462,9 +463,9 @@ export default function ReportPage() {
                       ? handleGenerateComprehensiveReport
                       : handleGeneratePremiumReport
                   }
-                  disabled={isLoading || !selectedReportType || (selectedReportType === 'premium' && !reportContent.trim())}
+                  disabled={isLoading || !selectedReportType}
                   className={`w-52 h-14 px-8 py-4 rounded-xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] flex justify-center items-center overflow-hidden transition-all duration-200 transform ${
-                    selectedReportType && !isLoading && (selectedReportType === 'comprehensive' || reportContent.trim())
+                    selectedReportType && !isLoading
                       ? (selectedReportType === 'comprehensive'
                           ? 'bg-violet-500 hover:bg-violet-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
                           : 'bg-amber-500 hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer')
@@ -472,7 +473,7 @@ export default function ReportPage() {
                   }`}
                 >
                   <div className={`text-center justify-center text-lg font-bold font-['Roboto'] leading-7 ${
-                    selectedReportType && !isLoading && (selectedReportType === 'comprehensive' || reportContent.trim())
+                    selectedReportType && !isLoading
                       ? 'text-white'
                       : 'text-gray-500'
                   }`}>
@@ -486,7 +487,7 @@ export default function ReportPage() {
                 <div className="w-[1086px] h-52 inline-flex flex-col justify-start items-start">
                   <div className=" pb-4 inline-flex justify-start items-start">
                     <div className="w-[1086px] h-7 flex justify-start items-center">
-                      <div className="justify-center text-gray-800 text-xl font-semibold font-['Roboto'] leading-7">협상 요구사항을 자세히 입력해주세요.</div>
+                      <div className="justify-center text-gray-800 text-xl font-semibold font-['Roboto'] leading-7">협상 요구사항을 입력해주세요. (선택사항)</div>
                     </div>
                   </div>
                   <div className="w-[1086px] h-32 px-4 py-3 relative bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-300 inline-flex justify-start items-start overflow-hidden">
