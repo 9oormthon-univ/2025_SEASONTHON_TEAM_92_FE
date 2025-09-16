@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import NoiseMeasurementTool from './NoiseMeasurementTool';
 import LevelMeasurementTool from './LevelMeasurementTool';
 import InternetSpeedTool from './InternetSpeedTool';
+import { smartDiagnosisApi } from '@/lib/api';
 
 interface SmartDiagnosisModalProps {
   isVisible: boolean;
@@ -19,6 +20,61 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
     level: { value: 0, isComplete: false },
     internet: { downloadSpeed: 0, uploadSpeed: 0, isComplete: false }
   });
+  const [existingData, setExistingData] = useState<any>(null);
+  const [showExistingDataOption, setShowExistingDataOption] = useState(false);
+
+  // 기존 측정 데이터 확인
+  useEffect(() => {
+    if (isVisible) {
+      checkExistingMeasurements();
+    }
+  }, [isVisible]);
+
+  const checkExistingMeasurements = async () => {
+    try {
+      const response = await smartDiagnosisApi.getSmartDiagnosisSummary();
+      if (response.success && response.data) {
+        const data = response.data;
+        const hasExistingData = data.measurements && (
+          data.measurements.noise?.latestValue > 0 ||
+          data.measurements.level?.latestValue > 0 ||
+          data.measurements.internet?.latestValue > 0
+        );
+        
+        if (hasExistingData) {
+          setExistingData(data);
+          setShowExistingDataOption(true);
+        }
+      }
+    } catch (error) {
+      console.error('기존 측정 데이터 확인 실패:', error);
+    }
+  };
+
+  const useExistingData = () => {
+    if (existingData) {
+      const data = {
+        noise: { 
+          value: existingData.measurements?.noise?.latestValue || 0, 
+          isComplete: true 
+        },
+        level: { 
+          value: existingData.measurements?.level?.latestValue || 0, 
+          isComplete: true 
+        },
+        internet: { 
+          downloadSpeed: existingData.measurements?.internet?.latestValue || 0, 
+          uploadSpeed: 0, 
+          isComplete: true 
+        },
+        overallScore: existingData.overallScore || 85,
+        insights: existingData.insights?.join(', ') || "기존 측정 데이터를 사용합니다."
+      };
+      
+      onComplete(data);
+      onClose();
+    }
+  };
 
   const steps = [
     {
@@ -109,6 +165,8 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
       level: { value: 0, isComplete: false },
       internet: { downloadSpeed: 0, uploadSpeed: 0, isComplete: false }
     });
+    setShowExistingDataOption(false);
+    setExistingData(null);
   };
 
   if (!isVisible) return null;
@@ -148,9 +206,36 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
           </div>
         </div>
 
+        {/* 기존 데이터 옵션 */}
+        {showExistingDataOption && (
+          <div className="p-6 border-b border-gray-200 bg-blue-50">
+            <div className="text-center space-y-4">
+              <div className="text-4xl mb-2">📊</div>
+              <h3 className="text-xl font-semibold text-blue-800">기존 측정 데이터 발견</h3>
+              <p className="text-blue-600 text-sm">
+                이전에 측정한 데이터가 있습니다. 기존 데이터를 사용하시겠습니까?
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={useExistingData}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  기존 데이터 사용
+                </button>
+                <button
+                  onClick={() => setShowExistingDataOption(false)}
+                  className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  새로 측정하기
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 현재 단계 */}
         <div className="p-6">
-          {currentStep === 0 && (
+          {!showExistingDataOption && currentStep === 0 && (
             <NoiseMeasurementTool
               onComplete={(data) => {
                 setMeasurementData(prev => ({
@@ -163,7 +248,7 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
             />
           )}
           
-          {currentStep === 1 && (
+          {!showExistingDataOption && currentStep === 1 && (
             <LevelMeasurementTool
               onComplete={(data) => {
                 setMeasurementData(prev => ({
