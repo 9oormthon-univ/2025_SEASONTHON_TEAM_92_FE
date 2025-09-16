@@ -11,6 +11,15 @@ function SocialLoginContent() {
   useEffect(() => {
     const token = searchParams.get('token');
     const isNewUser = searchParams.get('isNewUser') === 'true';
+    const error = searchParams.get('error');
+    const errorMessage = searchParams.get('message');
+
+    if (error) {
+      // OAuth 에러 처리
+      toast.error(`소셜 로그인 실패: ${errorMessage || '알 수 없는 오류가 발생했습니다.'}`);
+      router.push('/auth/login');
+      return;
+    }
 
     if (token) {
       // JWT 토큰과 로그인 상태를 localStorage에 저장
@@ -21,10 +30,10 @@ function SocialLoginContent() {
       localStorage.setItem('just_logged_in', 'true');
 
       if (isNewUser) {
-        toast.success('구글 계정으로 가입 완료! 온보딩을 시작합니다.');
+        toast.success('소셜 계정으로 가입 완료! 온보딩을 시작합니다.');
         router.push('/onboarding/location');
       } else {
-        toast.success('구글 계정으로 로그인했습니다.');
+        toast.success('소셜 계정으로 로그인했습니다.');
         router.push('/'); // 기존 사용자는 메인 페이지로 이동
       }
     } else {
