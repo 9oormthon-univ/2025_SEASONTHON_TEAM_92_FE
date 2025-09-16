@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { reportApi } from '../lib/api';
 import toast from 'react-hot-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
+import MarketDataComparison from './MarketDataComparison';
 
 interface ReportData {
   header: { title: string; generatedDate: string; dataPeriod: string; participantCount: number; dataRecency: string; reliabilityScore: number; };
@@ -65,6 +66,11 @@ export default function ComprehensiveReport({ reportId }: { reportId?: string })
   const radarChartData = reportData.subjectiveMetrics.categoryScores.map(c => ({ 
     category: c.category, myScore: c.myScore, neighborhoodAvg: c.neighborhoodAverage 
   }));
+
+  // 'conditions' 문자열에서 월세 파싱
+  const conditions = reportData.contractSummary.conditions || "";
+  const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
+  const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -137,11 +143,12 @@ export default function ComprehensiveReport({ reportId }: { reportId?: string })
           </div>
         </section>
 
-        {/* 4. 객관적 지표 - 현재 하드코딩 */}
-        <section className="print-break">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">📈 객관적 지표 (공공 데이터 기반)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6"><div className="bg-green-50 rounded-lg p-6"><h3 className="text-xl font-semibold text-gray-800 mb-4">시세 비교</h3><div className="space-y-3"><div className="flex justify-between items-center"><span className="text-gray-600">국토부 실거래가 평균</span><span className="font-semibold text-gray-900">62만원</span></div><div className="flex justify-between items-center"><span className="text-gray-600">내 계약</span><span className="font-semibold text-gray-900">60만원</span></div><div className="flex justify-between items-center"><span className="font-semibold text-green-600">동네 평균 대비 -3%</span></div></div></div><div className="bg-orange-50 rounded-lg p-6"><h3 className="text-xl font-semibold text-gray-800 mb-4">관리비 비교</h3><div className="space-y-3"><div className="flex justify-between items-center"><span className="text-gray-600">공동주택 평균</span><span className="font-semibold text-gray-900">12만원</span></div><div className="flex justify-between items-center"><span className="text-gray-600">내 입력값</span><span className="font-semibold text-gray-900">10만원</span></div><div className="flex justify-between items-center"><span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">정상 범위</span></div></div></div><div className="bg-purple-50 rounded-lg p-6"><h3 className="text-xl font-semibold text-gray-800 mb-4">소음/환경</h3><div className="space-y-3"><div className="flex justify-between items-center"><span className="text-gray-600">환경부 평균</span><span className="font-semibold text-gray-900">62dB</span></div><div className="flex justify-between items-center"><span className="text-gray-600">사용자 응답</span><span className="font-semibold text-gray-900">68dB</span></div><div className="flex justify-between items-center"><span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">체감 불만이 실제 데이터와 일치</span></div></div></div></div>
-        </section>
+        {/* 4. 객관적 지표 - MarketDataComparison 컴포넌트로 교체 */}
+        <MarketDataComparison 
+          userRent={userRent}
+          userAddress={reportData.contractSummary.address}
+        />
+
 
         {/* 5. 협상 카드 */}
         <section className="print-break">
