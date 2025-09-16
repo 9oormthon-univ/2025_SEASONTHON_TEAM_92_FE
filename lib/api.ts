@@ -167,8 +167,9 @@ export const reportApi = {
     const response = await api.post('/report/create', reportData);
     return response.data;
   },
-  getReport: async (reportId: string): Promise<ApiResponse<any>> => {
-    const response = await api.get(`/report/${reportId}`);
+  getReport: async (publicId: string): Promise<ApiResponse<any>> => {
+    // 공개 API로 변경 (비회원도 접근 가능)
+    const response = await api.get(`/public/report/${publicId}`);
     return response.data;
   },
   // 백엔드에 맞는 새로운 리포트 API 추가

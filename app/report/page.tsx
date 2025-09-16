@@ -89,27 +89,25 @@ export default function ReportPage() {
       const result = await response.json();
       
       if (response.ok) {
-        let reportId;
+        let publicId;
         
-        if (typeof result === 'number') {
-          reportId = result;
-        } else if (result.reportId) {
-          reportId = result.reportId;
+        if (result.success && result.publicId) {
+          publicId = result.publicId;
         } else {
           throw new Error('리포트 ID를 받지 못했습니다.');
         }
         
         toast.success('프리미엄 리포트를 생성했습니다!');
         
-        const reportResponse = await reportApi.getReport(reportId.toString());
+        const reportResponse = await reportApi.getReport(publicId);
         setReportData({
           ...reportResponse.data,
-          reportId: reportId,
-          reportUrl: `${window.location.origin}/report/${reportId}`,
+          reportId: publicId,
+          reportUrl: `${window.location.origin}/report/${publicId}`,
           reportType: 'premium'
         });
 
-        router.push(`/report/${reportId}`);
+        router.push(`/report/${publicId}`);
       } else {
         const errorMessage = result.message || '프리미엄 리포트 생성에 실패했습니다.';
         setError(errorMessage);
