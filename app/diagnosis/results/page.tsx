@@ -183,8 +183,8 @@ export default function DiagnosisResultsPage() {
     };
   }, []);
 
-  const handleGoToDashboard = () => {
-    router.push('/dashboard');
+  const handleGoToReport = () => {
+    router.push('/report');
   };
 
   const handleGoToWeeklyMission = () => {
@@ -823,7 +823,7 @@ export default function DiagnosisResultsPage() {
               </button>
               
               <button
-                onClick={handleGoToDashboard}
+                onClick={handleGoToReport}
                 className="bg-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-purple-700 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <div className="flex items-center justify-center">

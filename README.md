@@ -76,7 +76,7 @@ JWT 토큰을 사용한 인증 시스템이 구현되어 있습니다.
 frontend-backup/
 ├── app/                    # Next.js App Router 페이지
 │   ├── auth/              # 인증 관련 페이지
-│   ├── dashboard/         # 대시보드
+│   ├── report/            # 리포트 생성
 │   ├── diagnosis/         # 진단 시스템
 │   ├── weekly-mission/    # 주간 미션
 │   └── ...

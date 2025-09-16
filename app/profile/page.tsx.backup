@@ -607,15 +607,15 @@ export default function ProfilePage() {
             <div className="mt-8 pt-8 border-t border-gray-200">
               <h4 className="text-xl font-bold text-gray-900 mb-4">바로가기</h4>
               <div className="grid md:grid-cols-3 gap-4">
-                <Link href="/dashboard">
+                <Link href="/report">
                   <div className="bg-blue-50 rounded-lg p-4 hover:bg-blue-100 transition-colors cursor-pointer">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                        <i className="ri-dashboard-line text-blue-600"></i>
+                        <i className="ri-file-text-line text-blue-600"></i>
                       </div>
                       <div>
-                        <h5 className="font-medium text-gray-900">대시보드</h5>
-                        <p className="text-sm text-gray-600">리포트 및 분석</p>
+                        <h5 className="font-medium text-gray-900">리포트 생성</h5>
+                        <p className="text-sm text-gray-600">협상 리포트 생성 및 분석</p>
                       </div>
                     </div>
                   </div>

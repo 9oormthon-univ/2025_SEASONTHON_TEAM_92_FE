@@ -483,7 +483,7 @@ export default function HomePage() {
                 ) : (
                   <>
                     <Link
-                      href="/dashboard"
+                      href="/report"
                       className="px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#7C3AED] transition-all whitespace-nowrap cursor-pointer text-center bg-[#9333EA] text-white shadow-lg"
                       style={{
                         fontFamily:
@@ -593,7 +593,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/dashboard"
+                href="/report"
                 className="px-10 py-4 rounded-xl text-lg font-bold hover:opacity-90 transition-all cursor-pointer inline-block whitespace-nowrap shadow-lg bg-[#9333EA] text-white"
               >
                 <div className="flex items-center">
@@ -680,7 +680,7 @@ export default function HomePage() {
                 우리 지역 임대 데이터를 실시간으로 수집하여 정확한 분석을 제공합니다
               </p>
               <div className="mt-4 text-center">
-                <Link href="/dashboard" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
+                <Link href="/report" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
                   분석 시작하기 →
                 </Link>
               </div>
@@ -712,7 +712,7 @@ export default function HomePage() {
                 협상에 필요한 각종 서류를 맞춤형으로 생성하고 제공합니다
               </p>
               <div className="mt-4 text-center">
-                <Link href="/dashboard" className="text-xs text-[#61229A] font-medium hover:opacity-80">
+                <Link href="/report" className="text-xs text-[#61229A] font-medium hover:opacity-80">
                   서류 생성하기 →
                 </Link>
               </div>

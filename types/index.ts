@@ -3,7 +3,7 @@ export interface User {
   id: string;
   email: string;
   nickname: string;
-  role: 'tenant' | 'landlord' | 'admin' | 'anonymous';
+  role: 'tenant' | 'landlord' | 'anonymous';
   address?: string;
   buildingName?: string;
   neighborhood?: string;

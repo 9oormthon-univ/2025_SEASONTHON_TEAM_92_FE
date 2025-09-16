@@ -261,18 +261,6 @@ export const infoCardApi = {
     const response = await api.get('/api/info-cards');
     return response.data;
   },
-  createCard: async (cardData: any): Promise<ApiResponse<any>> => {
-    const response = await api.post('/api/admin/info-cards', cardData);
-    return response.data;
-  },
-  updateCard: async (id: string, cardData: any): Promise<ApiResponse<any>> => {
-    const response = await api.put(`/api/admin/info-cards/${id}`, cardData);
-    return response.data;
-  },
-  deleteCard: async (id: string): Promise<ApiResponse<string>> => {
-    const response = await api.delete(`/api/admin/info-cards/${id}`);
-    return response.data;
-  },
   getSituationInfoCard: async (situationType: string): Promise<ApiResponse<any>> => {
     const response = await api.get(`/api/info-cards/situation/${situationType}`);
     return response.data;

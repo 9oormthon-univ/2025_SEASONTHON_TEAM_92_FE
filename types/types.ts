@@ -4,7 +4,7 @@ export interface User {
   email: string;
   password?: string;
   nickname: string;
-  role: 'tenant' | 'landlord' | 'anonymous' | 'admin';
+  role: 'tenant' | 'landlord' | 'anonymous';
   latitude?: number;
   longitude?: number;
   address?: string;

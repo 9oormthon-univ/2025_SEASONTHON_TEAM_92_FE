@@ -378,16 +378,6 @@ export default function LoginPage() {
                   </p>
                 </div>
 
-                {/* Admin Login */}
-                <div className="text-center">
-                  <Link
-                    href="/admin/login"
-                    className="inline-flex items-center justify-center w-full px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium bg-white hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap text-gray-600"
-                  >
-                    <i className="ri-admin-line mr-2"></i>
-                    관리자 로그인
-                  </Link>
-                </div>
 
                 {/* Demo Account Info */}
                 <div className="mt-6 p-4 rounded-xl bg-purple-50 border border-purple-200">
