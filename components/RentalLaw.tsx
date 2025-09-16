@@ -311,7 +311,7 @@ export default function RentalLaw() {
           </div>
 
           <div className="space-y-6">
-            {laws.articles.map((article) => (
+            {(laws?.articles || []).map((article) => (
               <div key={article.articleId} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
@@ -342,7 +342,7 @@ export default function RentalLaw() {
                     <div>
                       <h6 className="font-semibold text-gray-800 mb-2">핵심 포인트</h6>
                       <ul className="list-disc list-inside space-y-1">
-                        {article.keyPoints.map((point, index) => (
+                        {(article?.keyPoints || []).map((point, index) => (
                           <li key={index} className="text-gray-700">{point}</li>
                         ))}
                       </ul>
@@ -354,7 +354,7 @@ export default function RentalLaw() {
                     <div>
                       <h6 className="font-semibold text-gray-800 mb-2">적용 예시</h6>
                       <ul className="list-disc list-inside space-y-1">
-                        {article.applicationExamples.map((example, index) => (
+                        {(article?.applicationExamples || []).map((example, index) => (
                           <li key={index} className="text-gray-700">{example}</li>
                         ))}
                       </ul>
@@ -366,7 +366,7 @@ export default function RentalLaw() {
                     <div>
                       <h6 className="font-semibold text-gray-800 mb-2">관련 상황</h6>
                       <div className="flex flex-wrap gap-2">
-                        {article.relatedSituations.map((situation, index) => (
+                        {(article?.relatedSituations || []).map((situation, index) => (
                           <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
                             {situation}
                           </span>

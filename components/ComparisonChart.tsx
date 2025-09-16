@@ -23,7 +23,7 @@ const formatQuestionId = (questionId: string): string => {
 };
 
 const ComparisonChart: React.FC<ComparisonChartProps> = ({ stats }) => {
-    const chartData = Object.keys(stats.userScores).map(key => ({
+    const chartData = Object.keys(stats?.userScores || {}).map(key => ({
         name: formatQuestionId(key),
         '나의 점수': stats.userScores[key]?.toFixed(1),
         '건물 평균': stats.buildingAverageScores[key]?.toFixed(1),

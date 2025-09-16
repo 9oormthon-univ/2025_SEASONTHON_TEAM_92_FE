@@ -217,7 +217,7 @@ export default function OfficetelData() {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {transactions.slice(0, 20).map((transaction, index) => (
+                          {(transactions || []).slice(0, 20).map((transaction, index) => (
                             <tr key={index} className="hover:bg-gray-50">
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {transaction.buildingName}

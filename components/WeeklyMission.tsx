@@ -131,7 +131,7 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
 
           <form onSubmit={handleSubmit} className="p-8">
             <div className="space-y-8">
-              {mission.questions.map((question, index) => (
+              {(mission?.questions || []).map((question, index) => (
                 <div key={question.id} className="space-y-4">
                   <div>
                     <h4 className="text-lg font-semibold text-gray-800 mb-4">
@@ -141,7 +141,7 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
 
                   {question.type === 'scale' && (
                     <div className="space-y-3">
-                      {question.options.map((option) => (
+                      {(question?.options || []).map((option) => (
                         <button
                           key={option.value}
                           type="button"
@@ -167,7 +167,7 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
 
                   {question.type === 'choice' && (
                     <div className="space-y-3">
-                      {question.options.map((option) => (
+                      {(question?.options || []).map((option) => (
                         <button
                           key={option.value}
                           type="button"
@@ -193,7 +193,7 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
 
                   {question.type === 'multiple' && (
                     <div className="space-y-3">
-                      {question.options.map((option) => {
+                      {(question?.options || []).map((option) => {
                         const selectedCount = responses[question.id] || 0;
                         const isSelected = selectedCount > 0;
                         

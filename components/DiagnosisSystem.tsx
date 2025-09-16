@@ -196,7 +196,7 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
 
         {/* 카테고리별 섹션 */}
         <div className="space-y-12">
-          {categories.map((category, categoryIndex) => (
+          {(categories || []).map((category, categoryIndex) => (
             <div 
               key={category.categoryId} 
               id={`category-${categoryIndex}`}
@@ -229,7 +229,7 @@ export default function DiagnosisSystem({ currentUser, onComplete }: DiagnosisSy
 
               <div className="p-8">
                 <div className="space-y-8">
-                  {category.questions.map((question, qIndex) => {
+                  {(category?.questions || []).map((question, qIndex) => {
                     const scoreLabels = getScoreLabels(question.subText);
                     return (
                       <div key={question.questionId} className="space-y-4">

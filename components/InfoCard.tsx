@@ -197,7 +197,7 @@ export default function InfoCard() {
                 추천 정책
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {infoCard.recommendedPolicies.map((policy) => (
+                {(infoCard?.recommendedPolicies || []).map((policy) => (
                   <div key={policy.policyId} className="bg-gray-50 rounded-lg p-4">
                     <h5 className="font-semibold text-gray-900 mb-2">{policy.policyName}</h5>
                     <p className="text-sm text-gray-600 mb-2">{policy.summary}</p>
@@ -226,7 +226,7 @@ export default function InfoCard() {
                 관련 법령
               </h4>
               <div className="space-y-4">
-                {infoCard.relatedLawArticles.map((law) => (
+                {(infoCard?.relatedLawArticles || []).map((law) => (
                   <div key={law.lawId} className="bg-gray-50 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
                       <h5 className="font-semibold text-gray-900">{law.lawName}</h5>
@@ -250,7 +250,7 @@ export default function InfoCard() {
                 추천 해결 기관
               </h4>
               <div className="space-y-4">
-                {infoCard.recommendedAgencies.map((agency) => (
+                {(infoCard?.recommendedAgencies || []).map((agency) => (
                   <div key={agency.agencyId} className="bg-gray-50 rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
                       <div>
@@ -293,7 +293,7 @@ export default function InfoCard() {
                 단계별 행동 가이드
               </h4>
               <div className="space-y-3">
-                {infoCard.actionSteps.map((step, index) => (
+                {(infoCard?.actionSteps || []).map((step, index) => (
                   <div key={index} className="flex items-start space-x-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}

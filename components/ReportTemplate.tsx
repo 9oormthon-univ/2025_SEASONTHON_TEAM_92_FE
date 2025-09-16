@@ -281,7 +281,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
         <section className="bg-yellow-50 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">협상 카드 (자동 생성)</h2>
           <div className="space-y-4">
-            {reportData.negotiationCards.map((card, index) => (
+            {(reportData.negotiationCards || []).map((card, index) => (
               <div key={index} className="bg-white rounded-lg p-4 border-l-4 border-blue-500">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-gray-800">{card.priority}순위: {card.title}</h3>
@@ -302,7 +302,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
         <section className="bg-purple-50 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">맞춤형 정책/지원 정보</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {reportData.policyInfo.map((policy, index) => (
+            {(reportData.policyInfo || []).map((policy, index) => (
               <div key={index} className="bg-white rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">{policy.title}</h3>
                 <p className="text-gray-600 text-sm mb-3">{policy.description}</p>

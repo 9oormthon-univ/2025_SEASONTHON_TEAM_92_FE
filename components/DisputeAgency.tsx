@@ -251,7 +251,7 @@ export default function DisputeAgency() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {agencies.agencies.map((agency) => (
+            {(agencies?.agencies || []).map((agency) => (
               <div key={agency.agencyId} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">

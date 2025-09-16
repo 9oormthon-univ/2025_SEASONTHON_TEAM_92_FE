@@ -152,7 +152,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
               🏘️ 주변 동네 월세 시세 비교
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {marketData.monthlyRentMarket.slice(0, 6).map((market: MarketData, index: number) => {
+              {(marketData?.monthlyRentMarket || []).slice(0, 6).map((market: MarketData, index: number) => {
                 const averageRent = market.averagePrice || 0;
                 const difference = userRent - averageRent;
                 const percentDiff = averageRent > 0 ? ((difference / averageRent) * 100) : 0;
@@ -224,7 +224,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {marketData.transactions.slice(0, 10).map((transaction: TransactionData, index: number) => {
+                  {(marketData?.transactions || []).slice(0, 10).map((transaction: TransactionData, index: number) => {
                     const transactionRent = transaction.monthlyRent || 0;
                     const difference = userRent - transactionRent;
                     
@@ -288,7 +288,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
               🗺️ 협상 근거 요약
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {marketData.monthlyRentMarket.slice(0, 4).map((market: MarketData, index: number) => {
+              {(marketData?.monthlyRentMarket || []).slice(0, 4).map((market: MarketData, index: number) => {
                 const averageRent = market.averagePrice || 0;
                 const difference = userRent - averageRent;
                 const percentDiff = averageRent > 0 ? ((difference / averageRent) * 100) : 0;

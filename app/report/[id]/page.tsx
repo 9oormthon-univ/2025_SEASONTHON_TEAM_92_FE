@@ -61,7 +61,9 @@ export default function ReportPage({ params }: ReportPageProps) {
                       soundproofing: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
                       parking: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 }
                     }
-                  }
+                  },
+                  negotiationCards: response.data.negotiationCards || [],
+                  policyInfo: response.data.policyInfos || []
                 };
                 
                 // categoryScores 배열을 categories 객체로 변환

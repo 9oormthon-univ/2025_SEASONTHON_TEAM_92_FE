@@ -372,7 +372,7 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: T
                   </tr>
                 </thead>
                 <tbody>
-                  {timeSeriesData.slice(-6).map((item, index, array) => {
+                  {(timeSeriesData || []).slice(-6).map((item, index, array) => {
                     const prevItem = index > 0 ? array[index - 1] : null;
                     const changeFromPrev = prevItem ? 
                       ((item.averageRent - prevItem.averageRent) / prevItem.averageRent * 100) : 0;
