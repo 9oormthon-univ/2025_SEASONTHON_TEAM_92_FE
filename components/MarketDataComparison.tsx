@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 interface MarketDataComparisonProps {
   userRent: number;
   userAddress?: string;
+  isPremium?: boolean;
 }
 
 interface MarketData {
