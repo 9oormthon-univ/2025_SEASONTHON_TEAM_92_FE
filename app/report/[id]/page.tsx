@@ -53,8 +53,32 @@ export default function ReportPage({ params }: ReportPageProps) {
                     managementFee: feeMatch ? parseInt(feeMatch[1]) : 0,
                     gpsVerified: response.data.contractSummary?.gpsVerified || false,
                     contractVerified: response.data.contractSummary?.contractVerified || false,
+                  },
+                  subjectiveMetrics: {
+                    ...response.data.subjectiveMetrics,
+                    categories: {
+                      lighting: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
+                      soundproofing: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 },
+                      parking: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 }
+                    }
                   }
                 };
+                
+                // categoryScores 배열을 categories 객체로 변환
+                if (response.data.subjectiveMetrics?.categoryScores) {
+                  response.data.subjectiveMetrics.categoryScores.forEach((cat: any) => {
+                    const categoryKey = cat.category === '채광' ? 'lighting' : 
+                                      cat.category === '소음' ? 'soundproofing' : 
+                                      cat.category === '주차' ? 'parking' : null;
+                    if (categoryKey) {
+                      transformedData.subjectiveMetrics.categories[categoryKey] = {
+                        myScore: cat.myScore || 0,
+                        neighborhoodAvg: cat.neighborhoodAverage || 0,
+                        buildingAvg: cat.buildingAverage || 0
+                      };
+                    }
+                  });
+                }
                 setReportTemplate(transformedData);
               } else {
                 setError('Report data not found.');

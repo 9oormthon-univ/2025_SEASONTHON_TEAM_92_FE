@@ -135,9 +135,9 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
   ];
 
   const barData = [
-    { name: '내 점수', value: reportData.subjectiveMetrics.overallScore },
-    { name: '동네 평균', value: reportData.subjectiveMetrics.neighborhoodAverage },
-    { name: '건물 평균', value: reportData.subjectiveMetrics.buildingAverage }
+    { name: '내 점수', value: reportData.subjectiveMetrics?.overallScore || 0 },
+    { name: '동네 평균', value: reportData.subjectiveMetrics?.neighborhoodAverage || 0 },
+    { name: '건물 평균', value: reportData.subjectiveMetrics?.buildingAverage || 0 }
   ];
 
   return (
@@ -207,9 +207,9 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
             <h3 className="text-lg font-semibold text-gray-800 mb-3">거주 환경 진단 요약</h3>
             <div className="bg-white rounded-lg p-4 mb-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{reportData.subjectiveMetrics.overallScore}점</div>
+                <div className="text-3xl font-bold text-blue-600 mb-2">{reportData.subjectiveMetrics?.overallScore || 0}점</div>
                 <div className="text-sm text-gray-600">
-                  동네 평균 {reportData.subjectiveMetrics.neighborhoodAverage}점 / 같은 건물 평균 {reportData.subjectiveMetrics.buildingAverage}점
+                  동네 평균 {reportData.subjectiveMetrics?.neighborhoodAverage || 0}점 / 같은 건물 평균 {reportData.subjectiveMetrics?.buildingAverage || 0}점
                 </div>
               </div>
             </div>
@@ -242,15 +242,15 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
               <div className="bg-white rounded-lg p-4">
                 <div className="text-center">
                   <div className="text-lg font-semibold text-gray-800 mb-2">방음</div>
-                  <div className="text-2xl font-bold text-blue-600">{data.subjectiveMetrics.categories.soundproofing.myScore}</div>
-                  <div className="text-sm text-gray-600">건물 평균 {data.subjectiveMetrics.categories.soundproofing.buildingAvg}</div>
+                  <div className="text-2xl font-bold text-blue-600">{data.subjectiveMetrics.categories?.soundproofing?.myScore || 0}</div>
+                  <div className="text-sm text-gray-600">건물 평균 {data.subjectiveMetrics.categories?.soundproofing?.buildingAvg || 0}</div>
                 </div>
               </div>
               <div className="bg-white rounded-lg p-4">
                 <div className="text-center">
                   <div className="text-lg font-semibold text-gray-800 mb-2">주차</div>
-                  <div className="text-2xl font-bold text-blue-600">{data.subjectiveMetrics.categories.parking.myScore}</div>
-                  <div className="text-sm text-gray-600">동네 평균 {data.subjectiveMetrics.categories.parking.neighborhoodAvg}</div>
+                  <div className="text-2xl font-bold text-blue-600">{data.subjectiveMetrics.categories?.parking?.myScore || 0}</div>
+                  <div className="text-sm text-gray-600">동네 평균 {data.subjectiveMetrics.categories?.parking?.neighborhoodAvg || 0}</div>
                 </div>
               </div>
             </div>
