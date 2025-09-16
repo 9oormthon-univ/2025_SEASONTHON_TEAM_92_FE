@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import NoiseMeasurementTool from './NoiseMeasurementTool';
+import LevelMeasurementTool from './LevelMeasurementTool';
+import InternetSpeedTool from './InternetSpeedTool';
 
 interface SmartDiagnosisModalProps {
   isVisible: boolean;
@@ -11,7 +14,6 @@ interface SmartDiagnosisModalProps {
 
 export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: SmartDiagnosisModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isMeasuring, setIsMeasuring] = useState(false);
   const [measurementData, setMeasurementData] = useState({
     noise: { value: 0, isComplete: false },
     level: { value: 0, isComplete: false },
@@ -39,55 +41,6 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
     }
   ];
 
-  const simulateMeasurement = (stepIndex: number) => {
-    setIsMeasuring(true);
-    
-    setTimeout(() => {
-      let newData = { ...measurementData };
-      
-      switch (stepIndex) {
-        case 0: // 소음 측정
-          newData.noise = {
-            value: Math.floor(Math.random() * 20) + 30, // 30-50dB
-            isComplete: true
-          };
-          break;
-        case 1: // 수평 측정
-          newData.level = {
-            value: Math.floor(Math.random() * 3) + 1, // 1-3도
-            isComplete: true
-          };
-          break;
-        case 2: // 인터넷 속도 측정
-          newData.internet = {
-            downloadSpeed: Math.floor(Math.random() * 200) + 100, // 100-300Mbps
-            uploadSpeed: Math.floor(Math.random() * 50) + 20, // 20-70Mbps
-            isComplete: true
-          };
-          break;
-      }
-      
-      setMeasurementData(newData);
-      setIsMeasuring(false);
-      
-      if (stepIndex < steps.length - 1) {
-        setCurrentStep(stepIndex + 1);
-      } else {
-        // 모든 측정 완료
-        const overallScore = calculateOverallScore(newData);
-        const insights = generateInsights(newData);
-        
-        onComplete({
-          ...newData,
-          overallScore,
-          insights
-        });
-        
-        toast.success('스마트 진단이 완료되었습니다!');
-        onClose();
-      }
-    }, 2000 + Math.random() * 1000); // 2-3초 시뮬레이션
-  };
 
   const calculateOverallScore = (data: any) => {
     let score = 0;
@@ -197,34 +150,68 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
 
         {/* 현재 단계 */}
         <div className="p-6">
-          {currentStep < steps.length && (
-            <div className="text-center">
-              <div className={`w-20 h-20 bg-${steps[currentStep].color}-100 rounded-full flex items-center justify-center mx-auto mb-6`}>
-                <i className={`${steps[currentStep].icon} text-3xl text-${steps[currentStep].color}-600`}></i>
-              </div>
-              
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {steps[currentStep].title}
-              </h3>
-              <p className="text-gray-600 mb-8">
-                {steps[currentStep].description}
-              </p>
-
-              {isMeasuring ? (
-                <div className="space-y-4">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"></div>
-                  <p className="text-gray-600">측정 중입니다...</p>
-                </div>
-              ) : (
-                <button
-                  onClick={() => simulateMeasurement(currentStep)}
-                  className={`bg-gradient-to-r from-${steps[currentStep].color}-500 to-${steps[currentStep].color}-600 text-white px-8 py-3 rounded-lg hover:from-${steps[currentStep].color}-600 hover:to-${steps[currentStep].color}-700 transition-all flex items-center mx-auto`}
-                >
-                  <i className="ri-play-circle-line mr-2"></i>
-                  측정 시작
-                </button>
-              )}
-            </div>
+          {currentStep === 0 && (
+            <NoiseMeasurementTool
+              onComplete={(data) => {
+                setMeasurementData(prev => ({
+                  ...prev,
+                  noise: { value: data.averageNoise, isComplete: true }
+                }));
+                setCurrentStep(1);
+              }}
+              onClose={() => setCurrentStep(1)}
+            />
+          )}
+          
+          {currentStep === 1 && (
+            <LevelMeasurementTool
+              onComplete={(data) => {
+                setMeasurementData(prev => ({
+                  ...prev,
+                  level: { value: data.level, isComplete: true }
+                }));
+                setCurrentStep(2);
+              }}
+              onClose={() => setCurrentStep(2)}
+            />
+          )}
+          
+          {currentStep === 2 && (
+            <InternetSpeedTool
+              onComplete={(data) => {
+                setMeasurementData(prev => ({
+                  ...prev,
+                  internet: { 
+                    downloadSpeed: data.downloadSpeed, 
+                    uploadSpeed: data.uploadSpeed, 
+                    isComplete: true 
+                  }
+                }));
+                
+                // 모든 측정 완료
+                const finalData = {
+                  ...measurementData,
+                  internet: { 
+                    downloadSpeed: data.downloadSpeed, 
+                    uploadSpeed: data.uploadSpeed, 
+                    isComplete: true 
+                  }
+                };
+                
+                const overallScore = calculateOverallScore(finalData);
+                const insights = generateInsights(finalData);
+                
+                onComplete({
+                  ...finalData,
+                  overallScore,
+                  insights
+                });
+                
+                toast.success('스마트 진단이 완료되었습니다!');
+                onClose();
+              }}
+              onClose={() => setCurrentStep(2)}
+            />
           )}
         </div>
 
@@ -248,7 +235,14 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
               {measurementData.internet.isComplete && (
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg">
                   <span className="text-gray-700">🚀 인터넷</span>
-                  <span className="font-semibold text-purple-600">{measurementData.internet.downloadSpeed}Mbps</span>
+                  <div className="text-right">
+                    <div className="font-semibold text-purple-600">
+                      다운로드: {measurementData.internet.downloadSpeed}Mbps
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      업로드: {measurementData.internet.uploadSpeed}Mbps
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
