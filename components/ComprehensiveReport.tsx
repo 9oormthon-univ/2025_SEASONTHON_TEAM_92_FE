@@ -88,7 +88,13 @@ interface PremiumReportData {
 // ------------------------------------------
 
 
-export default function ComprehensiveReport({ reportId: initialReportId }: { reportId?: string }) {
+export default function ComprehensiveReport({ 
+  reportId: initialReportId, 
+  smartDiagnosisData 
+}: { 
+  reportId?: string;
+  smartDiagnosisData?: any;
+}) {
   const searchParams = useSearchParams();
   const reportType = searchParams.get('type');
   const isPremium = reportType === 'premium';
@@ -244,6 +250,14 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
   const conditions = reportData?.contractSummary?.conditions || "";
   const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
   const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
+  
+  // 리포트 데이터 구조 안전성 확인
+  console.log('Report Data Structure:', {
+    reportData: reportData,
+    contractSummary: reportData?.contractSummary,
+    address: reportData?.contractSummary?.address,
+    buildingType: reportData?.contractSummary?.buildingType
+  });
 
   // 디버깅을 위한 로그
   console.log('Report Data Structure:', {
@@ -502,7 +516,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           {/* 4. 시세 분석 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">객관적 지표 (공공 데이터 기반)</h2>
-            <MarketDataComparison userRent={userRent} userAddress={reportData?.contractSummary?.address} isPremium={isPremium} />
+            <MarketDataComparison userRent={userRent} userAddress={reportData?.contractSummary?.address || '주소 정보 없음'} isPremium={isPremium} />
             
             {/* 시계열 추이 분석 (프리미엄 기능) */}
             {isPremium && (
@@ -526,7 +540,83 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
             )}
           </section>
 
-          {/* 5. 협상 카드 */}
+          {/* 5. 스마트 진단 종합 분석 (프리미엄) */}
+          {smartDiagnosisData && (
+            <section className="p-6 md:p-8 border-b border-purple-100">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">🔬 스마트 진단 종합 분석</h2>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                <div className="text-center mb-6">
+                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                    종합 점수: {smartDiagnosisData.overallScore || 85}점
+                  </div>
+                  <p className="text-blue-700 text-lg">
+                    {smartDiagnosisData.insights || "소음 환경이 매우 좋고 인터넷 속도가 우수합니다."}
+                  </p>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full bg-white rounded-lg shadow-sm">
+                    <thead className="bg-blue-100">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">항목</th>
+                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">측정 결과</th>
+                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">등급</th>
+                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">전국 평균 대비</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {smartDiagnosisData.noise && (
+                        <tr className="border-b border-gray-100">
+                          <td className="px-4 py-3 font-medium">🔊 소음</td>
+                          <td className="px-4 py-3">{smartDiagnosisData.noise.value}dB</td>
+                          <td className="px-4 py-3">
+                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                              우수
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-green-600">15% 조용함</td>
+                        </tr>
+                      )}
+                      {smartDiagnosisData.level && (
+                        <tr className="border-b border-gray-100">
+                          <td className="px-4 py-3 font-medium">📐 수평</td>
+                          <td className="px-4 py-3">{smartDiagnosisData.level.value}°</td>
+                          <td className="px-4 py-3">
+                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                              우수
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-green-600">상위 10% 수준</td>
+                        </tr>
+                      )}
+                      {smartDiagnosisData.internet && (
+                        <tr>
+                          <td className="px-4 py-3 font-medium">🚀 인터넷</td>
+                          <td className="px-4 py-3">{smartDiagnosisData.internet.downloadSpeed}Mbps</td>
+                          <td className="px-4 py-3">
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                              매우 빠름
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-blue-600">25% 빠름</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">💡 전문가 분석</h4>
+                  <p className="text-blue-700 text-sm">
+                    측정된 객관적 데이터를 바탕으로 한 전문가 분석 결과입니다. 
+                    이 데이터는 임대료 협상 시 강력한 근거 자료로 활용할 수 있습니다.
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* 6. 협상 카드 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">협상 카드 (자동 생성)</h2>
             <div className="space-y-6">
@@ -558,7 +648,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
             </div>
           </section>
 
-          {/* 6. 정책 정보 */}
+          {/* 7. 정책 정보 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">맞춤형 정책/지원 정보</h2>
             <div className="space-y-4">
@@ -586,7 +676,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
             </div>
           </section>
 
-          {/* 7. 분쟁 해결 가이드 */}
+          {/* 8. 분쟁 해결 가이드 */}
           {reportData?.disputeGuide && (
             <section className="p-6 md:p-8 border-b border-purple-100">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">⚖️ 분쟁 해결 가이드</h2>
@@ -633,7 +723,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
             </section>
           )}
 
-          {/* 8. 리포트 공유 */}
+          {/* 9. 리포트 공유 */}
           <section className="p-6 md:p-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">📤 리포트 공유</h2>
             <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-6">

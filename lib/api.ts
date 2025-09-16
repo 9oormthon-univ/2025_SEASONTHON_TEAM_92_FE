@@ -430,3 +430,54 @@ export const rentalLawApi = {
   },
 };
 
+// 스마트 진단 API
+export const smartDiagnosisApi = {
+  // 소음 측정
+  startNoiseMeasurement: async (location: string, duration: number): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/noise/start', { location, duration });
+    return response.data;
+  },
+  processRealtimeNoise: async (measurementId: number, noiseLevel: number, timestamp: string): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/noise/realtime', { measurementId, noiseLevel, timestamp });
+    return response.data;
+  },
+  completeNoiseMeasurement: async (measurementId: number, averageNoise: number, maxNoise: number, minNoise: number): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/noise/complete', { measurementId, averageNoise, maxNoise, minNoise });
+    return response.data;
+  },
+
+  // 수평계 측정
+  startLevelMeasurement: async (location: string): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/level/start', { location });
+    return response.data;
+  },
+  processLevelMeasurement: async (measurementId: number, x: number, y: number, z: number): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/level/measure', { measurementId, x, y, z });
+    return response.data;
+  },
+
+  // 인터넷 속도 측정
+  startInternetSpeedTest: async (location: string): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/internet/start', { location });
+    return response.data;
+  },
+  completeInternetSpeedTest: async (measurementId: number, downloadSpeed: number, uploadSpeed: number, ping: number): Promise<ApiResponse<any>> => {
+    const response = await api.post('/smart-diagnosis/internet/complete', { measurementId, downloadSpeed, uploadSpeed, ping });
+    return response.data;
+  },
+
+  // 측정 기록 조회
+  getLevelHistory: async (limit: number = 10): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/smart-diagnosis/level/history?limit=${limit}`);
+    return response.data;
+  },
+  getMeasurementDetail: async (measurementId: number): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/smart-diagnosis/measurements/${measurementId}`);
+    return response.data;
+  },
+  getSmartDiagnosisSummary: async (): Promise<ApiResponse<any>> => {
+    const response = await api.get('/smart-diagnosis/summary');
+    return response.data;
+  },
+};
+

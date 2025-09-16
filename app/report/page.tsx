@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { reportApi, diagnosisApi } from '../../lib/api';
+import { reportApi, diagnosisApi, smartDiagnosisApi } from '../../lib/api';
 import toast from 'react-hot-toast';
 import ComprehensiveReport from '@/components/ComprehensiveReport';
 
@@ -18,9 +18,24 @@ export default function ReportPage() {
   const [error, setError] = useState('');
   const [showComprehensiveReport, setShowComprehensiveReport] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState<'comprehensive' | 'premium' | null>(null);
+  const [smartDiagnosisSummary, setSmartDiagnosisSummary] = useState<any>(null);
   const router = useRouter();
 
+  // 스마트 진단 종합 결과 가져오기
+  const loadSmartDiagnosisSummary = async () => {
+    try {
+      const response = await smartDiagnosisApi.getSmartDiagnosisSummary();
+      if (response.success) {
+        setSmartDiagnosisSummary(response.data);
+      }
+    } catch (error) {
+      console.error('스마트 진단 종합 결과 로드 실패:', error);
+    }
+  };
 
+  useEffect(() => {
+    loadSmartDiagnosisSummary();
+  }, []);
 
   const handleGenerateComprehensiveReport = async () => {
     setIsLoading(true);
@@ -127,7 +142,7 @@ export default function ReportPage() {
   };
 
   if (showComprehensiveReport) {
-    return <ComprehensiveReport />;
+    return <ComprehensiveReport smartDiagnosisData={smartDiagnosisSummary} />;
   }
 
   return (

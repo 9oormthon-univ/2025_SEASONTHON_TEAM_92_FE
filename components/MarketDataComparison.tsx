@@ -31,6 +31,9 @@ interface TransactionData {
 }
 
 export default function MarketDataComparison({ userRent, userAddress }: MarketDataComparisonProps) {
+  // userAddress가 유효하지 않은 경우 처리
+  const safeUserAddress = userAddress && userAddress.trim() !== '' ? userAddress : '주소 정보 없음';
+  
   const [marketData, setMarketData] = useState<{
     monthlyRentMarket: MarketData[];
     jeonseMarket: MarketData[];
@@ -55,7 +58,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
         };
         
         for (const [gu, code] of Object.entries(addressMapping)) {
-          if (userAddress.includes(gu)) {
+          if (safeUserAddress.includes(gu)) {
             lawdCd = code;
             break;
           }
@@ -85,7 +88,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
 
   useEffect(() => {
     loadMarketData();
-  }, [userAddress]);
+  }, [safeUserAddress]);
 
   const formatPrice = (price: number) => {
     if (price >= 10000) {
