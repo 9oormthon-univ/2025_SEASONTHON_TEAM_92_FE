@@ -150,15 +150,15 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="bg-blue-50 p-3 rounded-lg">
               <span className="font-semibold text-blue-800">생성일자:</span>
-              <span className="ml-2 text-gray-700">{reportData?.header?.generatedDate || '알 수 없음'}</span>
+              <span className="ml-2 text-gray-700">{reportData?.header?.createdAt || '알 수 없음'}</span>
             </div>
             <div className="bg-green-50 p-3 rounded-lg">
               <span className="font-semibold text-green-800">참여 인원:</span>
-              <span className="ml-2 text-gray-700">{reportData?.header?.participantCount || 0}명</span>
+              <span className="ml-2 text-gray-700">{reportData?.header?.trustMetrics?.participantCount || 0}명</span>
             </div>
             <div className="bg-purple-50 p-3 rounded-lg">
               <span className="font-semibold text-purple-800">신뢰도 점수:</span>
-              <span className="ml-2 text-gray-700">{reportData?.header?.reliabilityScore || 0}/100</span>
+              <span className="ml-2 text-gray-700">{reportData?.header?.trustMetrics?.trustScore || 0}/100</span>
             </div>
           </div>
           <p className="text-gray-600 mt-4">{reportData?.header?.dataPeriod || '데이터 기간 정보 없음'}</p>
