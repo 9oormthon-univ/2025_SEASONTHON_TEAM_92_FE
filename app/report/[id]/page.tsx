@@ -25,25 +25,40 @@ export default function ReportPage({ params }: ReportPageProps) {
       const id = resolvedParams.id;
       
         if (id) {
-          // URL에서 프리미엄 타입 확인
-          const isPremiumReport = id.includes('premium') || 
+          // 백엔드에서 reportType을 받아서 처리 (리포트 생성 시 결정된 타입 사용)
+          // URL 파라미터는 백업용으로만 사용
+          const urlBasedPremium = id.includes('premium') || 
                                  (typeof window !== 'undefined' && window.location.search.includes('type=premium'));
-          setIsPremium(isPremiumReport);
+          setIsPremium(urlBasedPremium); // 초기값 설정
           
           const fetchReport = async () => {
             try {
               setLoading(true);
               
-              // 프리미엄 리포트인 경우 프리미엄 API 호출
-              const response = isPremiumReport 
-                ? await reportApi.getPremiumReport(id)
-                : await reportApi.getReport(id);
+              // 먼저 일반 리포트 API로 데이터를 가져온 후, reportType에 따라 처리
+              const response = await reportApi.getReport(id);
               
               console.log('리포트 상세 응답:', response);
               
               if (response && response.data) {
                 // 백엔드 응답 구조에 맞게 수정
                 setReport(response.data);
+                
+                // 백엔드에서 reportType을 제공하는 경우 우선 사용 (리포트 생성 시 결정된 타입)
+                const backendReportType = response.data.reportType;
+                const finalIsPremium = backendReportType === 'premium' || 
+                                      (backendReportType === undefined && urlBasedPremium);
+                
+                console.log('리포트 타입 확인:', {
+                  backendReportType,
+                  urlBasedPremium,
+                  finalIsPremium,
+                  id,
+                  responseData: response.data
+                });
+                
+                // 백엔드에서 받은 reportType으로 상태 업데이트
+                setIsPremium(finalIsPremium);
                 
                 // 계약 조건 문자열 파싱 (예: "보증금 1000 / 월세 60 / 관리비 10")
                 const conditions = response.data.contractSummary?.conditions || '';
@@ -54,7 +69,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                 // 백엔드 데이터를 템플릿 형태로 변환 (contractSummary -> contractInfo)
                 const transformedData = {
                   ...response.data,
-                  reportType: isPremiumReport ? 'premium' : 'free', // 프리미엄 타입 설정
+                  reportType: finalIsPremium ? 'premium' : 'free', // 최종 프리미엄 타입 설정
                   contractInfo: {
                     address: response.data.contractSummary?.address || '주소 정보 없음',
                     buildingName: '',
@@ -79,7 +94,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                   negotiationCards: (response.data.negotiationCards || []).map((card: any) => ({
                     ...card,
                     // 프리미엄 리포트인 경우 추가 필드 설정
-                    ...(isPremiumReport && {
+                    ...(finalIsPremium && {
                       successProbability: card.successProbability || Math.floor(Math.random() * 40) + 50, // 50-90%
                       alternativeStrategy: card.alternativeStrategy || "법적 근거를 바탕으로 단계적 접근을 권장합니다.",
                       expertTip: card.expertTip || "객관적 데이터와 함께 제시하면 성공 확률이 높아집니다."
@@ -88,7 +103,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                   policyInfo: (response.data.policyInfos || []).map((policy: any) => ({
                     ...policy,
                     // 프리미엄 리포트인 경우 추가 필드 설정
-                    ...(isPremiumReport && {
+                    ...(finalIsPremium && {
                       isEligible: policy.isEligible !== undefined ? policy.isEligible : Math.random() > 0.3, // 70% 확률로 대상자
                       applicationDeadline: policy.applicationDeadline || "2025.12.31",
                       requiredDocuments: policy.requiredDocuments || ["신분증", "소득증명서", "임대차계약서"]
@@ -103,7 +118,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                     }
                   },
                   // 프리미엄 리포트인 경우 분쟁 해결 가이드 확장
-                  ...(isPremiumReport && {
+                  ...(finalIsPremium && {
                     disputeGuide: {
                       ...response.data.disputeGuide,
                       disputeRoadmap: response.data.disputeGuide?.disputeRoadmap || [
@@ -157,7 +172,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                   delete transformedData.subjectiveMetrics.categoryScores;
                 }
                 // 프리미엄 리포트인 경우 프리미엄 전용 데이터 추가
-                if (isPremiumReport) {
+                if (finalIsPremium) {
                   transformedData.premiumFeatures = {
                     smartDiagnosis: {
                       noiseLevel: response.data.smartDiagnosis?.noiseLevel || 68,
@@ -205,10 +220,8 @@ export default function ReportPage({ params }: ReportPageProps) {
               console.error('Failed to fetch report:', err);
               setError(err.message || 'Failed to load report.');
               // Even if API fails, show mock template for demonstration
-              // ID에 따라 프리미엄 또는 무료 리포트 표시
-              const isPremiumReport = id.includes('premium') || 
-                                     (typeof window !== 'undefined' && window.location.search.includes('type=premium'));
-              setReportTemplate(isPremiumReport ? mockReportData : mockFreeReportData);
+              // URL 기반으로 프리미엄 또는 무료 리포트 표시
+              setReportTemplate(urlBasedPremium ? mockReportData : mockFreeReportData);
             } finally {
               setLoading(false);
             }
