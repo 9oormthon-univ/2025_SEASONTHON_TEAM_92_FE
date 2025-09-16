@@ -165,6 +165,11 @@ export const reportApi = {
     const response = await api.get('/report/comprehensive');
     return response.data;
   },
+  getPremiumReport: async (publicId: string): Promise<ApiResponse<any>> => {
+    // 프리미엄 리포트 전용 API
+    const response = await api.get(`/public/report/premium/${publicId}`);
+    return response.data;
+  },
 };
 
 export const groupApi = {

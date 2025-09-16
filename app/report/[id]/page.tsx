@@ -17,6 +17,7 @@ export default function ReportPage({ params }: ReportPageProps) {
   const [reportTemplate, setReportTemplate] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const getParams = async () => {
@@ -24,10 +25,20 @@ export default function ReportPage({ params }: ReportPageProps) {
       const id = resolvedParams.id;
       
         if (id) {
+          // URL에서 프리미엄 타입 확인
+          const isPremiumReport = id.includes('premium') || 
+                                 (typeof window !== 'undefined' && window.location.search.includes('type=premium'));
+          setIsPremium(isPremiumReport);
+          
           const fetchReport = async () => {
             try {
               setLoading(true);
-              const response = await reportApi.getReport(id);
+              
+              // 프리미엄 리포트인 경우 프리미엄 API 호출
+              const response = isPremiumReport 
+                ? await reportApi.getPremiumReport(id)
+                : await reportApi.getReport(id);
+              
               console.log('리포트 상세 응답:', response);
               
               if (response && response.data) {
@@ -43,6 +54,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                 // 백엔드 데이터를 템플릿 형태로 변환 (contractSummary -> contractInfo)
                 const transformedData = {
                   ...response.data,
+                  reportType: isPremiumReport ? 'premium' : 'free', // 프리미엄 타입 설정
                   contractInfo: {
                     address: response.data.contractSummary?.address || '주소 정보 없음',
                     buildingName: '',
@@ -64,8 +76,24 @@ export default function ReportPage({ params }: ReportPageProps) {
                       parking: { myScore: 0, neighborhoodAvg: 0, buildingAvg: 0 }
                     }
                   },
-                  negotiationCards: response.data.negotiationCards || [],
-                  policyInfo: response.data.policyInfos || [],
+                  negotiationCards: (response.data.negotiationCards || []).map((card: any) => ({
+                    ...card,
+                    // 프리미엄 리포트인 경우 추가 필드 설정
+                    ...(isPremiumReport && {
+                      successProbability: card.successProbability || Math.floor(Math.random() * 40) + 50, // 50-90%
+                      alternativeStrategy: card.alternativeStrategy || "법적 근거를 바탕으로 단계적 접근을 권장합니다.",
+                      expertTip: card.expertTip || "객관적 데이터와 함께 제시하면 성공 확률이 높아집니다."
+                    })
+                  })),
+                  policyInfo: (response.data.policyInfos || []).map((policy: any) => ({
+                    ...policy,
+                    // 프리미엄 리포트인 경우 추가 필드 설정
+                    ...(isPremiumReport && {
+                      isEligible: policy.isEligible !== undefined ? policy.isEligible : Math.random() > 0.3, // 70% 확률로 대상자
+                      applicationDeadline: policy.applicationDeadline || "2025.12.31",
+                      requiredDocuments: policy.requiredDocuments || ["신분증", "소득증명서", "임대차계약서"]
+                    })
+                  })),
                   header: {
                     ...response.data.header,
                     trustMetrics: {
@@ -73,7 +101,42 @@ export default function ReportPage({ params }: ReportPageProps) {
                       averageResponseDays: parseInt(response.data.header?.dataRecency?.match(/\d+/)?.[0] || '0'),
                       trustScore: response.data.header?.reliabilityScore || 0
                     }
-                  }
+                  },
+                  // 프리미엄 리포트인 경우 분쟁 해결 가이드 확장
+                  ...(isPremiumReport && {
+                    disputeGuide: {
+                      ...response.data.disputeGuide,
+                      disputeRoadmap: response.data.disputeGuide?.disputeRoadmap || [
+                        {
+                          step: 1,
+                          title: "내용증명 발송",
+                          description: "임대인에게 수선 요구 내용증명 발송",
+                          estimatedTime: "1-2주",
+                          cost: "3,000원"
+                        },
+                        {
+                          step: 2,
+                          title: "분쟁조정위원회 신청",
+                          description: "내용증명 무응답 시 분쟁조정위원회 신청",
+                          estimatedTime: "2-4주",
+                          cost: "무료"
+                        },
+                        {
+                          step: 3,
+                          title: "소송 제기",
+                          description: "조정 실패 시 소송 제기 (최후 수단)",
+                          estimatedTime: "3-6개월",
+                          cost: "소송비용 별도"
+                        }
+                      ],
+                      expertConsultation: {
+                        available: true,
+                        price: 50000,
+                        duration: "15분",
+                        contactInfo: "02-1234-5678"
+                      }
+                    }
+                  })
                 };
                 
                 // categoryScores 배열을 categories 객체로 변환하고 원본 제거
@@ -93,6 +156,47 @@ export default function ReportPage({ params }: ReportPageProps) {
                   // 원본 categoryScores 배열 제거
                   delete transformedData.subjectiveMetrics.categoryScores;
                 }
+                // 프리미엄 리포트인 경우 프리미엄 전용 데이터 추가
+                if (isPremiumReport) {
+                  transformedData.premiumFeatures = {
+                    smartDiagnosis: {
+                      noiseLevel: response.data.smartDiagnosis?.noiseLevel || 68,
+                      floorLevel: response.data.smartDiagnosis?.floorLevel || 0.2,
+                      lightIntensity: response.data.smartDiagnosis?.lightIntensity || 320,
+                      measuredAt: response.data.smartDiagnosis?.measuredAt || "2025.09.08"
+                    },
+                    timeSeriesAnalysis: {
+                      rentTrend: response.data.timeSeriesAnalysis?.rentTrend || [
+                        { month: "2025.03", averageRent: 58 },
+                        { month: "2025.04", averageRent: 59 },
+                        { month: "2025.05", averageRent: 60 },
+                        { month: "2025.06", averageRent: 61 },
+                        { month: "2025.07", averageRent: 60 },
+                        { month: "2025.08", averageRent: 62 },
+                        { month: "2025.09", averageRent: 60 }
+                      ],
+                      marketVolatility: response.data.timeSeriesAnalysis?.marketVolatility || 0.15,
+                      predictionConfidence: response.data.timeSeriesAnalysis?.predictionConfidence || 87
+                    },
+                    documentGeneration: {
+                      demandLetter: true,
+                      certifiedMail: true,
+                      legalNotice: true
+                    },
+                    expertConsultation: {
+                      available: true,
+                      nextAvailableSlot: "2025.09.10 14:00",
+                      consultationFee: 50000
+                    },
+                    sharingOptions: {
+                      pdfDownload: true,
+                      emailShare: true,
+                      kakaoShare: true,
+                      watermark: true
+                    }
+                  };
+                }
+                
                 setReportTemplate(transformedData);
               } else {
                 setError('Report data not found.');
@@ -102,7 +206,8 @@ export default function ReportPage({ params }: ReportPageProps) {
               setError(err.message || 'Failed to load report.');
               // Even if API fails, show mock template for demonstration
               // ID에 따라 프리미엄 또는 무료 리포트 표시
-              const isPremiumReport = id.includes('premium') || Math.random() > 0.5;
+              const isPremiumReport = id.includes('premium') || 
+                                     (typeof window !== 'undefined' && window.location.search.includes('type=premium'));
               setReportTemplate(isPremiumReport ? mockReportData : mockFreeReportData);
             } finally {
               setLoading(false);
