@@ -261,7 +261,17 @@ export default function ComprehensiveReport({
     );
   }
 
-  const conditions = reportData?.contractSummary?.conditions || "";
+  // contractSummary의 필수 필드들 안전성 체크
+  const safeContractSummary = {
+    address: reportData.contractSummary.address || '주소 정보 없음',
+    buildingType: reportData.contractSummary.buildingType || '정보 없음',
+    contractType: reportData.contractSummary.contractType || '정보 없음',
+    conditions: reportData.contractSummary.conditions || '정보 없음',
+    gpsVerified: reportData.contractSummary.gpsVerified || false,
+    contractVerified: reportData.contractSummary.contractVerified || false
+  };
+
+  const conditions = safeContractSummary.conditions;
   const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
   const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
   
@@ -348,7 +358,7 @@ export default function ComprehensiveReport({
                 <i className="ri-file-chart-line text-4xl text-white"></i>
               </div>
               <h1 className="text-2xl md:text-4xl font-bold mb-4">
-                {reportData?.contractSummary?.address || '주소 정보 없음'} 임대차 협상 리포트
+                {safeContractSummary.address} 임대차 협상 리포트
                 {isPremium && ' 💎'}
               </h1>
               
@@ -401,21 +411,21 @@ export default function ComprehensiveReport({
                   <i className="ri-map-pin-line text-violet-500 text-xl mr-3"></i>
                   <div>
                     <div className="text-gray-800 font-medium">주소</div>
-                    <div className="text-gray-600 text-sm">{reportData?.contractSummary?.address || '주소 정보 없음'}</div>
+                    <div className="text-gray-600 text-sm">{safeContractSummary.address}</div>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <i className="ri-building-line text-violet-500 text-xl mr-3"></i>
                   <div>
                     <div className="text-gray-800 font-medium">건물 유형</div>
-                    <div className="text-gray-600 text-sm">{reportData?.contractSummary?.buildingType || '정보 없음'}</div>
+                    <div className="text-gray-600 text-sm">{safeContractSummary.buildingType}</div>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <i className="ri-contract-line text-violet-500 text-xl mr-3"></i>
                   <div>
                     <div className="text-gray-800 font-medium">계약 유형</div>
-                    <div className="text-gray-600 text-sm">{reportData?.contractSummary?.contractType || '정보 없음'}</div>
+                    <div className="text-gray-600 text-sm">{safeContractSummary.contractType}</div>
                   </div>
                 </div>
               </div>
@@ -424,7 +434,7 @@ export default function ComprehensiveReport({
               <div className="bg-purple-50 rounded-lg p-6">
                 <h3 className="text-gray-800 font-bold mb-4">계약 조건</h3>
                 <div className="space-y-2">
-                  {(reportData?.contractSummary?.conditions || '정보 없음').split(' / ').map((condition: string, index: number) => (
+                  {safeContractSummary.conditions.split(' / ').map((condition: string, index: number) => (
                     <div key={index} className="flex justify-between items-center">
                       <span className="text-gray-700">{condition.split(' ')[0] || '항목'}</span>
                       <span className="text-gray-900 font-medium">{condition.split(' ').slice(1).join(' ') || '정보 없음'}</span>
@@ -434,13 +444,13 @@ export default function ComprehensiveReport({
                 
                 {/* 인증 상태 */}
                 <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                  {reportData?.contractSummary?.gpsVerified && (
+                  {safeContractSummary.gpsVerified && (
                     <div className="flex items-center text-emerald-600">
                       <i className="ri-checkbox-circle-line mr-2"></i>
                       GPS 위치 인증 완료
                     </div>
                   )}
-                  {reportData?.contractSummary?.contractVerified && (
+                  {safeContractSummary.contractVerified && (
                     <div className="flex items-center text-emerald-600">
                       <i className="ri-file-check-line mr-2"></i>
                       계약서/고지서 인증 완료
@@ -535,7 +545,7 @@ export default function ComprehensiveReport({
             <h2 className="text-2xl font-bold text-gray-800 mb-6">객관적 지표 (공공 데이터 기반)</h2>
             <MarketDataComparison 
               userRent={userRent} 
-              userAddress={reportData?.contractSummary?.address || '주소 정보 없음'} 
+              userAddress={safeContractSummary.address} 
               isPremium={isPremium} 
             />
             
@@ -553,7 +563,7 @@ export default function ComprehensiveReport({
                 </div>
                 
                 <TimeSeriesChart 
-                  buildingType={reportData?.contractSummary?.buildingType || '빌라'}
+                  buildingType={safeContractSummary.buildingType}
                   lawdCd="11410" // TODO: 사용자 실제 법정동코드로 변경
                   months={24}
                 />
