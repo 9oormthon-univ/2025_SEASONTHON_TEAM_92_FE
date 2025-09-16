@@ -64,18 +64,39 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
         }
       }
       
-      const [monthlyRes, jeonseRes, transactionsRes] = await Promise.all([
-        officetelApi.getMonthlyRentMarket(lawdCd),
-        officetelApi.getJeonseMarket(lawdCd),
-        officetelApi.getTransactions(lawdCd)
-      ]);
-
-      setMarketData({
-        monthlyRentMarket: monthlyRes?.success ? monthlyRes.data : [],
-        jeonseMarket: jeonseRes?.success ? jeonseRes.data : [],
-        transactions: transactionsRes?.success ? transactionsRes.data : []
+      // 최근 3개월 데이터 요청 (현재 월부터 역산)
+      const currentDate = new Date();
+      const months = [];
+      for (let i = 0; i < 3; i++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        months.push(date.toISOString().slice(0, 7).replace('-', ''));
+      }
+      
+      // 프록시를 통한 국토교통부 API 호출
+      const molitPromises = months.map(async (dealYmd) => {
+        try {
+          const response = await fetch(`/api/molit-proxy?dealYmd=${dealYmd}&lawdCd=${lawdCd}&numOfRows=100`);
+          const data = await response.json();
+          
+          if (data.response?.header?.resultCode === '00' && data.response?.body?.items?.itemList) {
+            return Array.isArray(data.response.body.items.itemList) 
+              ? data.response.body.items.itemList 
+              : [data.response.body.items.itemList];
+          }
+          return [];
+        } catch (err) {
+          console.error(`MOLIT API error for ${dealYmd}:`, err);
+          return [];
+        }
       });
-
+      
+      const molitResults = await Promise.all(molitPromises);
+      const allTransactions = molitResults.flat();
+      
+      // 데이터 가공
+      const processedData = processMolitData(allTransactions);
+      
+      setMarketData(processedData);
       toast.success('실거래가 데이터를 불러왔습니다.');
     } catch (err: any) {
       console.error('Market data load error:', err);
@@ -83,6 +104,56 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  // 국토교통부 데이터 가공 함수 (올바른 필드명 사용)
+  const processMolitData = (transactions: any[]) => {
+    const monthlyRentTransactions = transactions.filter(t => t.monthlyRent && parseInt(t.monthlyRent) > 0);
+    const jeonseTransactions = transactions.filter(t => !t.monthlyRent || parseInt(t.monthlyRent) === 0);
+    
+    // 동네별 월세 데이터 그룹화
+    const neighborhoodGroups: {[key: string]: any[]} = {};
+    monthlyRentTransactions.forEach(transaction => {
+      const dong = transaction.neighborhood || transaction.umdNm || '알 수 없음';
+      if (!neighborhoodGroups[dong]) {
+        neighborhoodGroups[dong] = [];
+      }
+      neighborhoodGroups[dong].push(transaction);
+    });
+    
+    const monthlyRentMarket = Object.entries(neighborhoodGroups).map(([neighborhood, transactions]) => {
+      const rents = transactions.map(t => parseInt(t.monthlyRent)).filter(r => r > 0);
+      const areas = transactions.map(t => parseFloat(t.area || t.excluUseAr)).filter(a => a > 0);
+      
+      return {
+        neighborhood,
+        averagePrice: rents.length > 0 ? rents.reduce((a, b) => a + b, 0) / rents.length : 0,
+        minPrice: rents.length > 0 ? Math.min(...rents) : 0,
+        maxPrice: rents.length > 0 ? Math.max(...rents) : 0,
+        transactionCount: transactions.length,
+        pricePerSquareMeter: rents.length > 0 && areas.length > 0 
+          ? (rents.reduce((a, b) => a + b, 0) / rents.length) / (areas.reduce((a, b) => a + b, 0) / areas.length)
+          : 0
+      };
+    });
+    
+    // 거래 데이터 변환
+    const processedTransactions = transactions.slice(0, 20).map(transaction => ({
+      buildingName: transaction.buildingName || transaction.offiNm || '건물명 없음',
+      contractDate: `${transaction.year || ''}-${String(transaction.month || '').padStart(2, '0')}-${String(transaction.day || '').padStart(2, '0')}`,
+      contractType: transaction.monthlyRent ? '월세' : '전세',
+      contractTerm: transaction.contractTerm || '정보 없음',
+      deposit: parseInt(transaction.deposit?.replace(/,/g, '') || '0'),
+      monthlyRent: parseInt(transaction.monthlyRent?.replace(/,/g, '') || '0'),
+      area: parseFloat(transaction.area || transaction.excluUseAr || '0'),
+      floor: parseInt(transaction.floor || '0')
+    }));
+    
+    return {
+      monthlyRentMarket,
+      jeonseMarket: [], // 전세 데이터는 별도 처리 필요
+      transactions: processedTransactions
+    };
   };
 
   useEffect(() => {

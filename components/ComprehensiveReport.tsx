@@ -316,21 +316,39 @@ export default function ComprehensiveReport({
   // 막대 차트 데이터도 안전하게 처리
   const safeBarChartData = barChartData.filter(item => typeof item.value === 'number' && !isNaN(item.value));
 
-  const radarChartData = Object.entries(reportData?.subjectiveMetrics?.categories || {}).map(([categoryKey, score]: [string, any]) => ({ 
-    category: categoryKey === 'lighting' ? '채광' : 
-              categoryKey === 'soundproofing' ? '방음' : 
-              categoryKey === 'parking' ? '주차' :
-              categoryKey === 'waterPressure' ? '수압' :
-              categoryKey === 'heating' ? '난방' :
-              categoryKey === 'ventilation' ? '환기' :
-              categoryKey === 'security' ? '보안' :
-              categoryKey === 'management' ? '관리' :
-              categoryKey === 'convenience' ? '편의성' :
-              categoryKey === 'internet' ? '인터넷' : categoryKey, 
-    myScore: score.myScore || 0, 
-    neighborhoodAvg: score.neighborhoodAvg || 0,
-    buildingAvg: score.buildingAvg || 0
-  }));
+  // 카테고리 데이터 안전성 강화 - 배열과 객체 모두 처리
+  const categoriesData = reportData?.subjectiveMetrics?.categoryScores || reportData?.subjectiveMetrics?.categories || [];
+  const radarChartData = Array.isArray(categoriesData) 
+    ? categoriesData.map((score: any) => ({ 
+        category: score.category === 'lighting' ? '채광' : 
+                  score.category === 'soundproofing' ? '방음' : 
+                  score.category === 'parking' ? '주차' :
+                  score.category === 'waterPressure' ? '수압' :
+                  score.category === 'heating' ? '난방' :
+                  score.category === 'ventilation' ? '환기' :
+                  score.category === 'security' ? '보안' :
+                  score.category === 'management' ? '관리' :
+                  score.category === 'convenience' ? '편의성' :
+                  score.category === 'internet' ? '인터넷' : score.category, 
+        myScore: score.myScore || 0, 
+        neighborhoodAvg: score.neighborhoodAverage || score.neighborhoodAvg || 0,
+        buildingAvg: score.buildingAverage || score.buildingAvg || 0
+      }))
+    : Object.entries(categoriesData).map(([categoryKey, score]: [string, any]) => ({ 
+        category: categoryKey === 'lighting' ? '채광' : 
+                  categoryKey === 'soundproofing' ? '방음' : 
+                  categoryKey === 'parking' ? '주차' :
+                  categoryKey === 'waterPressure' ? '수압' :
+                  categoryKey === 'heating' ? '난방' :
+                  categoryKey === 'ventilation' ? '환기' :
+                  categoryKey === 'security' ? '보안' :
+                  categoryKey === 'management' ? '관리' :
+                  categoryKey === 'convenience' ? '편의성' :
+                  categoryKey === 'internet' ? '인터넷' : categoryKey, 
+        myScore: score.myScore || 0, 
+        neighborhoodAvg: score.neighborhoodAverage || score.neighborhoodAvg || 0,
+        buildingAvg: score.buildingAverage || score.buildingAvg || 0
+      }));
 
   // 차트 데이터가 비어있을 때 기본 데이터 제공
   const safeRadarChartData = radarChartData.length > 0 ? radarChartData : [
@@ -526,7 +544,7 @@ export default function ComprehensiveReport({
 
             {/* 카테고리별 상세 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {Object.entries(reportData?.subjectiveMetrics?.categories || {}).map(([categoryKey, score]: [string, any], index: number) => {
+              {safeRadarChartData.map((score: any, index: number) => {
                 const diff = score.neighborhoodAvg - score.myScore;
                 const isLower = diff > 0;
                 const cardColor = isLower ? 'red' : diff < -0.5 ? 'green' : 'yellow';
@@ -534,18 +552,7 @@ export default function ComprehensiveReport({
                 return (
                   <div key={index} className={`p-4 bg-${cardColor}-50 rounded-xl border border-${cardColor}-200`}>
                     <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-gray-800 font-bold">
-                        {categoryKey === 'lighting' ? '채광' : 
-                         categoryKey === 'soundproofing' ? '방음' : 
-                         categoryKey === 'parking' ? '주차' :
-                         categoryKey === 'waterPressure' ? '수압' :
-                         categoryKey === 'heating' ? '난방' :
-                         categoryKey === 'ventilation' ? '환기' :
-                         categoryKey === 'security' ? '보안' :
-                         categoryKey === 'management' ? '관리' :
-                         categoryKey === 'convenience' ? '편의성' :
-                         categoryKey === 'internet' ? '인터넷' : categoryKey}
-                      </h4>
+                      <h4 className="text-gray-800 font-bold">{score.category}</h4>
                       <span className={`text-${cardColor}-600 font-bold`}>{score.myScore.toFixed(1)}점</span>
                     </div>
                     <p className="text-gray-600 text-sm">
@@ -618,78 +625,115 @@ export default function ComprehensiveReport({
           </section>
 
           {/* 5. 스마트 진단 종합 분석 (프리미엄) */}
-          {smartDiagnosisData && (
+          {isPremium && (
             <section className="p-6 md:p-8 border-b border-purple-100">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">🔬 스마트 진단 종합 분석</h2>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
-                <div className="text-center mb-6">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">
-                    종합 점수: {smartDiagnosisData.overallScore || 85}점
-                  </div>
-                  <p className="text-blue-700 text-lg">
-                    {smartDiagnosisData.insights || "소음 환경이 매우 좋고 인터넷 속도가 우수합니다."}
-                  </p>
+              <div className="flex items-center mb-6">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                  <i className="ri-crown-line text-white"></i>
                 </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full bg-white rounded-lg shadow-sm">
-                    <thead className="bg-blue-100">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">항목</th>
-                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">측정 결과</th>
-                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">등급</th>
-                        <th className="px-4 py-3 text-left text-blue-800 font-semibold">전국 평균 대비</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {smartDiagnosisData.noise && (
-                        <tr className="border-b border-gray-100">
-                          <td className="px-4 py-3 font-medium">🔊 소음</td>
-                          <td className="px-4 py-3">{smartDiagnosisData.noise.value}dB</td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                              우수
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-green-600">15% 조용함</td>
-                        </tr>
-                      )}
-                      {smartDiagnosisData.level && (
-                        <tr className="border-b border-gray-100">
-                          <td className="px-4 py-3 font-medium">📐 수평</td>
-                          <td className="px-4 py-3">{smartDiagnosisData.level.value}°</td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                              우수
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-green-600">상위 10% 수준</td>
-                        </tr>
-                      )}
-                      {smartDiagnosisData.internet && (
-                        <tr>
-                          <td className="px-4 py-3 font-medium">🚀 인터넷</td>
-                          <td className="px-4 py-3">{smartDiagnosisData.internet.downloadSpeed}Mbps</td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                              매우 빠름
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-blue-600">25% 빠름</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
-                  <h4 className="font-semibold text-blue-800 mb-2">💡 전문가 분석</h4>
-                  <p className="text-blue-700 text-sm">
-                    측정된 객관적 데이터를 바탕으로 한 전문가 분석 결과입니다. 
-                    이 데이터는 임대료 협상 시 강력한 근거 자료로 활용할 수 있습니다.
-                  </p>
+                <h2 className="text-2xl font-bold text-gray-800">🔬 스마트 진단 종합 분석</h2>
+                <div className="ml-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  PREMIUM
                 </div>
               </div>
+              
+              {smartDiagnosisData ? (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                  <div className="text-center mb-6">
+                    <div className="text-4xl font-bold text-blue-600 mb-2">
+                      종합 점수: {smartDiagnosisData.overallScore || 85}점
+                    </div>
+                    <p className="text-blue-700 text-lg">
+                      {smartDiagnosisData.insights || "소음 환경이 매우 좋고 인터넷 속도가 우수합니다."}
+                    </p>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full bg-white rounded-lg shadow-sm">
+                      <thead className="bg-blue-100">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-blue-800 font-semibold">항목</th>
+                          <th className="px-4 py-3 text-left text-blue-800 font-semibold">측정 결과</th>
+                          <th className="px-4 py-3 text-left text-blue-800 font-semibold">등급</th>
+                          <th className="px-4 py-3 text-left text-blue-800 font-semibold">전국 평균 대비</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {smartDiagnosisData.noise && (
+                          <tr className="border-b border-gray-100">
+                            <td className="px-4 py-3 font-medium">🔊 소음</td>
+                            <td className="px-4 py-3">{smartDiagnosisData.noise.value}dB</td>
+                            <td className="px-4 py-3">
+                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                우수
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-green-600">15% 조용함</td>
+                          </tr>
+                        )}
+                        {smartDiagnosisData.level && (
+                          <tr className="border-b border-gray-100">
+                            <td className="px-4 py-3 font-medium">📐 수평</td>
+                            <td className="px-4 py-3">{smartDiagnosisData.level.value}°</td>
+                            <td className="px-4 py-3">
+                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                우수
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-green-600">상위 10% 수준</td>
+                          </tr>
+                        )}
+                        {smartDiagnosisData.internet && (
+                          <tr>
+                            <td className="px-4 py-3 font-medium">🚀 인터넷</td>
+                            <td className="px-4 py-3">{smartDiagnosisData.internet.downloadSpeed}Mbps</td>
+                            <td className="px-4 py-3">
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                매우 빠름
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-blue-600">25% 빠름</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
+                    <h4 className="font-semibold text-blue-800 mb-2">💡 전문가 분석</h4>
+                    <p className="text-blue-700 text-sm">
+                      측정된 객관적 데이터를 바탕으로 한 전문가 분석 결과입니다. 
+                      이 데이터는 임대료 협상 시 강력한 근거 자료로 활용할 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="ri-tools-line text-gray-600 text-2xl"></i>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-700 mb-2">스마트 진단 데이터 준비 중</h3>
+                  <p className="text-gray-600 mb-4">
+                    현재 스마트 진단 데이터를 수집하고 있습니다. 잠시만 기다려주세요.
+                  </p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+                        소음 측정 중
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                        수평 측정 중
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
+                        인터넷 속도 측정 중
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
