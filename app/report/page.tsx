@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { reportApi, diagnosisApi, smartDiagnosisApi } from '../../lib/api';
 import toast from 'react-hot-toast';
-import ComprehensiveReport from '@/components/ComprehensiveReport';
+// import ComprehensiveReport from '@/components/ComprehensiveReport'; // 리포트 상세 페이지에서 사용
 
 export default function ReportPage() {
   const [reportContent, setReportContent] = useState('');
@@ -50,8 +50,55 @@ export default function ReportPage() {
         return;
       }
 
-      setShowComprehensiveReport(true);
-      toast.success('종합 리포트를 생성했습니다!');
+      // 무료 리포트 생성 (reportType: 'free'로 설정)
+      const jwtToken = localStorage.getItem('jwtToken');
+      const userId = localStorage.getItem('userId');
+      
+      if (!jwtToken || !userId) {
+        setError('로그인이 필요합니다.');
+        toast.error('로그인이 필요합니다.');
+        router.push('/auth/login');
+        return;
+      }
+
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 
+        (process.env.NODE_ENV === 'production' 
+          ? 'https://2025seasonthonteam92be-production.up.railway.app' 
+          : 'http://localhost:8080');
+      
+      const response = await fetch(`${baseURL}/report/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({
+          reportContent: reportContent || '',
+          reportType: 'free' // 무료 리포트로 설정
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        let publicId;
+        
+        if (result.success && result.publicId) {
+          publicId = result.publicId;
+        } else {
+          throw new Error('리포트 ID를 받지 못했습니다.');
+        }
+        
+        toast.success('무료 리포트를 생성했습니다!');
+        
+        // ComprehensiveReport 컴포넌트로 이동 (무료 버전)
+        router.push(`/report/${publicId}`);
+      } else {
+        const errorMessage = result.message || '무료 리포트 생성에 실패했습니다.';
+        setError(errorMessage);
+        toast.error(errorMessage);
+      }
+      
     } catch (err: any) {
       console.error('Comprehensive report generation error:', err);
       setError('종합 리포트 생성 중 오류가 발생했습니다.');
@@ -115,15 +162,8 @@ export default function ReportPage() {
         
         toast.success('프리미엄 리포트를 생성했습니다!');
         
-        const reportResponse = await reportApi.getReport(publicId);
-        setReportData({
-          ...reportResponse.data,
-          reportId: publicId,
-          reportUrl: `${window.location.origin}/report/${publicId}`,
-          reportType: 'premium'
-        });
-
-        router.push(`/report/${publicId}`);
+        // ComprehensiveReport 컴포넌트로 이동 (프리미엄 버전)
+        router.push(`/report/${publicId}?type=premium`);
       } else {
         const errorMessage = result.message || '프리미엄 리포트 생성에 실패했습니다.';
         setError(errorMessage);
@@ -141,9 +181,7 @@ export default function ReportPage() {
     }
   };
 
-  if (showComprehensiveReport) {
-    return <ComprehensiveReport smartDiagnosisData={smartDiagnosisSummary} />;
-  }
+  // 리포트 생성 후 상세 페이지로 이동하므로 여기서는 렌더링하지 않음
 
   return (
     <div className="w-full px-4 py-8 bg-gradient-to-b from-purple-100 to-purple-200 flex flex-col justify-center items-center min-h-screen">

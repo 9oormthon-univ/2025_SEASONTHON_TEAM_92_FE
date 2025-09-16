@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { reportApi } from '@/lib/api';
 import { ReportResponse } from '@/types';
-import ReportTemplate from '@/components/ReportTemplate';
+import ComprehensiveReport from '@/components/ComprehensiveReport';
 import { mockReportData, mockFreeReportData } from '@/lib/mockData';
 
 interface ReportPageProps {
@@ -267,5 +267,5 @@ export default function ReportPage({ params }: ReportPageProps) {
     );
   }
 
-  return <ReportTemplate data={reportTemplate} />;
+  return <ComprehensiveReport reportId={reportId || undefined} />;
 }
