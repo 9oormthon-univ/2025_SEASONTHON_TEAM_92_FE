@@ -110,6 +110,8 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           : await reportApi.getComprehensiveReport();
 
         if (response && response.success) {
+          console.log('API Response:', response);
+          console.log('Report Data:', response.data);
           setReportData(response.data);
           const url = initialReportId 
             ? `${window.location.origin}/report/${initialReportId}${isPremium ? '?type=premium' : ''}`
@@ -242,6 +244,13 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
   const conditions = reportData?.contractSummary?.conditions || "";
   const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
   const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
+
+  // 디버깅을 위한 로그
+  console.log('Report Data Structure:', {
+    reportData,
+    header: reportData?.header,
+    participantCount: reportData?.header?.participantCount
+  });
 
   const barChartData = [
     { name: '내 점수', value: reportData?.subjectiveMetrics?.overallScore?.myScore || 0 },

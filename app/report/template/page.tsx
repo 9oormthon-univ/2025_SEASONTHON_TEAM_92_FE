@@ -31,13 +31,13 @@ const transformData = (backendData: any): ReportTemplateType => {
 
   return {
     header: {
-      title: backendData.header.title,
-      createdAt: backendData.header.generatedDate,
-      dataPeriod: backendData.header.dataPeriod,
+      title: backendData?.header?.title || '리포트 제목',
+      createdAt: backendData?.header?.generatedDate || '알 수 없음',
+      dataPeriod: backendData?.header?.dataPeriod || '데이터 기간 정보 없음',
       trustMetrics: {
-        participantCount: backendData.header.participantCount,
-        averageResponseDays: parseInt(backendData.header.dataRecency.match(/\d+/)?.[0] || '0'),
-        trustScore: backendData.header.reliabilityScore,
+        participantCount: backendData?.header?.participantCount || 0,
+        averageResponseDays: parseInt(backendData?.header?.dataRecency?.match(/\d+/)?.[0] || '0'),
+        trustScore: backendData?.header?.reliabilityScore || 0,
       },
     },
     contractInfo: {
