@@ -167,14 +167,9 @@ export const reportApi = {
     const response = await api.post('/report/create', reportData);
     return response.data;
   },
-  getReport: async (reportId: string): Promise<ApiResponse<any>> => {
-    const response = await api.get(`/report/${reportId}`);
-    return response.data;
-  },
-  // 프리미엄 리포트용 API 함수 추가
-  getPremiumReport: async (reportId: string): Promise<ApiResponse<any>> => {
-    // 실제 프리미엄 엔드포인트는 백엔드와 협의 후 수정 필요
-    const response = await api.get(`/report/premium/${reportId}`);
+  getReport: async (publicId: string): Promise<ApiResponse<any>> => {
+    // 공개 API로 변경 (비회원도 접근 가능)
+    const response = await api.get(`/public/report/${publicId}`);
     return response.data;
   },
   getComprehensiveReport: async (): Promise<ApiResponse<any>> => {
