@@ -6,6 +6,10 @@ import { reportApi } from '../lib/api';
 import toast from 'react-hot-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
 import MarketDataComparison from './MarketDataComparison';
+import TimeSeriesChart from './TimeSeriesChart';
+import DocumentGenerator from './DocumentGenerator';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 // --- 프리미엄 리포트용 확장 인터페이스 정의 ---
 
@@ -89,10 +93,11 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
   const reportType = searchParams.get('type');
   const isPremium = reportType === 'premium';
 
-  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [reportData, setReportData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [shareUrl, setShareUrl] = useState('');
+  const [showDocumentGenerator, setShowDocumentGenerator] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -129,6 +134,83 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
   };
 
   const printReport = () => window.print();
+
+  const downloadPDF = async () => {
+    try {
+      toast.loading('PDF를 생성하는 중입니다...', { id: 'pdf-loading' });
+      
+      // PDF 생성을 위해 print 스타일 적용
+      const printElements = document.querySelectorAll('.no-print');
+      printElements.forEach(el => (el as HTMLElement).style.display = 'none');
+      
+      // 컨테이너 요소 가져오기
+      const element = document.querySelector('.pdf-container') as HTMLElement;
+      if (!element) {
+        throw new Error('PDF 생성할 요소를 찾을 수 없습니다.');
+      }
+
+      // html2canvas로 이미지 생성 (고해상도)
+      const canvas = await html2canvas(element, {
+        scale: 2, // 고해상도
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        height: element.scrollHeight,
+        width: element.scrollWidth,
+      });
+
+      // PDF 생성
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      // PDF 크기 계산
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
+
+      // 여러 페이지 처리
+      let heightLeft = imgHeight * ratio;
+      let position = 0;
+
+      // 첫 페이지 추가
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      heightLeft -= pdfHeight;
+
+      // 추가 페이지들
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight * ratio;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
+        heightLeft -= pdfHeight;
+      }
+
+      // PDF 다운로드
+      const fileName = `${reportData.contractSummary?.address || '월세협상리포트'}_${reportData.header?.generatedDate || new Date().toLocaleDateString()}.pdf`;
+      pdf.save(fileName);
+
+      // print 스타일 복원
+      printElements.forEach(el => (el as HTMLElement).style.display = '');
+      
+      toast.success('PDF 다운로드가 완료되었습니다!', { id: 'pdf-loading' });
+      
+    } catch (error) {
+      console.error('PDF 생성 실패:', error);
+      toast.error('PDF 생성 중 오류가 발생했습니다.', { id: 'pdf-loading' });
+      
+      // print 스타일 복원
+      const printElements = document.querySelectorAll('.no-print');
+      printElements.forEach(el => (el as HTMLElement).style.display = '');
+    }
+  };
 
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-100 to-purple-200">
@@ -167,7 +249,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
     { name: '건물 평균', value: reportData.subjectiveMetrics?.overallScore?.buildingAverage || 0 }
   ];
 
-  const radarChartData = (reportData.subjectiveMetrics?.categoryScores || []).map(c => ({ 
+  const radarChartData = (reportData.subjectiveMetrics?.categoryScores || []).map((c: any) => ({ 
     category: c.category || '알 수 없음', 
     myScore: c.myScore || 0, 
     neighborhoodAvg: c.neighborhoodAverage || 0 
@@ -197,16 +279,27 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
         <div className="no-print flex justify-center mb-8">
           <div className="flex flex-col sm:flex-row gap-4">
             <button onClick={copyShareUrl} className="bg-gradient-to-r from-[#9333EA] to-[#C084FC] text-white px-6 py-3 rounded-xl hover:from-[#7C3AED] hover:to-[#A855F7] transition-all flex items-center justify-center shadow-lg">
-              <i className="ri-share-line mr-2"></i> 공유하기
+              <i className="ri-share-line mr-2"></i> 링크 공유
             </button>
+            <button onClick={downloadPDF} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all flex items-center justify-center shadow-lg">
+              <i className="ri-download-line mr-2"></i> PDF 다운로드
+            </button>
+            {isPremium && (
+              <button 
+                onClick={() => setShowDocumentGenerator(true)}
+                className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all flex items-center justify-center shadow-lg"
+              >
+                <i className="ri-file-text-line mr-2"></i> 법적 문서 생성
+              </button>
+            )}
             <button onClick={printReport} className="bg-gray-600 text-white px-6 py-3 rounded-xl hover:bg-gray-700 transition-all flex items-center justify-center shadow-lg">
-              <i className="ri-printer-line mr-2"></i> 인쇄하기
+              <i className="ri-printer-line mr-2"></i> 브라우저 인쇄
             </button>
           </div>
         </div>
 
         {/* 메인 카드 */}
-        <div className="bg-white rounded-2xl shadow-xl border border-violet-200 overflow-hidden">
+        <div className="pdf-container bg-white rounded-2xl shadow-xl border border-violet-200 overflow-hidden">
           
           {/* 1. 리포트 헤더 - 보라색 배경 */}
           <section className="bg-gradient-to-r from-purple-900 to-purple-800 text-white p-6 md:p-8">
@@ -291,7 +384,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
               <div className="bg-purple-50 rounded-lg p-6">
                 <h3 className="text-gray-800 font-bold mb-4">계약 조건</h3>
                 <div className="space-y-2">
-                  {(reportData.contractSummary?.conditions || '정보 없음').split(' / ').map((condition, index) => (
+                  {(reportData.contractSummary?.conditions || '정보 없음').split(' / ').map((condition: string, index: number) => (
                     <div key={index} className="flex justify-between items-center">
                       <span className="text-gray-700">{condition.split(' ')[0] || '항목'}</span>
                       <span className="text-gray-900 font-medium">{condition.split(' ').slice(1).join(' ') || '정보 없음'}</span>
@@ -325,7 +418,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
             {/* 종합 점수 차트 */}
             <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 mb-8">
               <h3 className="text-xl font-bold text-gray-800 text-center mb-6">거주 환경 종합 점수</h3>
-              <div className="h-64 mb-4">
+              <div className="h-64 mb-4" style={{ width: '100%', height: '256px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={barChartData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -348,7 +441,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
 
             {/* 카테고리별 상세 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {(reportData.subjectiveMetrics?.categoryScores || []).map((score, index) => {
+              {(reportData.subjectiveMetrics?.categoryScores || []).map((score: any, index: number) => {
                 const diff = score.neighborhoodAverage - score.myScore;
                 const isLower = diff > 0;
                 const cardColor = isLower ? 'red' : diff < -0.5 ? 'green' : 'yellow';
@@ -370,7 +463,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
             {/* 레이더 차트 */}
             <div className="bg-white rounded-2xl border-2 border-violet-200 p-6">
               <h3 className="text-xl font-bold text-gray-800 text-center mb-6">카테고리별 상세 분석</h3>
-              <div className="h-80">
+              <div className="h-80" style={{ width: '100%', height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart data={radarChartData}>
                     <PolarGrid />
@@ -400,14 +493,35 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           {/* 4. 시세 분석 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">객관적 지표 (공공 데이터 기반)</h2>
-            <MarketDataComparison userRent={userRent} userAddress={reportData.contractSummary.address} isPremium={isPremium} />
+            <MarketDataComparison userRent={userRent} userAddress={reportData.contractSummary?.address} isPremium={isPremium} />
+            
+            {/* 시계열 추이 분석 (프리미엄 기능) */}
+            {isPremium && (
+              <div className="mt-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
+                    <i className="ri-crown-line text-white"></i>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800">📈 시장 트렌드 분석 (프리미엄 전용)</h3>
+                  <div className="ml-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    PREMIUM
+                  </div>
+                </div>
+                
+                <TimeSeriesChart 
+                  buildingType={reportData.contractSummary?.buildingType || '빌라'}
+                  lawdCd="11410" // TODO: 사용자 실제 법정동코드로 변경
+                  months={24}
+                />
+              </div>
+            )}
           </section>
 
           {/* 5. 협상 카드 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">협상 카드 (자동 생성)</h2>
             <div className="space-y-6">
-              {(reportData.negotiationCards || []).map((card, index) => {
+              {(reportData.negotiationCards || []).map((card: any, index: number) => {
                 const colors = [
                   { bg: 'bg-pink-50', border: 'border-pink-200', accent: 'bg-pink-500', text: 'text-pink-800' },
                   { bg: 'bg-emerald-50', border: 'border-emerald-200', accent: 'bg-emerald-500', text: 'text-emerald-800' },
@@ -439,7 +553,7 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           <section className="p-6 md:p-8 border-b border-purple-100">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">맞춤형 정책/지원 정보</h2>
             <div className="space-y-4">
-              {(reportData.policyInfos || []).map((policy, index) => (
+              {(reportData.policyInfos || []).map((policy: any, index: number) => (
                 <div key={index} className="bg-purple-100 border border-violet-200 rounded-xl p-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center">
@@ -532,6 +646,13 @@ export default function ComprehensiveReport({ reportId: initialReportId }: { rep
           </section>
         </div>
       </div>
+
+      {/* 문서 생성 모달 */}
+      <DocumentGenerator 
+        reportData={reportData}
+        isVisible={showDocumentGenerator}
+        onClose={() => setShowDocumentGenerator(false)}
+      />
     </div>
   );
 }

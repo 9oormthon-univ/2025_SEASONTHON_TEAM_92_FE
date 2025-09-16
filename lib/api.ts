@@ -331,6 +331,74 @@ export const officetelApi = {
     const response = await api.get(`/api/officetel/monthly-rent-market?lawdCd=${lawdCd}`);
     return response.data;
   },
+  getTimeSeriesAnalysis: async (lawdCd: string, months: number = 24): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/officetel/timeseries?lawdCd=${lawdCd}&months=${months}`);
+    return response.data;
+  },
+};
+
+export const villaApi = {
+  getTransactions: async (lawdCd: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/villa/transactions?lawdCd=${lawdCd}`);
+    return response.data;
+  },
+  getJeonseMarket: async (lawdCd: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/villa/jeonse-market?lawdCd=${lawdCd}`);
+    return response.data;
+  },
+  getMonthlyRentMarket: async (lawdCd: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/villa/monthly-rent-market?lawdCd=${lawdCd}`);
+    return response.data;
+  },
+  getTimeSeriesAnalysis: async (lawdCd: string, months: number = 24): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/api/villa/timeseries?lawdCd=${lawdCd}&months=${months}`);
+    return response.data;
+  },
+};
+
+// 건물 유형별 통합 API
+export const realEstateApi = {
+  getTimeSeriesAnalysis: async (buildingType: string, lawdCd: string, months: number = 24): Promise<ApiResponse<any>> => {
+    // 건물 유형에 따라 다른 API 호출
+    switch (buildingType?.toLowerCase()) {
+      case '오피스텔':
+      case 'officetel':
+        return await officetelApi.getTimeSeriesAnalysis(lawdCd, months);
+      case '빌라':
+      case '다세대주택':
+      case 'villa':
+        return await villaApi.getTimeSeriesAnalysis(lawdCd, months);
+      default:
+        // 기본값은 빌라 API 사용
+        return await villaApi.getTimeSeriesAnalysis(lawdCd, months);
+    }
+  },
+  getTransactions: async (buildingType: string, lawdCd: string): Promise<ApiResponse<any>> => {
+    switch (buildingType?.toLowerCase()) {
+      case '오피스텔':
+      case 'officetel':
+        return await officetelApi.getTransactions(lawdCd);
+      case '빌라':
+      case '다세대주택':
+      case 'villa':
+        return await villaApi.getTransactions(lawdCd);
+      default:
+        return await villaApi.getTransactions(lawdCd);
+    }
+  },
+  getMonthlyRentMarket: async (buildingType: string, lawdCd: string): Promise<ApiResponse<any>> => {
+    switch (buildingType?.toLowerCase()) {
+      case '오피스텔':
+      case 'officetel':
+        return await officetelApi.getMonthlyRentMarket(lawdCd);
+      case '빌라':
+      case '다세대주택':
+      case 'villa':
+        return await villaApi.getMonthlyRentMarket(lawdCd);
+      default:
+        return await villaApi.getMonthlyRentMarket(lawdCd);
+    }
+  },
 };
 
 // 분쟁 해결 기관 API
