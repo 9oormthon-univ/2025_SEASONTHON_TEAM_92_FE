@@ -143,17 +143,13 @@ export default function ComprehensiveReport({
             finalIsPremium
           });
           
-          // 백엔드에서 공유 URL 생성
-          const reportId = initialReportId || (reportData && reportData.id) || null;
-          const shareUrlResponse = await reportApi.generateShareUrl(reportId, finalIsPremium);
-          if (shareUrlResponse.success && shareUrlResponse.data?.shareUrl) {
-            setShareUrl(shareUrlResponse.data.shareUrl);
-          } else {
-            // 백엔드에서 URL을 생성하지 못한 경우 기본 URL 사용
-            const url = initialReportId 
-              ? `${window.location.origin}/report/${initialReportId}${finalIsPremium ? '?type=premium' : ''}`
-              : window.location.href;
+          // 항상 프론트엔드에서 직접 공유 URL을 생성
+          if (initialReportId) {
+            const url = `${window.location.origin}/report/${initialReportId}${finalIsPremium ? '?type=premium' : ''}`;
             setShareUrl(url);
+          } else {
+            // initialReportId가 없는 경우에 대한 fallback
+            setShareUrl(window.location.href);
           }
         } else {
           setError(response?.message || '리포트를 불러올 수 없습니다.');
@@ -628,7 +624,7 @@ export default function ComprehensiveReport({
 
           {/* 4. 시세 분석 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">객관적 지표 (공공 데이터 기반)</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">시세 분석</h2>
             <MarketDataComparison 
               userRent={userRent} 
               userAddress={safeContractSummary.address} 

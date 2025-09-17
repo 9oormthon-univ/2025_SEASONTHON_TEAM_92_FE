@@ -379,14 +379,6 @@ export default function LoginPage() {
                 </div>
 
 
-                {/* Demo Account Info */}
-                <div className="mt-6 p-4 rounded-xl bg-purple-50 border border-purple-200">
-                  <h3 className="text-sm font-medium mb-2 text-purple-800">데모 계정</h3>
-                  <div className="text-xs space-y-1 text-purple-700">
-                    <p>이메일: test@example.com</p>
-                    <p>비밀번호: 12345678</p>
-                  </div>
-                </div>
               </form>
             </div>
           </div>

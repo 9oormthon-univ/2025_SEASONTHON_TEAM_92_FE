@@ -689,70 +689,6 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {/* 데이터 분석 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-bar-chart-line text-2xl text-[#9333EA]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">데이터 분석</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                우리 지역 임대 데이터를 실시간으로 수집하여 정확한 분석을 제공합니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/report" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
-                  분석 시작하기 →
-                </Link>
-              </div>
-            </div>
-
-            {/* 그룹 협상 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-team-line text-2xl text-[#C99AF3]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">그룹 협상</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                같은 건물 이웃들과 함께 협상을 진행하여 더 합리적인 결과를 만들어갑니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/weekly-mission" className="text-xs text-[#C99AF3] font-medium hover:opacity-80">
-                  그룹 참여하기 →
-                </Link>
-              </div>
-            </div>
-
-            {/* 서류 지원 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-file-text-line text-2xl text-[#61229A]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">서류 지원</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                협상에 필요한 각종 서류를 맞춤형으로 생성하고 제공합니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/report" className="text-xs text-[#61229A] font-medium hover:opacity-80">
-                  서류 생성하기 →
-                </Link>
-              </div>
-            </div>
-
-            {/* AI 리포트 생성 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-robot-line text-2xl text-[#9333EA]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">AI 리포트 생성</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                AI가 당신을 위한 맞춤형 협상 가이드와 단계별 전략을 생성합니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/report" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
-                  리포트 생성하기 →
-                </Link>
-              </div>
-            </div>
-
             {/* 주간 미션 */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
@@ -785,82 +721,34 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* 맞춤형 정책 정보 */}
+            {/* 스마트 보조진단 */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-government-line text-2xl text-[#9333EA]"></i>
+                <i className="ri-brain-line text-2xl text-[#9333EA]"></i>
               </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">맞춤형 정책 정보</h3>
+              <h3 className="text-lg font-bold mb-2 text-center text-black">스마트 보조진단</h3>
               <p className="text-sm text-center text-black leading-relaxed">
-                청년 주거 지원 정책과 지역별 맞춤 지원사업 정보를 제공합니다
+                AI가 복잡한 상황을 정확히 파악하고 맞춤형 협상 전략을 제공합니다
               </p>
               <div className="mt-4 text-center">
-                <Link href="/policy" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
-                  정책 확인하기 →
+                <Link href="/report" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
+                  보조진단 시작하기 →
                 </Link>
               </div>
             </div>
 
-            {/* 공공 데이터 조회 */}
+            {/* 리포트 생성 */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-database-line text-2xl text-[#C99AF3]"></i>
+                <i className="ri-file-text-line text-2xl text-[#61229A]"></i>
               </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">공공 데이터 조회</h3>
+              <h3 className="text-lg font-bold mb-2 text-center text-black">리포트 생성</h3>
               <p className="text-sm text-center text-black leading-relaxed">
-                국토부 실거래가 데이터를 기반으로 한 객관적이고 신뢰할 수 있는 시세 정보
+                진단 결과를 바탕으로 임대인과의 협상에 필요한 맞춤형 리포트를 생성합니다
               </p>
               <div className="mt-4 text-center">
-                <Link href="/officetel" className="text-xs text-[#C99AF3] font-medium hover:opacity-80">
-                  시세 조회하기 →
-                </Link>
-              </div>
-            </div>
-
-            {/* 분쟁 해결 기관 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-scales-line text-2xl text-[#61229A]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">분쟁 해결 기관</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                임대차 관련 분쟁 발생 시 도움을 받을 수 있는 전문 기관 정보를 제공합니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/dispute" className="text-xs text-[#61229A] font-medium hover:opacity-80">
-                  기관 찾기 →
-                </Link>
-              </div>
-            </div>
-
-            {/* 임대차 관련 법령 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-book-line text-2xl text-[#9333EA]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">임대차 관련 법령</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                임대차보호법 등 관련 법령 정보를 상황별로 쉽게 찾아볼 수 있습니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/legal" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
-                  법령 검색하기 →
-                </Link>
-              </div>
-            </div>
-
-            {/* 상황별 정보 카드 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
-                <i className="ri-booklet-line text-2xl text-[#C99AF3]"></i>
-              </div>
-              <h3 className="text-lg font-bold mb-2 text-center text-black">상황별 정보 카드</h3>
-              <p className="text-sm text-center text-black leading-relaxed">
-                특정 상황에 맞는 실용적인 정보와 대응 방법을 카드 형태로 제공합니다
-              </p>
-              <div className="mt-4 text-center">
-                <Link href="/info-card" className="text-xs text-[#C99AF3] font-medium hover:opacity-80">
-                  정보 카드 보기 →
+                <Link href="/report" className="text-xs text-[#61229A] font-medium hover:opacity-80">
+                  리포트 생성하기 →
                 </Link>
               </div>
             </div>

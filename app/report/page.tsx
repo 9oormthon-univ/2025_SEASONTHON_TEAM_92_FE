@@ -184,684 +184,310 @@ export default function ReportPage() {
   // 리포트 생성 후 상세 페이지로 이동하므로 여기서는 렌더링하지 않음
 
   return (
-    <div className="size- px-16 inline-flex justify-start items-start">
-      <div className="w-[1280px] h-[3229px] max-w-[1280px] inline-flex flex-col justify-start items-start">
-        <div className="size- pb-12 inline-flex justify-start items-start">
-          <div className="w-[1280px] h-60 inline-flex flex-col justify-start items-start">
-            <div className="size- pb-3 inline-flex justify-start items-start">
-              <div className="w-[1280px] h-10 flex justify-center items-center">
-                <div className="text-center justify-center text-purple-600 text-4xl font-normal font-['Pacifico'] leading-10">월세의 정석</div>
+    <div className="w-full px-4 py-8 bg-gradient-to-b from-purple-100 to-purple-200 flex flex-col justify-center items-center min-h-screen">
+      <div className="w-full max-w-7xl mx-auto flex flex-col items-center gap-12">
+        
+        {/* --- Header Section --- */}
+        <div className="w-full flex flex-col items-center text-center">
+          <div className="text-purple-600 text-3xl md:text-4xl font-normal font-['Pacifico'] leading-10">월세의 정석</div>
+          <div className="w-20 h-2 bg-purple-600 rounded-full my-4" />
+          <div className="text-gray-900 text-3xl md:text-4xl font-bold font-['Roboto'] leading-10">협상 리포트 생성</div>
+          <p className="max-w-2xl mt-4 text-gray-700 text-lg md:text-xl font-normal font-['Roboto'] leading-loose">
+            당신의 진단 결과와 요구사항를 바탕으로 맞춤형 협상 전략을 생성합니다
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 max-w-3xl">
+            {[
+              "진단 점수 기반 협상 포인트 분석",
+              "개인화된 협상 카드 생성",
+              "단계별 협상 가이드 제공"
+            ].map((text, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                <span className="text-gray-800 text-base font-normal font-['Roboto'] leading-normal">{text}</span>
               </div>
-            </div>
-            <div className="size- px-[600px] pb-8 inline-flex justify-start items-start">
-              <div className="w-20 h-2 bg-purple-600 rounded-full" />
-            </div>
-            <div className="size- pb-4 inline-flex justify-start items-start">
-              <div className="w-[1280px] h-10 flex justify-center items-center">
-                <div className="text-center justify-center text-gray-900 text-4xl font-bold font-['Roboto'] leading-10">AI 협상 리포트 생성</div>
-              </div>
-            </div>
-            <div className="size- px-64 pb-8 inline-flex justify-start items-start">
-              <div className="w-[768px] h-8 max-w-[768px] flex justify-center items-center">
-                <div className="text-center justify-center text-gray-700 text-xl font-normal font-['Roboto'] leading-loose">당신의 진단 결과와 요구사항를 바탕으로 AI가 맞춤형 협상 전략을 생성합니다</div>
-              </div>
-            </div>
-            <div className="w-[1280px] h-7 inline-flex justify-center items-start">
-              <div className="w-[780.05px] h-7 flex justify-start items-start gap-6 flex-wrap content-start">
-                <div className="w-60 h-7 flex justify-center items-center">
-                  <div className="size- pr-3 flex justify-start items-start">
-                    <div className="w-5 h-7 relative flex justify-center items-center">
-                      <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
-                        <div className="w-3.5 h-2.5 left-[3.35px] top-[4.98px] absolute bg-purple-600" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-52 h-6 flex justify-center items-center">
-                    <div className="text-center justify-center text-gray-800 text-base font-normal font-['Roboto'] leading-normal">진단 점수 기반 협상 포인트 분석</div>
-                  </div>
-                </div>
-                <div className="w-60 h-7 flex justify-center items-center">
-                  <div className="size- pr-3 flex justify-start items-start">
-                    <div className="w-5 h-7 relative flex justify-center items-center">
-                      <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
-                        <div className="w-3.5 h-2.5 left-[3.35px] top-[4.98px] absolute bg-purple-600" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-40 h-6 flex justify-center items-center">
-                    <div className="text-center justify-center text-gray-800 text-base font-normal font-['Roboto'] leading-normal">개인화된 협상 카드 생성</div>
-                  </div>
-                </div>
-                <div className="w-60 h-7 flex justify-center items-center">
-                  <div className="size- pr-3 flex justify-start items-start">
-                    <div className="w-5 h-7 relative flex justify-center items-center">
-                      <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
-                        <div className="w-3.5 h-2.5 left-[3.35px] top-[4.98px] absolute bg-purple-600" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-40 h-6 flex justify-center items-center">
-                    <div className="text-center justify-center text-gray-800 text-base font-normal font-['Roboto'] leading-normal">단계별 협상 가이드 제공</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* 메인 컨텐트 카드 */}
-        <div className="w-[1280px] h-[1360.50px] p-0.5 bg-white rounded-3xl shadow-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 flex flex-col justify-start items-start overflow-hidden">
-          <div className="w-[1276px] h-[1356.50px] p-12 flex flex-col justify-start items-start">
-            {/* 리포트 타입 선택 */}
-            <div className="pb-12 inline-flex justify-start items-start">
-              <div className="w-[1180px] h-[652.50px] flex justify-start items-start gap-10 flex-wrap content-start">
-                {/* 종합 협상 리포트 카드 */}
-                <div
-                  onClick={() => setSelectedReportType('comprehensive')}
-                  className={`w-[570px] h-[652.50px] p-11 bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-[3px] outline-offset-[-3px] outline-purple-400 inline-flex flex-col justify-start items-start overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
-                    selectedReportType === 'comprehensive'
-                      ? 'bg-purple-100 outline-purple-500 shadow-xl'
-                      : 'bg-white outline-purple-400'
-                  }`}>
-                      <div className="w-[484px] h-[518.50px] flex flex-col justify-start items-start">
-                        <div className="px-52 pb-6 inline-flex justify-start items-start">
-                          <div className="size-20 bg-purple-100 rounded-2xl flex justify-center items-center">
-                            <div className="w-8 h-9 relative flex justify-center items-center">
-                              <div className="w-8 h-7 left-[0.01px] top-[3px] absolute overflow-hidden">
-                                <div className="size-6 left-[4.38px] top-[2.50px] absolute bg-purple-600" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="pb-4 inline-flex justify-start items-start">
-                          <div className="w-[484px] h-9 flex justify-center items-center">
-                            <div className="text-center justify-center text-gray-900 text-3xl font-bold font-['Roboto'] leading-9">종합 협상 리포트</div>
-                          </div>
-                        </div>
-                        <div className="pb-6 inline-flex justify-start items-start">
-                          <div className="w-[484px] h-6 flex justify-center items-center">
-                            <div className="w-20 h-9 px-6 py-2 bg-gray-500 rounded-full flex justify-center items-start">
-                              <div className="text-center justify-center text-white text-base font-bold font-['Roboto'] leading-normal">무료</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="pb-8 inline-flex justify-start items-start">
-                          <div className="w-[484px] h-14 flex justify-center items-start flex-wrap content-start">
-                            <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">진단 결과를 바탕으로 완전한 협상 전략과</div>
-                            <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">리포트를 자동 생성합니다</div>
-                          </div>
-                        </div>
-                        <div className="w-[459px] h-40 flex flex-col justify-start items-start">
-                          <div className="w-[459px] h-5 inline-flex justify-start items-start">
-                            <div className=" pr-2 pt-0.5 flex justify-start items-start">
-                              <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                  <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-emerald-500" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="w-52 h-5 flex justify-start items-center">
-                              <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">8개 섹션으로 구성된 완전한 리포트</div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-start">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-start">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-emerald-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-60 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">객관적 데이터와 수치로 명시된 근거 제공</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-start">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-start">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-emerald-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-44 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">협상 카드 우선순위 자동 생성</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-emerald-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-40 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">맞춤형 정책/지원 정보 포함</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-emerald-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-44 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">분쟁 해결 가이드 및 법령 정보</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                    </div>
-
-                    {/* 프리미엄 리포트 카드 */}
-                    <div
-                      onClick={() => setSelectedReportType('premium')}
-                      className={`w-[570px] h-[652.50px] p-11 relative bg-purple-100 rounded-2xl shadow-2xl outline outline-[3px] outline-offset-[-3px] outline-purple-600 inline-flex flex-col justify-start items-start cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
-                        selectedReportType === 'premium'
-                          ? 'bg-purple-200 outline-purple-700 shadow-2xl'
-                          : 'bg-purple-100 outline-purple-600'
-                      }`}
-                    >
-                      <div className="w-[484px] h-[566.50px] flex flex-col justify-start items-start">
-                        <div className="px-52 pb-6 inline-flex justify-start items-start">
-                          <div className="size-20 bg-purple-600 rounded-2xl flex justify-center items-center">
-                            <div className="w-8 h-9 relative flex justify-center items-center">
-                              <div className="w-8 h-7 left-[0.01px] top-[3px] absolute overflow-hidden">
-                                <div className="size-6 left-[3.12px] top-[3.12px] absolute bg-white" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="pb-4 inline-flex justify-start items-start">
-                          <div className="w-[484px] h-9 flex justify-center items-center">
-                            <div className="text-center justify-center text-gray-900 text-3xl font-bold font-['Roboto'] leading-9">프리미엄 리포트</div>
-                          </div>
-                        </div>
-                        <div className="pb-6 inline-flex justify-start items-start">
-                          <div className="w-[484px] h-6 flex justify-center items-center">
-                            <div className="w-32 h-9 px-6 py-2 bg-purple-600 rounded-full flex justify-center items-start">
-                              <div className="text-center justify-center text-white text-base font-bold font-['Roboto'] leading-normal">유료 서비스</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="pb-8 inline-flex justify-start items-start">
-                          <div className="w-[484px] h-14 flex justify-center items-start flex-wrap content-start">
-                            <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">고급 AI 분석과 스마트 보조 진단으로</div>
-                            <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">더욱 정교한 협상 전략을 제공합니다</div>
-                          </div>
-                        </div>
-                        <div className="w-[459px] h-48 flex flex-col justify-start items-start">
-                          <div className="w-[459px] h-5 inline-flex justify-start items-start">
-                            <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                              <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                  <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-amber-500" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="w-44 h-5 flex justify-start items-center">
-                              <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">종합 리포트의 모든 기능 포함</div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-3.5 h-3 left-[0.63px] top-[0.66px] absolute bg-amber-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-48 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">스마트 보조 진단 기능 사용 가능</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-amber-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-44 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">AI 개인 맞춤형 협상 문구 생성</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-amber-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-36 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">실시간 시장 데이터 분석</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-amber-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-32 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">전문가 검토 의견 포함</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-3 inline-flex justify-start items-start">
-                            <div className="w-[459px] h-5 flex justify-start items-center">
-                              <div className=" pr-2 pt-0.5 flex justify-start items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-amber-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-40 h-5 flex justify-start items-center">
-                                <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">30일 무제한 업데이트 지원</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="w-36 h-12 left-[212.28px] top-[-13px] absolute flex flex-col justify-start items-start">
-                        <div className="w-36 h-12 px-6 py-3 bg-linear-71 from-purple-600 to-violet-600 rounded-full shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] inline-flex justify-start items-start overflow-hidden">
-                          <div className="pr-2 pt-1 flex justify-start items-start">
-                            <div className="size-4 relative overflow-hidden">
-                              <div className="w-3.5 h-3 left-[1.67px] top-[1.67px] absolute bg-white" />
-                            </div>
-                          </div>
-                          <div className="justify-center text-white text-base font-bold font-['Roboto'] leading-normal [text-shadow:_0px_10px_15px_rgb(0_0_0_/_0.10)]">PREMIUM</div>
-                        </div>
-                      </div>
+        {/* --- Single Main Content Card --- */}
+        <div className="w-full p-1 md:p-2 bg-white rounded-3xl shadow-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 flex flex-col items-center">
+          <div className="w-full p-4 md:p-8 lg:p-12 flex flex-col items-center gap-10">
+            
+            {/* --- Report Type Selection --- */}
+            <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-6 md:gap-10">
+              {/* Comprehensive Report Card */}
+              <div
+                onClick={() => setSelectedReportType('comprehensive')}
+                className={`w-full lg:w-1/2 p-6 md:p-8 flex flex-col items-start rounded-2xl shadow-lg outline outline-[3px] outline-offset-[-3px] cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
+                  selectedReportType === 'comprehensive'
+                    ? 'bg-purple-50 outline-purple-500 shadow-xl'
+                    : 'bg-white outline-purple-400'
+                }`}
+              >
+                <div className="flex items-center gap-4 pb-4">
+                  <div className="size-16 bg-purple-100 rounded-2xl flex justify-center items-center">
+                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                  </div>
+                  <div>
+                    <div className="text-gray-900 text-2xl font-bold font-['Roboto']">종합 협상 리포트</div>
+                    <div className="mt-1 px-4 py-1 bg-gray-500 rounded-full inline-block">
+                      <div className="text-white text-sm font-bold font-['Roboto']">무료</div>
                     </div>
                   </div>
                 </div>
-
-                {/* 리포트 생성 버튼 */}
-                <div className="w-[1180px] h-16 inline-flex justify-center items-start">
-                  <button
-                    onClick={
-                      selectedReportType === 'comprehensive'
-                        ? handleGenerateComprehensiveReport
-                        : handleGeneratePremiumReport
-                    }
-                    disabled={isLoading || !selectedReportType}
-                    className={`w-80 h-16 px-12 py-5 rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] flex justify-center items-center overflow-hidden transition-all duration-200 transform ${
-                      selectedReportType && !isLoading
-                        ? (selectedReportType === 'comprehensive'
-                            ? 'bg-purple-500 hover:bg-purple-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
-                            : 'bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer')
-                        : 'bg-gray-300 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className={`w-64 h-8 inline-flex justify-start items-center ${
-                      selectedReportType && !isLoading
-                        ? 'text-white'
-                        : 'text-gray-500'
-                    }`}>
-                      <div className="pr-3 flex justify-start items-start">
-                        <div className="w-6 h-8 relative flex justify-center items-center">
-                          <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
-                            <div className="size-5 left-[2.91px] top-[2.40px] absolute bg-white" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className={`text-center justify-center text-xl font-bold font-['Roboto'] leading-7 ${
-                        selectedReportType && !isLoading
-                          ? 'text-white'
-                          : 'text-gray-500'
-                      }`}>
-                        {isLoading ? '생성 중...' : '프리미엄 리포트 생성하기'}
-                      </div>
+                <p className="pb-6 text-gray-700 text-base md:text-lg font-normal font-['Roboto'] leading-7">
+                  진단 결과를 바탕으로 완전한 협상 전략과 리포트를 자동 생성합니다.
+                </p>
+                <div className="space-y-2">
+                  {[
+                    "8개 섹션으로 구성된 완전한 리포트",
+                    "객관적 데이터와 수치로 명시된 근거 제공",
+                    "협상 카드 우선순위 자동 생성",
+                    "맞춤형 정책/지원 정보 포함",
+                    "분쟁 해결 가이드 및 법령 정보"
+                  ].map((text, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      <span className="text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">{text}</span>
                     </div>
-                  </button>
+                  ))}
                 </div>
+              </div>
 
-                {/* 에러 메시지 표시 */}
-                {error && (
-                  <div className="w-[1086px] mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                    <div className="flex items-center">
-                      <div className="size-4 mr-2 text-red-500">⚠️</div>
-                      <span className="text-sm font-medium">{error}</span>
+              {/* Premium Report Card */}
+              <div
+                onClick={() => setSelectedReportType('premium')}
+                className={`w-full lg:w-1/2 p-6 md:p-8 relative flex flex-col items-start rounded-2xl shadow-2xl outline outline-[3px] outline-offset-[-3px] cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
+                  selectedReportType === 'premium'
+                    ? 'bg-purple-100 outline-purple-700 shadow-2xl'
+                    : 'bg-purple-50 outline-purple-600'
+                }`}
+              >
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full shadow-lg flex items-center gap-2">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                  <span className="text-white text-base font-bold font-['Roboto']">PREMIUM</span>
+                </div>
+                
+                <div className="flex items-center gap-4 pb-4 mt-6">
+                  <div className="size-16 bg-amber-500 rounded-2xl flex justify-center items-center">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M15 3v4M13 5h4M9 17v4M7 19h4M12 3c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z"></path></svg>
+                  </div>
+                  <div>
+                    <div className="text-gray-900 text-2xl font-bold font-['Roboto']">프리미엄 리포트</div>
+                     <div className="mt-1 px-4 py-1 bg-amber-500 rounded-full inline-block">
+                      <div className="text-white text-sm font-bold font-['Roboto']">유료 서비스</div>
                     </div>
                   </div>
-                )}
-
-                <div className="pt-8 inline-flex justify-start items-start">
-                  <div className="w-[1180px] h-20 p-6 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start">
-                    <div className="w-[1128px] h-7 inline-flex justify-center items-start">
-                      <div className="pr-3 pt-1 flex justify-start items-start">
-                        <div className="size-5 relative overflow-hidden">
-                          <div className="size-4 left-[2.08px] top-[1.67px] absolute bg-purple-600" />
-                        </div>
-                      </div>
-                      <div className="text-center justify-center text-purple-600 text-lg font-medium font-['Roboto'] leading-7">생성된 리포트는 임대인와 공유할 수 있는 링크로 제공됩니다</div>
+                </div>
+                <p className="pb-6 text-gray-700 text-base md:text-lg font-normal font-['Roboto'] leading-7">
+                  고급 분석과 스마트 보조 진단으로 더욱 정교한 협상 전략을 제공합니다.
+                </p>
+                <div className="space-y-2">
+                  {[
+                    "종합 리포트의 모든 기능 포함",
+                    "스마트 보조 진단 기능 사용 가능",
+                    "개인 맞춤형 협상 문구 생성",
+                    "실시간 시장 데이터 분석",
+                    "전문가 검토 의견 포함",
+                    "30일 무제한 업데이트 지원"
+                  ].map((text, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                      <span className="text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">{text}</span>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {selectedReportType === 'premium' && (
-              <>
-                {/* 스마트 보조 진단 기능 */}
-                <div className="pt-12 inline-flex justify-start items-start">
-                  <div className="w-[1280px] h-[616px] p-0.5 bg-white rounded-3xl shadow-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start overflow-hidden">
-                    <div className="w-[1276px] h-20 px-8 py-6 bg-linear-86 from-purple-600 to-violet-600 flex flex-col justify-start items-start">
-                      <div className="w-[1212px] h-9 inline-flex justify-start items-center">
-                        <div className="pr-3 flex justify-start items-start">
-                          <div className="w-8 h-9 relative flex justify-start items-center">
-                            <div className="w-8 h-7 left-0 top-[3px] absolute overflow-hidden">
-                              <div className="size-7 left-[1.35px] top-[1.43px] absolute bg-white" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="justify-center text-white text-2xl font-bold font-['Roboto'] leading-loose">스마트 보조 진단 기능</div>
-                      </div>
-                    </div>
-                    <div className="w-[1276px] h-[528px] p-8 flex flex-col justify-start items-start">
-                      <div className="w-[1212px] h-80 inline-flex justify-start items-start gap-8 flex-wrap content-start">
-                        <div className="w-[590px] h-80 inline-flex flex-col justify-start items-start">
-                          <div className="w-[590px] h-24 p-5 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-600 inline-flex justify-start items-center">
-                            <div className="pr-4 flex justify-start items-start">
-                              <div className="size-12 bg-purple-600 rounded-xl flex justify-center items-center">
-                                <div className="w-5 h-7 relative flex justify-start items-center">
-                                  <div className="size-5 left-0 top-[4px] absolute overflow-hidden">
-                                    <div className="w-3.5 h-4 left-[2.92px] top-[1.25px] absolute bg-white" />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="w-52 h-14 inline-flex flex-col justify-start items-start">
-                              <div className="w-52 h-7 inline-flex justify-start items-center">
-                                <div className="justify-center text-gray-900 text-lg font-bold font-['Roboto'] leading-7">AI 상황 분석</div>
-                              </div>
-                              <div className="pt-1 inline-flex justify-start items-start">
-                                <div className="w-52 h-6 flex justify-start items-center">
-                                  <div className="justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">복잡한 상황도 AI가 정확히 파악</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-4 inline-flex justify-start items-start">
-                            <div className="w-[539px] h-16 p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex justify-start items-center">
-                              <div className=" pr-3 flex justify-start items-start">
-                                <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center">
-                                  <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                    <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                      <div className="size-3 left-[1.46px] top-[1.31px] absolute bg-white" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-36 h-10 inline-flex flex-col justify-start items-start">
-                                <div className="w-36 h-6 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">맞춤형 협상 문구</div>
-                                </div>
-                                <div className="w-36 h-4 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">상황에 맞는 협상 대화 템플릿</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-4 inline-flex justify-start items-start">
-                            <div className="w-[539px] h-16 p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex justify-start items-center">
-                              <div className=" pr-3 flex justify-start items-start">
-                                <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center">
-                                  <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                    <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                      <div className="w-2.5 h-3 left-[2.62px] top-[0.88px] absolute bg-white" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-28 h-10 inline-flex flex-col justify-start items-start">
-                                <div className="w-28 h-6 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">실시간 조언</div>
-                                </div>
-                                <div className="w-28 h-4 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">협상 과정에서 즉시 도움</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="w-[539px] h-60 inline-flex flex-col justify-start items-start">
-                          <div className="w-[539px] h-16 p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 inline-flex justify-start items-center">
-                            <div className=" pr-3 flex justify-start items-start">
-                              <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center">
-                                <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                  <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                    <div className="w-2.5 h-2 left-[1.83px] top-[1.75px] absolute bg-white" />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="w-32 h-10 inline-flex flex-col justify-start items-start">
-                              <div className="w-32 h-6 inline-flex justify-start items-center">
-                                <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">성공률 예측</div>
-                              </div>
-                              <div className="w-32 h-4 inline-flex justify-start items-center">
-                                <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">각 협상 전략의 성공 가능성</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-4 inline-flex justify-start items-start">
-                            <div className="w-[539px] h-16 p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex justify-start items-center">
-                              <div className=" pr-3 flex justify-start items-start">
-                                <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center">
-                                  <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                    <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                      <div className="size-3 left-[1.46px] top-[1.17px] absolute bg-white" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-36 h-10 inline-flex flex-col justify-start items-start">
-                                <div className="w-36 h-6 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">타이밍 분석</div>
-                                </div>
-                                <div className="w-36 h-4 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">협상하기 가장 좋은 시점 안내</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className=" pt-4 inline-flex justify-start items-start">
-                            <div className="w-[539px] h-16 p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex justify-start items-center">
-                              <div className=" pr-3 flex justify-start items-start">
-                                <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center">
-                                  <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                    <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                      <div className="size-3 left-[1.46px] top-[0.91px] absolute bg-white" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-28 h-10 inline-flex flex-col justify-start items-start">
-                                <div className="w-28 h-6 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">전문가 지원</div>
-                                </div>
-                                <div className="w-28 h-4 inline-flex justify-start items-center">
-                                  <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">필요시 전문가 상담 연결</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="pt-8 inline-flex justify-start items-start">
-                        <div className="w-[1212px] h-20 p-6 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start">
-                          <div className="w-[1160px] h-8 inline-flex justify-center items-center">
-                            <div className="pr-3 flex justify-start items-start">
-                              <div className="w-6 h-8 relative flex justify-start items-center">
-                                <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
-                                  <div className="size-5 left-[2.50px] top-[2.50px] absolute bg-purple-600" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="w-[574.75px] h-7 flex justify-start items-center">
-                              <div className="justify-center text-purple-600 text-lg font-bold font-['Roboto'] leading-7">스마트 보조 진단은 프리미엄 리포트 이용자만 사용할 수 있는 독점 기능입니다</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
+            {/* --- Generate Button --- */}
+            <div className="w-full flex justify-center">
+              <button
+                onClick={
+                  selectedReportType === 'comprehensive'
+                    ? handleGenerateComprehensiveReport
+                    : handleGeneratePremiumReport
+                }
+                disabled={isLoading || !selectedReportType}
+                className={`w-full sm:w-96 h-16 px-12 py-5 rounded-2xl shadow-lg flex justify-center items-center gap-3 transition-all duration-200 transform ${
+                  selectedReportType && !isLoading
+                    ? (selectedReportType === 'comprehensive'
+                        ? 'bg-purple-500 hover:bg-purple-600 text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
+                        : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer')
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3.5 4.5a.5.5 0 000 1h5a.5.5 0 000-1h-5zM7 9a.5.5 0 000 1h5a.5.5 0 000-1H7zm0 2.5a.5.5 0 000 1h2a.5.5 0 000-1h-2z" clipRule="evenodd" /></svg>
+                <span className="text-xl font-bold font-['Roboto'] leading-7">
+                  {isLoading
+                    ? '생성 중...'
+                    : !selectedReportType
+                      ? '리포트 유형을 선택해주세요'
+                      : selectedReportType === 'comprehensive'
+                        ? '종합 협상 리포트 생성하기'
+                        : '프리미엄 리포트 생성하기'}
+                </span>
+              </button>
+            </div>
+
+            {/* --- Error Message --- */}
+            {error && (
+              <div className="w-full max-w-4xl p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-2">
+                <span className="text-red-500">⚠️</span>
+                <span className="text-sm font-medium">{error}</span>
+              </div>
             )}
 
-            {/* 생성될 리포트 구성 */}
-            <div className="pt-12 inline-flex justify-start items-start">
-              <div className="w-[1280px] h-[808px] p-8 bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-2 outline-offset-[-2px] outline-violet-200 flex flex-col justify-start items-start overflow-hidden">
-                <div className="pb-6 inline-flex justify-start items-start">
-                  <div className="w-[1212px] h-16 flex justify-start items-center">
-                    <div className="pr-4 flex justify-start items-start">
-                      <div className="size-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex justify-center items-center">
-                        <div className="w-8 h-9 relative flex justify-start items-center">
-                          <div className="w-8 h-7 left-0 top-[3px] absolute overflow-hidden">
-                            <div className="size-6 left-[4.38px] top-[2.50px] absolute bg-white" />
+            {/* --- Info Box --- */}
+            <div className="w-full max-w-4xl p-6 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 flex items-center gap-3">
+              <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+              <span className="text-purple-600 text-base md:text-lg font-medium font-['Roboto']">
+                생성된 리포트는 임대인와 공유할 수 있는 링크로 제공됩니다.
+              </span>
+            </div>
+
+            {/* --- Premium Features Section (Conditionally Rendered) --- */}
+            {selectedReportType === 'premium' && (
+              <div className="w-full max-w-7xl flex flex-col items-center gap-8 pt-10 border-t-2 border-gray-100">
+                <div className="w-full p-1 md:p-2 bg-white rounded-3xl shadow-xl outline outline-2 outline-offset-[-2px] outline-purple-400 flex flex-col items-center">
+                  <div className="w-full h-20 px-4 sm:px-8 py-6 bg-gradient-to-r from-amber-500 to-amber-600 flex items-center gap-3 rounded-t-3xl">
+                    <svg className="w-8 h-8 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707.707M12 21v-1m0-16a8 8 0 100 16 8 8 0 000-16z"></path></svg>
+                    <h2 className="text-white text-xl md:text-2xl font-bold font-['Roboto']">프리미엄 기능</h2>
+                  </div>
+                  <div className="w-full p-4 md:p-8 flex flex-col items-center gap-8">
+                    <div className="w-full flex flex-col lg:flex-row justify-center gap-8">
+                      {/* Left Column */}
+                      <div className="w-full lg:w-1/2 space-y-4">
+                        <div className="p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex items-center gap-3">
+                          <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z"></path></svg>
+                          </div>
+                          <div>
+                            <div className="text-gray-800 text-base font-semibold">맞춤형 협상 문구</div>
+                            <div className="text-gray-600 text-xs">상황에 맞는 협상 대화 템플릿</div>
+                          </div>
+                        </div>
+                        <div className="p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex items-center gap-3">
+                          <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                          </div>
+                          <div>
+                            <div className="text-gray-800 text-base font-semibold">실시간 조언</div>
+                            <div className="text-gray-600 text-xs">협상 과정에서 즉시 도움</div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Right Column */}
+                      <div className="w-full lg:w-1/2 space-y-4">
+                        <div className="p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex items-center gap-3">
+                          <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                          </div>
+                          <div>
+                            <div className="text-gray-800 text-base font-semibold">성공률 예측</div>
+                            <div className="text-gray-600 text-xs">각 협상 전략의 성공 가능성</div>
+                          </div>
+                        </div>
+                        <div className="p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex items-center gap-3">
+                          <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                          </div>
+                          <div>
+                            <div className="text-gray-800 text-base font-semibold">타이밍 분석</div>
+                            <div className="text-gray-600 text-xs">협상하기 가장 좋은 시점 안내</div>
+                          </div>
+                        </div>
+                        <div className="p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 flex items-center gap-3">
+                          <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                          </div>
+                          <div>
+                            <div className="text-gray-800 text-base font-semibold">전문가 지원</div>
+                            <div className="text-gray-600 text-xs">필요시 전문가 상담 연결</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="w-48 h-14 inline-flex flex-col justify-start items-start">
-                      <div className="w-48 h-8 inline-flex justify-start items-center">
-                        <div className="justify-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">생성될 리포트 구성</div>
-                      </div>
-                      <div className="pt-1 inline-flex justify-start items-start">
-                        <div className="w-48 h-6 flex justify-start items-center">
-                          <div className="justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">맞춤형 협상 리포트</div>
-                        </div>
-                      </div>
+                    <div className="w-full max-w-6xl p-6 bg-amber-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-amber-400 flex items-center gap-3">
+                      <svg className="w-6 h-6 text-amber-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                      <span className="text-amber-600 text-base md:text-lg font-bold font-['Roboto']">
+                        프리미엄 리포트 이용자만 사용할 수 있는 독점 기능입니다.
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div className="w-[1150px] h-96 p-6 flex flex-col justify-start items-start">
-                  <div className="w-[1102px] h-80 inline-flex justify-start items-start gap-6 flex-wrap content-start">
-                    <div className="w-[539px] h-80 inline-flex flex-col justify-start items-start">
-                      {[
-                        { num: "1", title: "리포트 헤더", desc: "생성일자, 데이터 신뢰도 표시" },
-                        { num: "2", title: "계약 정보 요약", desc: "주소, 계약 조건, 인증 여부" },
-                        { num: "3", title: "주관적 지표", desc: "커뮤니티 데이터 기반 비교" },
-                        { num: "4", title: "객관적 지표", desc: "공공 데이터 기반 시세 비교" }
-                      ].map((item, index) => (
-                        <div key={index} className={`w-[539px] h-16 p-3.5 bg-purple-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-violet-200 inline-flex justify-start items-center ${index > 0 ? 'mt-4' : ''}`}>
-                          <div className=" pr-3 flex justify-start items-start">
-                            <div className="size-8 bg-violet-500 rounded-full flex justify-center items-center">
-                              <div className="w-2 h-5 flex justify-start items-center">
-                                <div className="justify-center text-white text-sm font-bold font-['Roboto'] leading-tight">{item.num}</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="w-36 h-10 inline-flex flex-col justify-start items-start">
-                            <div className="w-36 h-6 inline-flex justify-start items-center">
-                              <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">{item.title}</div>
-                            </div>
-                            <div className="w-36 h-4 inline-flex justify-start items-center">
-                              <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">{item.desc}</div>
-                            </div>
-                          </div>
+              </div>
+            )}
+
+            {/* --- Report Structure Section --- */}
+            <div className="w-full max-w-7xl flex flex-col items-center gap-6 pt-10 border-t-2 border-gray-100">
+              <div className="w-full flex items-center gap-4">
+                <div className="size-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex justify-center items-center flex-shrink-0">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <div>
+                  <h2 className="text-gray-900 text-xl md:text-2xl font-bold font-['Roboto']">생성될 리포트 구성</h2>
+                  <p className="text-gray-600 text-base">맞춤형 협상 리포트</p>
+                </div>
+              </div>
+              <div className="w-full p-2 md:p-6">
+                <div className="w-full flex flex-col lg:flex-row justify-center gap-6">
+                  {/* Left Column */}
+                  <div className="w-full lg:w-1/2 space-y-4">
+                    {[
+                      { num: "1", title: "리포트 헤더", desc: "생성일자, 데이터 신뢰도 표시" },
+                      { num: "2", title: "계약 정보 요약", desc: "주소, 계약 조건, 인증 여부" },
+                      { num: "3", title: "주관적 지표", desc: "커뮤니티 데이터 기반 비교" },
+                      { num: "4", title: "객관적 지표", desc: "공공 데이터 기반 시세 비교" }
+                    ].map((item, index) => (
+                      <div key={index} className="w-full p-3.5 bg-purple-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-violet-200 flex items-center gap-3">
+                        <div className="size-8 bg-violet-500 rounded-full flex justify-center items-center flex-shrink-0">
+                          <span className="text-white text-sm font-bold">{item.num}</span>
                         </div>
-                      ))}
-                    </div>
-                    <div className="w-[539px] h-80 inline-flex flex-col justify-start items-start">
-                      {[
-                        { num: "5", title: "협상 카드", desc: "우선순위별 자동 생성" },
-                        { num: "6", title: "정책/지원 정보", desc: "맞춤형 지원금 및 혜택" },
-                        { num: "7", title: "분쟁 해결 가이드", desc: "관련 법령 및 조정위원회" },
-                        { num: "8", title: "업데이트 알림", desc: "지속적인 데이터 업데이트" }
-                      ].map((item, index) => (
-                        <div key={index} className={`w-[539px] h-16 p-3.5 bg-purple-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-violet-200 inline-flex justify-start items-center ${index > 0 ? 'mt-4' : ''}`}>
-                          <div className=" pr-3 flex justify-start items-start">
-                            <div className="size-8 bg-violet-500 rounded-full flex justify-center items-center">
-                              <div className="w-2 h-5 flex justify-start items-center">
-                                <div className="justify-center text-white text-sm font-bold font-['Roboto'] leading-tight">{item.num}</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="w-28 h-10 inline-flex flex-col justify-start items-start">
-                            <div className="w-28 h-6 inline-flex justify-start items-center">
-                              <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">{item.title}</div>
-                            </div>
-                            <div className="w-28 h-4 inline-flex justify-start items-center">
-                              <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">{item.desc}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className=" pt-6 inline-flex justify-start items-start">
-                    <div className="w-[1102px] h-14 p-4 bg-purple-100 rounded-lg inline-flex flex-col justify-start items-start">
-                      <div className="w-[1070px] h-6 inline-flex justify-center items-center">
-                        <div className=" pr-2 flex justify-start items-start">
-                          <div className="w-4 h-6 relative flex justify-start items-center">
-                            <div className="size-4 left-0 top-[4px] absolute overflow-hidden">
-                              <div className="w-2.5 h-3.5 left-[3px] top-[1px] absolute bg-violet-500" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="w-96 h-5 flex justify-start items-center">
-                          <div className="justify-center text-violet-500 text-sm font-medium font-['Roboto'] leading-tight">모든 리포트는 최신 공공 데이터와 87명의 이웃 데이터를 기반으로 생성됩니다</div>
+                        <div>
+                          <div className="text-gray-800 text-base font-semibold">{item.title}</div>
+                          <div className="text-gray-600 text-xs">{item.desc}</div>
                         </div>
                       </div>
-                    </div>
+                    ))}
+                  </div>
+                  {/* Right Column */}
+                  <div className="w-full lg:w-1/2 space-y-4">
+                    {[
+                      { num: "5", title: "협상 카드", desc: "우선순위별 자동 생성" },
+                      { num: "6", title: "정책/지원 정보", desc: "맞춤형 지원금 및 혜택" },
+                      { num: "7", title: "분쟁 해결 가이드", desc: "관련 법령 및 조정위원회" },
+                      { num: "8", title: "업데이트 알림", desc: "지속적인 데이터 업데이트" }
+                    ].map((item, index) => (
+                      <div key={index} className="w-full p-3.5 bg-purple-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-violet-200 flex items-center gap-3">
+                        <div className="size-8 bg-violet-500 rounded-full flex justify-center items-center flex-shrink-0">
+                          <span className="text-white text-sm font-bold">{item.num}</span>
+                        </div>
+                        <div>
+                          <div className="text-gray-800 text-base font-semibold">{item.title}</div>
+                          <div className="text-gray-600 text-xs">{item.desc}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 메인으로 돌아가기 버튼 */}
-            <div className="pt-12 inline-flex justify-start items-start">
-              <div className="w-[1280px] h-14 flex justify-center items-start">
-                <div className="pt-5 flex justify-start items-start">
-                  <div className="w-64 h-5 flex justify-center items-start">
-                    <button
-                      onClick={() => router.push('/')}
-                      className="w-64 h-14 px-10 py-4 bg-gray-600 rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] hover:bg-gray-700 transition-colors inline-flex flex-col justify-start items-start overflow-hidden"
-                    >
-                      <div className="w-44 h-7 inline-flex justify-start items-center">
-                        <div className="pr-3 flex justify-start items-start">
-                          <div className="w-5 h-7 relative flex justify-center items-center">
-                            <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
-                              <div className="w-3.5 h-3 left-[3.75px] top-[3.52px] absolute bg-white" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-center justify-center text-white text-lg font-bold font-['Roboto'] leading-7">메인으로 돌아가기</div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {/* --- Back to Main Button --- */}
+            <div className="w-full flex justify-center pt-10 border-t-2 border-gray-100">
+              <button
+                onClick={() => router.push('/')}
+                className="w-full sm:w-64 h-14 px-10 py-4 bg-gray-600 rounded-2xl shadow-lg hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span className="text-white text-lg font-bold">메인으로 돌아가기</span>
+              </button>
             </div>
+
           </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

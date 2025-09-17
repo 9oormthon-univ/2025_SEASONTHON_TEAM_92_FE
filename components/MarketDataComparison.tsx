@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { officetelApi } from '@/lib/api';
+import { officetelApi, locationApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 interface MarketDataComparisonProps {
@@ -40,27 +40,19 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadMarketData = async (customLawdCd?: string) => {
+  const loadMarketData = async () => {
     try {
       setIsLoading(true);
       
-      // 사용자 위치 기반 법정동 코드 추출
-      let lawdCd = customLawdCd || '11410'; // 기본값: 마포구 (사용자 주소가 없을 때만 사용)
-      
-      if (userAddress) {
-        const addressMapping: {[key: string]: string} = {
-          '강남구': '11680', '강서구': '11500', '구로구': '11530', '금천구': '11545',
-          '노원구': '11350', '도봉구': '11320', '동대문구': '11230', '동작구': '11590',
-          '마포구': '11410', '서초구': '11620', '성동구': '11200', '성북구': '11290',
-          '송파구': '11710', '양천구': '11440', '영등포구': '11560', '용산구': '11170',
-          '은평구': '11380', '종로구': '11110', '중구': '11140', '중랑구': '11260'
-        };
-        
-        for (const [gu, code] of Object.entries(addressMapping)) {
-          if (safeUserAddress.includes(gu)) {
-            lawdCd = code;
-            break;
-          }
+      let lawdCd = '11410'; // 기본값: 마포구
+
+      if (safeUserAddress !== '주소 정보 없음') {
+        const lawdResponse = await locationApi.getLawdCode(safeUserAddress);
+        if (lawdResponse.success && lawdResponse.data.lawdCd) {
+          lawdCd = lawdResponse.data.lawdCd;
+          log.info(`Successfully fetched lawdCd: ${lawdCd} for address: ${safeUserAddress}`);
+        } else {
+          toast.error('주소에 해당하는 지역 코드를 찾지 못했습니다.');
         }
       }
       
