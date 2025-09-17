@@ -224,7 +224,7 @@ export default function ReportPage() {
                     : 'bg-white outline-purple-400'
                 }`}
               >
-                <div className="flex items-center gap-4 pb-4">
+                <div className="flex items-center gap-4 pb-4 mt-6">
                   <div className="size-16 bg-purple-100 rounded-2xl flex justify-center items-center">
                     <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                   </div>
@@ -268,9 +268,9 @@ export default function ReportPage() {
                   <span className="text-white text-base font-bold font-['Roboto']">PREMIUM</span>
                 </div>
                 
-                <div className="flex items-center gap-4 pb-4 mt-6">
-                  <div className="size-16 bg-amber-500 rounded-2xl flex justify-center items-center">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M15 3v4M13 5h4M9 17v4M7 19h4M12 3c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z"></path></svg>
+                <div className="flex items-center gap-4 pb-4 mt-4">
+                  <div className="size-16 bg-purple-300 rounded-2xl flex justify-center items-center">
+                    <span className="text-white text-2xl">💎</span>
                   </div>
                   <div>
                     <div className="text-gray-900 text-2xl font-bold font-['Roboto']">프리미엄 리포트</div>

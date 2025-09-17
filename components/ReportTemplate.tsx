@@ -293,6 +293,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
         <MarketDataComparison 
           userRent={reportData.contractInfo?.monthlyRent || 0}
           userAddress={reportData.contractInfo?.address}
+          buildingType={reportData.contractInfo?.buildingType}
         />
 
         {/* 5. 협상 카드 */}
@@ -356,6 +357,12 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
               <span className="ml-2 text-sm text-purple-600 font-normal">+ 자동 매칭 & 신청 가이드</span>
             )}
           </h2>
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              💡 <strong>팁:</strong> 아래 정책들은 실제 정부 지원 사이트로 연결됩니다. 
+              신청 전 해당 사이트에서 최신 정보와 자격 요건을 확인하세요.
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {(reportData.policyInfo || []).map((policy, index) => (
               <div key={index} className="bg-white rounded-lg p-4">
@@ -374,7 +381,24 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
                 <p className="text-gray-600 text-sm mb-3">{policy.description}</p>
                 <div className="mb-3">
                   <span className="text-xs font-semibold text-gray-500">신청 조건:</span>
-                  <p className="text-xs text-gray-600">{policy.eligibility}</p>
+                  <p className="text-xs text-gray-600">{policy.eligibility || "상세 조건은 해당 사이트에서 확인하세요."}</p>
+                </div>
+                
+                {/* 정책별 상세 정보 */}
+                <div className="mb-3 p-2 bg-gray-50 rounded text-xs">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-semibold text-gray-700">지원 내용:</span>
+                    <span className="text-gray-600">
+                      {policy.title.includes('청년 월세') ? '월세 일부 지원' : 
+                       policy.title.includes('HUG') ? '전세보증금 보장' : '월세 지원금'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-700">대상:</span>
+                    <span className="text-gray-600">
+                      {policy.title.includes('청년') ? '청년층' : '전세 거주자'}
+                    </span>
+                  </div>
                 </div>
                 
                 {/* 프리미엄 전용 정보 */}
@@ -399,14 +423,27 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
                   </div>
                 )}
                 
-                <a 
-                  href={policy.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700"
-                >
-                  신청하기
-                </a>
+                <div className="flex space-x-2">
+                  <a 
+                    href={policy.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 flex items-center"
+                  >
+                    <span className="mr-1">🔗</span>
+                    신청하기
+                  </a>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(policy.link);
+                      toast.success('링크가 클립보드에 복사되었습니다.');
+                    }}
+                    className="inline-block bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 flex items-center"
+                  >
+                    <span className="mr-1">📋</span>
+                    링크 복사
+                  </button>
+                </div>
               </div>
             ))}
           </div>

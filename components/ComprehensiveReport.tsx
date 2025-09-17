@@ -187,7 +187,7 @@ export default function ComprehensiveReport({
 
       // html2canvas로 이미지 생성 (고해상도)
       const canvas = await html2canvas(element, {
-        scale: 1.5, // 적절한 해상도 (2에서 1.5로 조정)
+        scale: 1.5, // 적절한 해상도
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
@@ -204,33 +204,33 @@ export default function ComprehensiveReport({
         format: 'a4',
       });
 
-      // PDF 크기 계산
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
+      // PDF 크기 계산 (단순화된 로직)
+      const pdfWidth = pdf.internal.pageSize.getWidth(); // A4 너비 (210mm)
+      const pdfHeight = pdf.internal.pageSize.getHeight(); // A4 높이 (297mm)
       
-      // 배율을 너무 축소하지 않도록 조정 (최소 0.7, 최대 1.0)
-      const ratio = Math.max(0.7, Math.min(1.0, Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)));
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      // 이미지 크기를 PDF 용지 폭에 정확히 맞추기
+      const targetWidth = pdfWidth; // PDF 용지 폭에 맞춤
+      const scaleRatio = targetWidth / canvas.width; // 가로 비율 계산
+      const scaledHeight = canvas.height * scaleRatio; // 세로 길이 자동 조정
+      
+      // 중앙 정렬을 위한 X 좌표 (이미 용지 폭에 맞춰져 있으므로 0)
+      const imgX = 0;
       const imgY = 0;
 
-      // 여러 페이지 처리 (공백 페이지 방지)
-      let heightLeft = imgHeight * ratio;
-      let position = 0;
+      // 여러 페이지 처리 (단순화된 로직)
+      let currentY = 0;
       let pageCount = 0;
 
       // 첫 페이지 추가
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      heightLeft -= pdfHeight;
+      pdf.addImage(imgData, 'PNG', imgX, imgY, targetWidth, scaledHeight);
+      currentY += pdfHeight;
       pageCount++;
 
-      // 추가 페이지들 (공백 페이지 방지)
-      while (heightLeft > 10) { // 10mm 이상 남은 경우에만 새 페이지 추가
-        position = heightLeft - imgHeight * ratio;
+      // 추가 페이지들 (내용이 길어 여러 페이지가 필요한 경우)
+      while (currentY < scaledHeight) {
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
-        heightLeft -= pdfHeight;
+        pdf.addImage(imgData, 'PNG', imgX, -currentY, targetWidth, scaledHeight);
+        currentY += pdfHeight;
         pageCount++;
       }
 
