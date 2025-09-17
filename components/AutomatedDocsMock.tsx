@@ -4,7 +4,7 @@ export default function AutomatedDocsMock() {
   return (
     <section className="print-break bg-gray-50 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-3xl font-bold text-gray-900">📄 전자문서 자동 작성</h2>
+        <h2 className="text-3xl font-bold text-gray-900">전자문서 자동 작성</h2>
         <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Premium</span>
       </div>
       <p className="text-gray-600 mb-6">리포트 데이터를 기반으로 필요한 법률 문서를 자동으로 생성합니다.</p>

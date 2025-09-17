@@ -169,6 +169,7 @@ export const mockReportData: ReportTemplate = {
       noiseLevel: 68,
       floorLevel: 0.2,
       lightIntensity: 320,
+      internetSpeed: 45.2,
       measuredAt: "2025.09.08"
     },
     

@@ -308,7 +308,9 @@ export default function SmartDiagnosisModal({ isVisible, onClose, onComplete }: 
               {measurementData.noise.isComplete && (
                 <div className="flex justify-between items-center bg-white p-3 rounded-lg">
                   <span className="text-gray-700">🔊 소음</span>
-                  <span className="font-semibold text-blue-600">{measurementData.noise.value}dB</span>
+                  <span className="font-semibold text-blue-600">
+                    {isNaN(measurementData.noise.value) ? '--' : measurementData.noise.value}dB
+                  </span>
                 </div>
               )}
               {measurementData.level.isComplete && (

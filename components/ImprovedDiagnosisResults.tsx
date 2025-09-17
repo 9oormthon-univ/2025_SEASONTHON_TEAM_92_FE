@@ -41,8 +41,19 @@ export default function ImprovedDiagnosisResults({ diagnosisResult }: ImprovedDi
           sum += dataArray[i] * dataArray[i];
         }
         const rms = Math.sqrt(sum / dataArray.length);
-        const db = 20 * Math.log10(rms / 255);
-        setNoiseLevel(db === -Infinity ? 0 : db + 100);
+        // dB 계산 - NaN과 Infinity 방지
+        let db = 0;
+        if (rms > 0) {
+          const normalizedRms = rms / 255;
+          if (normalizedRms > 0) {
+            db = 20 * Math.log10(normalizedRms);
+            // 실제 환경에 맞게 조정 (일반적으로 30-80dB 범위)
+            db = Math.max(30, Math.min(80, db + 60));
+          }
+        }
+        
+        const adjustedDb = isNaN(db) ? 35 : db;
+        setNoiseLevel(adjustedDb);
         animationFrameId = requestAnimationFrame(getNoiseLevel);
       };
 

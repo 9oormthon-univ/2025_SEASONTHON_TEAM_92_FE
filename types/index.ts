@@ -360,6 +360,7 @@ export interface ReportTemplate {
       noiseLevel: number;
       floorLevel: number;
       lightIntensity: number;
+      internetSpeed: number;
       measuredAt: string;
     };
     

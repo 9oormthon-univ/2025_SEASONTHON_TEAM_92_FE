@@ -700,7 +700,9 @@ export default function ComprehensiveReport({
                         {currentSmartDiagnosisData.noise && (
                           <tr className="border-b border-gray-100">
                             <td className="px-4 py-3 font-medium">🔊 소음</td>
-                            <td className="px-4 py-3">{currentSmartDiagnosisData.noise.value}dB</td>
+                            <td className="px-4 py-3">
+                              {isNaN(currentSmartDiagnosisData.noise.value) ? '--' : currentSmartDiagnosisData.noise.value}dB
+                            </td>
                             <td className="px-4 py-3">
                               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                                 우수
@@ -869,7 +871,7 @@ export default function ComprehensiveReport({
                                 ? 'bg-green-100 text-green-800' 
                                 : 'bg-red-100 text-red-800'
                             }`}>
-                              {policy.isEligible ? '✅ 대상자' : '❌ 비대상자'}
+                              {policy.isEligible ? '✅ 대상자' : ''}
                             </span>
                           )}
                         </div>
