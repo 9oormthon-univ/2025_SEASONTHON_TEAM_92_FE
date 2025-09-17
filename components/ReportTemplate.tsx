@@ -18,6 +18,21 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 정책 제목에 따른 링크 반환 함수
+  const getPolicyLink = (title: string): string => {
+    switch (title) {
+      case '청년 월세 특별지원':
+        return 'https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00004661';
+      case '서울시 청년 월세 지원금':
+        return 'https://housing.seoul.go.kr/site/main/content/sh01_060513';
+      case '전세보증금 반환보증 (HUG)':
+        return 'https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp';
+      default:
+        return '#';
+    }
+  };
+
+
   useEffect(() => {
     if (reportId) {
       loadReportData();
@@ -384,6 +399,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
                   <p className="text-xs text-gray-600">{policy.eligibility || "상세 조건은 해당 사이트에서 확인하세요."}</p>
                 </div>
                 
+                
                 {/* 정책별 상세 정보 */}
                 <div className="mb-3 p-2 bg-gray-50 rounded text-xs">
                   <div className="flex justify-between items-center mb-1">
@@ -425,7 +441,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
                 
                 <div className="flex space-x-2">
                   <a 
-                    href={policy.link} 
+                    href={getPolicyLink(policy.title)} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="inline-block bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 flex items-center"
@@ -435,7 +451,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
                   </a>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(policy.link);
+                      navigator.clipboard.writeText(getPolicyLink(policy.title));
                       toast.success('링크가 클립보드에 복사되었습니다.');
                     }}
                     className="inline-block bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 flex items-center"
