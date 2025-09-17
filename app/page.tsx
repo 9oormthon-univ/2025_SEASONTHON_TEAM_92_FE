@@ -87,9 +87,21 @@ export default function HomePage() {
             
             // 1. 온보딩 완료 여부 체크
             if (!userData.onboardingCompleted) {
-              // 온보딩이 완료되지 않았다면 온보딩으로 리다이렉트
-              router.push('/onboarding/location');
-              return;
+              // GPS 인증이 완료된 사용자는 온보딩을 건너뛰고 메인 페이지로
+              if (userData.gpsVerified) {
+                console.log('GPS 인증 완료된 사용자 - 온보딩 건너뛰기');
+                // 백엔드에 온보딩 완료 상태 업데이트
+                try {
+                  await authApi.updateUserProfile({ onboardingCompleted: true });
+                  console.log('온보딩 완료 상태 업데이트됨');
+                } catch (error) {
+                  console.error('온보딩 상태 업데이트 실패:', error);
+                }
+              } else {
+                // 온보딩이 완료되지 않았다면 온보딩으로 리다이렉트
+                router.push('/onboarding/location');
+                return;
+              }
             }
             
             // 2. 진단 완료 여부 체크 (localStorage 일시적 플래그도 함께 확인)
@@ -342,6 +354,13 @@ export default function HomePage() {
               >
                 기능
               </a>
+              <div className="w-px h-4 bg-[#9333EA]"></div>
+              <Link
+                href="/diagnosis"
+                className="font-medium transition-colors cursor-pointer hover:text-[#9333EA] text-gray-700"
+              >
+                스마트 진단
+              </Link>
               <div className="w-px h-4 bg-[#9333EA]"></div>
               <a
                 href="#usage"

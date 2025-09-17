@@ -108,7 +108,7 @@ export const mockReportData: ReportTemplate = {
       title: "전세보증금 반환보증 (HUG)",
       description: "전세보증금 반환보증 서비스",
       eligibility: "전세 계약자",
-      link: "https://www.hug.or.kr",
+      link: "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp",
       isEligible: false,
       applicationDeadline: "상시",
       requiredDocuments: ["전세계약서", "신분증", "소득증명서"]

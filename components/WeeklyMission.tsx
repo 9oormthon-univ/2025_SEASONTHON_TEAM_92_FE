@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { User } from '../types';
+import MissionResult from './MissionResult';
 
 interface WeeklyMissionProps {
   currentUser: User;
@@ -9,14 +10,15 @@ interface WeeklyMissionProps {
 export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
   const [responses, setResponses] = useState<{[key: string]: number}>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   // Mock weekly mission data
   const mission = {
-    week: '2024년 1주차',
+    week: '2025년 1주차',
     theme: '방음 상태 점검',
     icon: 'ri-volume-down-line',
     description: '이번 주는 우리 집의 방음 상태를 점검해보세요',
-    reward: '우리 건물 vs 우리 동네 방음 비교 분석',
+    reward: '우리 건물 vs 동네 비교 분석',
     questions: [
       {
         id: 'neighbor_noise_frequency',
@@ -82,12 +84,18 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
+      setShowResult(true);
       onComplete?.();
     } catch (error) {
       console.error('미션 결과 저장 실패:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleBackToMain = () => {
+    setShowResult(false);
+    setResponses({});
   };
 
   if (isLoading) {
@@ -102,149 +110,153 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
     );
   }
 
+  if (showResult) {
+    // 미션 결과 계산 (간단한 로직)
+    const userScore = 68; // 사용자 점수
+    const buildingAverage = 72; // 건물 평균
+    const neighborhoodAverage = 74; // 동네 평균
+    
+    return (
+      <MissionResult
+        userScore={userScore}
+        buildingAverage={buildingAverage}
+        neighborhoodAverage={neighborhoodAverage}
+        buildingComparison={null}
+        neighborhoodComparison={null}
+        onBackToMain={handleBackToMain}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 cursor-pointer mb-2">월세 공동협약</h1>
-          <div className="w-16 h-1 bg-gray-700 mx-auto mb-6"></div>
-          <div className="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <i className="ri-calendar-check-line mr-2"></i>
-            {mission.week} 주간 미션
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{mission.theme}</h2>
-          <p className="text-gray-600">{mission.description}</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-6">
-            <div className="flex items-center text-white">
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                <i className={`${mission.icon} text-2xl`}></i>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold">미션 완료 보상</h3>
-                <p className="text-green-100 text-sm">{mission.reward}</p>
+    <div className="size- px-96 inline-flex justify-start items-start">
+      <div className="w-[672px] h-[1583px] max-w-[672px] inline-flex flex-col justify-start items-start">
+        <div className="size- pb-8 inline-flex justify-start items-start">
+          <div className="w-[672px] h-48 inline-flex flex-col justify-start items-start">
+            <div className="size- pb-2 inline-flex justify-start items-start">
+              <div className="w-[672px] h-9 flex justify-center items-center">
+                <div className="text-center justify-center text-black text-3xl font-bold font-['Inter'] leading-9">월세의 정석</div>
               </div>
             </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-8">
-            <div className="space-y-8">
-              {(mission?.questions || []).map((question, index) => (
-                <div key={question.id} className="space-y-4">
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4">
-                      {index + 1}. {question.text}
-                    </h4>
+            <div className="size- px-72 pb-6 inline-flex justify-start items-start">
+              <div className="w-16 h-1 bg-purple-600" />
+            </div>
+            <div className="self-stretch inline-flex justify-center items-start">
+              <div className="size- px-60 pb-4 flex justify-start items-start">
+                <div className="w-48 h-9 px-4 py-2 bg-purple-600 rounded-full flex justify-start items-center">
+                  <div className="size- pr-2 flex justify-start items-start">
+                    <div className="w-3.5 h-5 relative flex justify-center items-center">
+                      <div className="size-3.5 left-[0.01px] top-[3px] absolute overflow-hidden">
+                        <div className="size-3 left-[1.46px] top-[1.17px] absolute bg-white" />
+                      </div>
+                    </div>
                   </div>
-
-                  {question.type === 'scale' && (
-                    <div className="space-y-3">
-                      {(question?.options || []).map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => handleScaleResponse(question.id, option.value as number)}
-                          className={`w-full p-4 text-left rounded-lg border-2 transition-all cursor-pointer ${
-                            responses[question.id] === option.value
-                              ? 'border-green-500 bg-green-50 text-green-700'
-                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <div className={`w-4 h-4 rounded-full mr-3 ${
-                              responses[question.id] === option.value
-                                ? 'bg-green-500'
-                                : 'bg-gray-300'
-                            }`}></div>
-                            <span className="font-medium">{option.label}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {question.type === 'choice' && (
-                    <div className="space-y-3">
-                      {(question?.options || []).map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => handleChoiceResponse(question.id, option.value as string)}
-                          className={`w-full p-4 text-left rounded-lg border-2 transition-all cursor-pointer ${
-                            responses[question.id] === option.value
-                              ? 'border-green-500 bg-green-50 text-green-700'
-                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <div className={`w-4 h-4 rounded-full mr-3 ${
-                              responses[question.id] === option.value
-                                ? 'bg-green-500'
-                                : 'bg-gray-300'
-                            }`}></div>
-                            <span className="font-medium">{option.label}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {question.type === 'multiple' && (
-                    <div className="space-y-3">
-                      {(question?.options || []).map((option) => {
-                        const selectedCount = responses[question.id] || 0;
-                        const isSelected = selectedCount > 0;
-                        
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => handleMultipleResponse(question.id, option.value as string)}
-                            className={`w-full p-4 text-left rounded-lg border-2 transition-all cursor-pointer ${
-                              isSelected
-                                ? 'border-green-500 bg-green-50 text-green-700'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center">
-                              <div className={`w-4 h-4 rounded-sm mr-3 flex items-center justify-center ${
-                                isSelected
-                                  ? 'bg-green-500'
-                                  : 'bg-gray-300'
-                              }`}>
-                                {isSelected && (
-                                  <i className="ri-check-line text-xs text-white"></i>
-                                )}
-                              </div>
-                              <span className="font-medium">{option.label}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <div className="text-center justify-center text-white text-sm font-medium font-['Roboto'] leading-tight">{mission.week} 주간 미션</div>
                 </div>
-              ))}
+              </div>
             </div>
-
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <button
-                type="submit"
-                disabled={!isFormComplete()}
-                className="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer whitespace-nowrap"
-              >
-                미션 완료하고 결과 보기
-              </button>
+            <div className="size- pb-2 inline-flex justify-start items-start">
+              <div className="w-[672px] h-8 flex justify-center items-center">
+                <div className="text-center justify-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">{mission.theme}</div>
+              </div>
             </div>
-          </form>
+            <div className="w-[672px] h-6 inline-flex justify-center items-center">
+              <div className="text-center justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">{mission.description}</div>
+            </div>
+          </div>
         </div>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
-            주간 미션 참여로 더 정확한 이웃 비교 데이터를 받아보세요!
-          </p>
+        <div className="w-[672px] h-[1319px] p-px bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start overflow-hidden">
+          <div className="w-[670px] h-28 p-6 bg-gradient-to-r from-purple-600 to-violet-600 flex flex-col justify-start items-start">
+            <div className="w-[622px] h-16 inline-flex justify-start items-center">
+              <div className="size- pr-4 flex justify-start items-start">
+                <div className="size-12 bg-white/20 rounded-full flex justify-center items-center">
+                  <div className="w-6 h-8 relative flex justify-start items-center">
+                    <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
+                      <div className="size-4 left-[4px] top-[3.56px] absolute bg-white" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="w-56 h-16 inline-flex flex-col justify-start items-start">
+                <div className="w-56 h-7 inline-flex justify-start items-center">
+                  <div className="justify-center text-white text-lg font-bold font-['Roboto'] leading-7">미션 완료 보상</div>
+                </div>
+                <div className="w-56 h-10 flex flex-col justify-start items-start">
+                  <div className="w-56 h-5 inline-flex justify-start items-center">
+                    <div className="justify-center text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">참여 시간: 단 2분</div>
+                  </div>
+                  <div className="w-56 h-5 inline-flex justify-start items-center">
+                    <div className="justify-center text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">즉시 보상: {mission.reward}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="w-[670px] h-[1201px] p-8 flex flex-col justify-start items-start">
+            <div className="w-[606px] h-[1024px] flex flex-col justify-start items-start">
+              <form onSubmit={handleSubmit}>
+                {(mission?.questions || []).map((question, index) => (
+                  <div key={question.id} className="w-[606px] h-96 flex flex-col justify-start items-start">
+                    <div className="size- pb-4 inline-flex justify-start items-start">
+                      <div className="w-[606px] h-7 inline-flex flex-col justify-start items-start">
+                        <div className="size- pb-4 inline-flex justify-start items-start">
+                          <div className="w-[606px] h-7 flex justify-start items-center">
+                            <div className="justify-center text-gray-800 text-lg font-semibold font-['Roboto'] leading-7">{index + 1}. {question.text}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="size- pt-4 inline-flex justify-start items-start">
+                      <div className="w-[606px] h-80 flex justify-start items-start flex-wrap content-start">
+                        {(question?.options || []).map((option, optionIndex) => (
+                          <div key={optionIndex} className={`w-[606px] h-14 p-4 rounded-lg outline outline-2 outline-offset-[-2px] ${responses[question.id] === option.value ? 'outline-purple-500 bg-purple-50' : 'outline-gray-200'} inline-flex flex-col justify-start items-start ${optionIndex > 0 ? 'pt-3' : ''}`}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (question.type === 'scale') {
+                                  handleScaleResponse(question.id, option.value as number);
+                                } else if (question.type === 'choice') {
+                                  handleChoiceResponse(question.id, option.value as string);
+                                } else if (question.type === 'multiple') {
+                                  handleMultipleResponse(question.id, option.value as string);
+                                }
+                              }}
+                              className="w-[570px] h-6 inline-flex justify-start items-center"
+                            >
+                              <div className="size- pr-3 flex justify-start items-start">
+                                <div className={`size-4 ${responses[question.id] === option.value ? 'bg-purple-600' : 'bg-gray-300'} ${question.type === 'multiple' ? 'rounded-xs' : 'rounded-full'}`} />
+                              </div>
+                              <div className="w-20 h-6 flex justify-start items-center">
+                                <div className="justify-center text-black text-base font-medium font-['Roboto'] leading-normal">{option.label}</div>
+                              </div>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="size- pt-8 inline-flex justify-start items-start">
+                  <div className="w-[606px] h-20 pt-6 border-t border-gray-100 flex justify-start items-start">
+                    <button
+                      type="submit"
+                      disabled={!isFormComplete()}
+                      className={`w-[606px] h-14 px-6 py-4 ${isFormComplete() ? 'bg-purple-600' : 'opacity-50 bg-purple-600'} rounded-xl flex justify-center items-center`}
+                    >
+                      <div className={`${isFormComplete() ? 'opacity-100' : 'opacity-50'} text-center justify-center text-white text-base font-semibold font-['Roboto'] leading-normal`}>미션 완료하고 결과 보기</div>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div className="size- pt-6 inline-flex justify-start items-start">
+          <div className="w-[672px] h-5 inline-flex flex-col justify-start items-start">
+            <div className="w-[672px] h-5 inline-flex justify-center items-center">
+              <div className="text-center justify-center text-gray-500 text-sm font-normal font-['Roboto'] leading-tight">주간 미션 참여로 더 정확한 이웃 비교 데이터를 받아보세요!</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -143,6 +143,24 @@ function ProfileSetupComponent() {
       localStorage.setItem('userRent', formData.rent);
       localStorage.setItem('userMaintenanceFee', formData.maintenanceFee);
       
+      // 백엔드에 온보딩 완료 상태 업데이트
+      try {
+        await authApi.updateUserProfile({
+          onboardingCompleted: true,
+          gpsVerified: true, // 프로필 설정 완료 시 GPS 인증도 완료로 간주
+          building: formData.building,
+          buildingType: formData.buildingType,
+          contractType: formData.contractType,
+          security: parseInt(formData.security),
+          rent: parseInt(formData.rent),
+          maintenanceFee: parseInt(formData.maintenanceFee)
+        });
+        console.log('온보딩 완료 상태가 백엔드에 저장되었습니다.');
+      } catch (updateError) {
+        console.error('백엔드 온보딩 상태 업데이트 실패:', updateError);
+        // 백엔드 업데이트 실패해도 로컬에서는 온보딩 완료로 처리
+      }
+      
       // 온보딩 완료 플래그 설정
       localStorage.setItem('onboarding_completed', 'true');
       

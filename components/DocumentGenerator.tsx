@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import toast from 'react-hot-toast';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface DocumentGeneratorProps {
   reportData: any;
@@ -47,6 +49,12 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
     setIsGenerating(true);
     
     try {
+      // 임차인 정보 유효성 검사
+      if (!tenantInfo.name.trim()) {
+        toast.error('임차인 정보를 입력해주세요.');
+        return;
+      }
+
       toast.loading('문서를 생성하는 중입니다...', { id: 'doc-loading' });
       
       // PDF 생성
@@ -63,13 +71,15 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
       
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(12);
-      pdf.text('작성일: ' + new Date().toLocaleDateString(), 20, 50);
-      pdf.text('임차인: [사용자명]', 20, 65);
-      pdf.text('임대인: [임대인명]', 20, 80);
-      pdf.text('주소: ' + (reportData?.contractSummary?.address || '[주소]'), 20, 95);
+      pdf.text('작성일: ' + new Date().toLocaleDateString('ko-KR'), 20, 50);
+      pdf.text('임차인: ' + (tenantInfo.name || '[사용자명]'), 20, 65);
+      pdf.text('임차인 주소: ' + (tenantInfo.address || '[주소]'), 20, 80);
+      pdf.text('임차인 연락처: ' + (tenantInfo.phone || '[연락처]'), 20, 95);
+      pdf.text('임대인 이메일: ' + (landlordEmail || '[이메일]'), 20, 110);
+      pdf.text('임대물건 주소: ' + (reportData?.contractSummary?.address || '[주소]'), 20, 125);
       
-      pdf.text('본 문서는 월세의 정석에서 자동 생성된 템플릿입니다.', 20, 120);
-      pdf.text('실제 사용 시에는 법무 검토를 받으시기 바랍니다.', 20, 135);
+      pdf.text('본 문서는 월세의 정석에서 자동 생성된 템플릿입니다.', 20, 150);
+      pdf.text('실제 사용 시에는 법무 검토를 받으시기 바랍니다.', 20, 165);
       
       // 문서별 내용
       let content = '';
@@ -106,11 +116,16 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
       }
       
       const lines = content.trim().split('\n');
-      let yPos = 160;
+      let yPos = 190;
       lines.forEach(line => {
         pdf.text(line.trim(), 20, yPos);
         yPos += 15;
       });
+      
+      // 서명란 추가
+      pdf.setFontSize(12);
+      pdf.text('임차인 서명: _________________', 20, yPos + 20);
+      pdf.text('임대인 서명: _________________', 20, yPos + 40);
       
       // 하단 정보
       pdf.setFontSize(10);
@@ -118,7 +133,7 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
       pdf.text('월세의 정석 | https://rental-lovat-theta.vercel.app', 20, 290);
       
       // 파일 다운로드
-      const fileName = `${title}_${new Date().toLocaleDateString().replace(/\//g, '')}.pdf`;
+      const fileName = `${title}_${tenantInfo.name || '문서'}_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '-')}.pdf`;
       pdf.save(fileName);
       
       toast.success('문서가 생성되었습니다!', { id: 'doc-loading' });
@@ -131,13 +146,248 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
     }
   };
 
+  const [landlordEmail, setLandlordEmail] = useState('');
+  const [tenantInfo, setTenantInfo] = useState({
+    name: '',
+    address: '',
+    phone: ''
+  });
+
+  const generateWordDocument = async (docType: string) => {
+    setIsGenerating(true);
+    toast.loading('Word 문서를 생성하는 중입니다...', { id: 'word-loading' });
+    
+    try {
+      // 임차인 정보 유효성 검사
+      if (!tenantInfo.name.trim()) {
+        toast.error('임차인 정보를 입력해주세요.');
+        return;
+      }
+
+      // Word 문서 생성
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            // 제목
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${docType} 계약서`,
+                  bold: true,
+                  size: 32,
+                }),
+              ],
+              heading: HeadingLevel.TITLE,
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 },
+            }),
+            
+            // 임차인 정보
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "임차인 정보",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 200, after: 200 },
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `성명: ${tenantInfo.name}`,
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 100 },
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `주소: ${tenantInfo.address}`,
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 100 },
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `연락처: ${tenantInfo.phone}`,
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 200 },
+            }),
+            
+            // 임대인 정보
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "임대인 정보",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 200, after: 200 },
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `이메일: ${landlordEmail}`,
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 200 },
+            }),
+            
+            // 계약 내용
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "계약 내용",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 200, after: 200 },
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "위 임차인과 임대인은 다음과 같이 임대차계약을 체결합니다.",
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 200 },
+            }),
+            
+            // 서명란
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "임차인 서명: _________________",
+                  size: 20,
+                }),
+              ],
+              spacing: { before: 400, after: 100 },
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "임대인 서명: _________________",
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 200 },
+            }),
+            
+            // 작성일
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `작성일: ${new Date().toLocaleDateString('ko-KR')}`,
+                  size: 20,
+                }),
+              ],
+              alignment: AlignmentType.RIGHT,
+              spacing: { before: 200 },
+            }),
+          ],
+        }],
+      });
+
+      // 문서를 Blob으로 변환
+      const blob = await Packer.toBlob(doc);
+      
+      // 파일명 생성
+      const fileName = `${docType}_${tenantInfo.name || '문서'}_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '-')}.docx`;
+      
+      // 파일 다운로드
+      saveAs(blob, fileName);
+      
+      toast.success('Word 문서가 생성되었습니다!', { id: 'word-loading' });
+      
+    } catch (error) {
+      console.error('Word 문서 생성 실패:', error);
+      toast.error('Word 문서 생성 중 오류가 발생했습니다.', { id: 'word-loading' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const sendEmail = async (docType: string) => {
+    // 유효성 검사
+    if (!landlordEmail.trim()) {
+      toast.error('임대인의 이메일 주소를 입력해주세요.');
+      return;
+    }
+    
+    if (!tenantInfo.name.trim()) {
+      toast.error('임차인 정보를 입력해주세요.');
+      return;
+    }
+
+    if (!tenantInfo.address.trim()) {
+      toast.error('임차인 주소를 입력해주세요.');
+      return;
+    }
+
+    if (!tenantInfo.phone.trim()) {
+      toast.error('임차인 연락처를 입력해주세요.');
+      return;
+    }
+
+    // 이메일 형식 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(landlordEmail)) {
+      toast.error('올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+
     toast.loading('이메일을 발송하는 중입니다...', { id: 'email-loading' });
     
-    // 목업 이메일 발송 (2초 딜레이)
-    setTimeout(() => {
-      toast.success('임대인에게 이메일이 발송되었습니다!', { id: 'email-loading' });
-    }, 2000);
+    try {
+      // 실제 구현에서는 백엔드 API를 호출하여 이메일 발송
+      // const response = await fetch('/api/send-email', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     to: landlordEmail,
+      //     subject: `${docType} 계약서`,
+      //     tenantInfo,
+      //     docType
+      //   })
+      // });
+      
+      // 현재는 시뮬레이션
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast.success(
+        <div>
+          <p className="font-semibold">📧 이메일 발송 완료!</p>
+          <p className="text-sm mt-1">
+            {landlordEmail}로 {docType} 계약서가 발송되었습니다.
+          </p>
+        </div>, 
+        { id: 'email-loading', duration: 4000 }
+      );
+      
+    } catch (error) {
+      console.error('이메일 발송 실패:', error);
+      toast.error('이메일 발송 중 오류가 발생했습니다.', { id: 'email-loading' });
+    }
   };
 
   return (
@@ -244,15 +494,77 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
                 />
               </div>
 
+              {/* 임차인 정보 입력 */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">📝 임차인 정보</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">임차인 성명 *</label>
+                    <input
+                      type="text"
+                      value={tenantInfo.name}
+                      onChange={(e) => setTenantInfo({...tenantInfo, name: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="홍길동"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">연락처</label>
+                    <input
+                      type="tel"
+                      value={tenantInfo.phone}
+                      onChange={(e) => setTenantInfo({...tenantInfo, phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="010-1234-5678"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">주소</label>
+                    <input
+                      type="text"
+                      value={tenantInfo.address}
+                      onChange={(e) => setTenantInfo({...tenantInfo, address: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="서울시 마포구 공덕동 123-45"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 임대인 이메일 입력 */}
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">📧 임대인 이메일</h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">임대인 이메일 주소 *</label>
+                  <input
+                    type="email"
+                    value={landlordEmail}
+                    onChange={(e) => setLandlordEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="landlord@example.com"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">문서가 첨부파일로 발송됩니다.</p>
+                </div>
+              </div>
+
               {/* 액션 버튼들 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => generateDocument(selectedDocument)}
                   disabled={isGenerating}
                   className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 transition-all shadow-lg"
                 >
-                  <i className="ri-download-line mr-2"></i>
+                  <i className="ri-file-pdf-line mr-2"></i>
                   {isGenerating ? '생성 중...' : 'PDF 다운로드'}
+                </button>
+                
+                <button
+                  onClick={() => generateWordDocument(selectedDocument)}
+                  disabled={isGenerating}
+                  className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 transition-all shadow-lg"
+                >
+                  <i className="ri-file-word-line mr-2"></i>
+                  {isGenerating ? '생성 중...' : 'Word 다운로드'}
                 </button>
                 
                 <button
