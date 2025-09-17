@@ -386,7 +386,7 @@ export default function HomePage() {
                           }}
                         >
                           <i className="ri-user-line mr-2"></i>
-                          내 프로필
+                          마이페이지
                         </Link>
                         <div className="border-t my-2 border-gray-200"></div>
                         <button

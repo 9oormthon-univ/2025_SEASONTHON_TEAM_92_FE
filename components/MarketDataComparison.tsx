@@ -176,14 +176,19 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
   return (
     <section className="bg-green-50 rounded-lg p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">📊 객관적 지표 (국토부 실거래가 기반)</h2>
-        <button
-          onClick={() => loadMarketData()}
-          disabled={isLoading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
-        >
-          {isLoading ? '로딩...' : '최신 데이터 갱신'}
-        </button>
+        <h2 className="text-2xl font-bold text-gray-900">객관적 지표 (국토부 실거래가 기반)</h2>
+        <div className="flex flex-col items-end">
+          <button
+            onClick={() => loadMarketData()}
+            disabled={isLoading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+          >
+            {isLoading ? '로딩...' : '최신 데이터 갱신'}
+          </button>
+          <span className="text-xs text-gray-500 mt-1">
+            기준일: {new Date().toLocaleDateString('ko-KR')}
+          </span>
+        </div>
       </div>
       
       <div className="space-y-6">
@@ -192,7 +197,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-building-line mr-2 text-blue-600"></i>
-              🏘️ 주변 동네 월세 시세 비교
+              주변 동네 월세 시세 비교
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {(marketData?.monthlyRentMarket || []).slice(0, 6).map((market: MarketData, index: number) => {
@@ -235,7 +240,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
                         difference > 0 ? 'bg-red-50 text-red-700 border border-red-200' : 
                         'bg-green-50 text-green-700 border border-green-200'
                       }`}>
-                        <strong>💡 협상 포인트:</strong> {market.neighborhood} 대비 
+                        <strong>협상 포인트:</strong> {market.neighborhood} 대비 
                         {difference > 0 ? `${percentDiff.toFixed(1)}% 높음 → 임대료 조정 요청 근거` : 
                          `${Math.abs(percentDiff).toFixed(1)}% 낮음 → 현재 합리적 수준`}
                       </div>
@@ -252,7 +257,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-line-chart-line mr-2 text-green-600"></i>
-              📈 최근 거래 동향 (최근 3개월)
+              최근 거래 동향 (최근 3개월)
             </h3>
             <div className="overflow-x-auto">
               <table className="min-w-full">
@@ -299,7 +304,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
             </div>
             
             <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-blue-800 mb-2">🎯 시세 분석 요약</h4>
+              <h4 className="font-semibold text-blue-800 mb-2">시세 분석 요약</h4>
               <div className="text-sm text-blue-700" dangerouslySetInnerHTML={{
                 __html: (() => {
                   const avgMarketRent = (marketData?.monthlyRentMarket?.length || 0) > 0 
@@ -358,7 +363,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
                       <div className={`mt-2 text-xs font-medium ${
                         difference > 0 ? 'text-red-700' : 'text-green-700'
                       }`}>
-                        {difference > 0 ? '💰 임대료 조정 요청 가능' : '✅ 합리적 계약 수준'}
+                        {difference > 0 ? '임대료 조정 요청 가능' : '합리적 계약 수준'}
                       </div>
                     )}
                   </div>

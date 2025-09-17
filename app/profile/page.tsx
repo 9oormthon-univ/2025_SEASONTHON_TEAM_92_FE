@@ -44,7 +44,7 @@ export default function ProfilePage() {
           buildingType: buildingType || profile?.buildingType || '정보 없음',
           contractType: contractType || profile?.contractType || '정보 없음',
           residencePeriod: profile?.residencePeriod || 0,
-          role: '임차인 (세입자)'
+          role: '사용자'
         });
 
       } catch (err: any) {
@@ -62,7 +62,7 @@ export default function ProfilePage() {
           buildingType: localStorage.getItem('userBuildingType') || '정보 없음',
           contractType: localStorage.getItem('userContractType') || '정보 없음',
           residencePeriod: 0,
-          role: '임차인 (세입자)'
+          role: '사용자'
         });
       } finally {
         setIsLoading(false);
@@ -90,12 +90,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm('정말 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      // TODO: 실제 계정 삭제 API 구현
-      alert('계정 삭제 기능은 추후 구현 예정입니다.');
-    }
-  };
 
   const handleBackToMain = () => {
     router.push('/');
@@ -135,7 +129,7 @@ export default function ProfilePage() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 font-display mb-2">월세의 정석</h1>
           <div className="w-16 h-1 bg-purple-600 mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold text-gray-900">내 프로필</h2>
+          <h2 className="text-2xl font-bold text-gray-900">마이페이지</h2>
         </div>
 
         {/* Main Profile Card */}
@@ -211,11 +205,61 @@ export default function ProfilePage() {
                 </div>
                 */}
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">역할</label>
-                  <div className="px-4 py-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <span className="text-gray-900">{userProfile.role}</span>
+              </div>
+            </div>
+
+            {/* 진단 내역 섹션 */}
+            <div className="border-t border-purple-200 pt-8 mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="text-xl font-bold text-gray-900">진단 내역</h4>
+                <Link
+                  href="/diagnosis"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2"
+                >
+                  <i className="ri-add-line"></i>
+                  <span>새 진단</span>
+                </Link>
+              </div>
+              
+              <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex justify-center items-center mr-4">
+                    <i className="ri-stethoscope-line text-purple-600 text-xl"></i>
                   </div>
+                  <div>
+                    <h5 className="text-gray-900 font-medium text-lg">최근 진단 결과</h5>
+                    <p className="text-gray-600 text-sm">마지막 진단: 2025년 1월 17일</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-white rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-purple-600 mb-1">85점</div>
+                    <div className="text-sm text-gray-600">종합 점수</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-green-600 mb-1">7개</div>
+                    <div className="text-sm text-gray-600">양호 항목</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-orange-600 mb-1">3개</div>
+                    <div className="text-sm text-gray-600">개선 필요</div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-3">
+                  <Link
+                    href="/diagnosis/results"
+                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center"
+                  >
+                    상세 결과 보기
+                  </Link>
+                  <Link
+                    href="/report"
+                    className="flex-1 px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors text-center"
+                  >
+                    리포트 생성
+                  </Link>
                 </div>
               </div>
             </div>
@@ -223,7 +267,7 @@ export default function ProfilePage() {
             {/* 바로가기 섹션 */}
             <div className="border-t border-purple-200 pt-8 mb-8">
               <h4 className="text-xl font-bold text-gray-900 mb-4">바로가기</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Link
                   href="/report"
                   className="p-4 bg-purple-50 rounded-lg border border-purple-200 hover:bg-purple-100 transition-colors"
@@ -235,21 +279,6 @@ export default function ProfilePage() {
                     <div>
                       <h5 className="text-gray-900 font-medium">리포트 생성</h5>
                       <p className="text-gray-600 text-sm">협상 리포트 생성 및 분석</p>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/diagnosis"
-                  className="p-4 bg-purple-50 rounded-lg border border-purple-200 hover:bg-purple-100 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex justify-center items-center mr-3">
-                      <i className="ri-stethoscope-line text-purple-600"></i>
-                    </div>
-                    <div>
-                      <h5 className="text-gray-900 font-medium">진단하기</h5>
-                      <p className="text-gray-600 text-sm">우리 집 상태 점검</p>
                     </div>
                   </div>
                 </Link>
@@ -283,13 +312,6 @@ export default function ProfilePage() {
                   <span>로그아웃</span>
                 </button>
                 
-                <button
-                  onClick={handleDeleteAccount}
-                  className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
-                >
-                  <i className="ri-delete-bin-line"></i>
-                  <span>계정 삭제</span>
-                </button>
               </div>
             </div>
           </div>

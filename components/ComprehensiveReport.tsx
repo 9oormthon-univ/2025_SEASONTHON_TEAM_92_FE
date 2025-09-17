@@ -143,10 +143,17 @@ export default function ComprehensiveReport({
             finalIsPremium
           });
           
-          const url = initialReportId 
-            ? `${window.location.origin}/report/${initialReportId}${finalIsPremium ? '?type=premium' : ''}`
-            : window.location.href;
-          setShareUrl(url);
+          // 백엔드에서 공유 URL 생성
+          const shareUrlResponse = await reportApi.generateShareUrl(initialReportId || reportData.id, finalIsPremium);
+          if (shareUrlResponse.success && shareUrlResponse.data?.shareUrl) {
+            setShareUrl(shareUrlResponse.data.shareUrl);
+          } else {
+            // 백엔드에서 URL을 생성하지 못한 경우 기본 URL 사용
+            const url = initialReportId 
+              ? `${window.location.origin}/report/${initialReportId}${finalIsPremium ? '?type=premium' : ''}`
+              : window.location.href;
+            setShareUrl(url);
+          }
         } else {
           setError(response?.message || '리포트를 불러올 수 없습니다.');
         }
@@ -183,7 +190,7 @@ export default function ComprehensiveReport({
 
       // html2canvas로 이미지 생성 (고해상도)
       const canvas = await html2canvas(element, {
-        scale: 2, // 고해상도
+        scale: 1.5, // 적절한 해상도 (2에서 1.5로 조정)
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
@@ -205,24 +212,29 @@ export default function ComprehensiveReport({
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      
+      // 배율을 너무 축소하지 않도록 조정 (최소 0.7, 최대 1.0)
+      const ratio = Math.max(0.7, Math.min(1.0, Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)));
       const imgX = (pdfWidth - imgWidth * ratio) / 2;
       const imgY = 0;
 
-      // 여러 페이지 처리
+      // 여러 페이지 처리 (공백 페이지 방지)
       let heightLeft = imgHeight * ratio;
       let position = 0;
+      let pageCount = 0;
 
       // 첫 페이지 추가
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       heightLeft -= pdfHeight;
+      pageCount++;
 
-      // 추가 페이지들
-      while (heightLeft >= 0) {
+      // 추가 페이지들 (공백 페이지 방지)
+      while (heightLeft > 10) { // 10mm 이상 남은 경우에만 새 페이지 추가
         position = heightLeft - imgHeight * ratio;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
         heightLeft -= pdfHeight;
+        pageCount++;
       }
 
       // PDF 다운로드
@@ -232,7 +244,7 @@ export default function ComprehensiveReport({
       // print 스타일 복원
       printElements.forEach(el => (el as HTMLElement).style.display = '');
       
-      toast.success('PDF 다운로드가 완료되었습니다!', { id: 'pdf-loading' });
+      toast.success(`PDF 다운로드가 완료되었습니다! (${pageCount}페이지)`, { id: 'pdf-loading' });
       
     } catch (error) {
       console.error('PDF 생성 실패:', error);
@@ -968,6 +980,26 @@ export default function ComprehensiveReport({
                   링크 복사하기
                 </button>
               </div>
+            </div>
+          </section>
+
+          {/* 네비게이션 버튼 */}
+          <section className="p-6 md:p-8 border-t border-purple-100">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <i className="ri-arrow-left-line mr-2"></i>
+                뒤로가기
+              </button>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <i className="ri-home-line mr-2"></i>
+                홈으로
+              </button>
             </div>
           </section>
         </div>

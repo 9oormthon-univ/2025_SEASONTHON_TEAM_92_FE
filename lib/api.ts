@@ -170,6 +170,14 @@ export const reportApi = {
     const response = await api.get(`/public/report/premium/${publicId}`);
     return response.data;
   },
+  generateShareUrl: async (reportId: string, isPremium: boolean = false): Promise<ApiResponse<{ shareUrl: string }>> => {
+    // 공유 URL 생성 API
+    const response = await api.post('/report/share-url', { 
+      reportId, 
+      isPremium 
+    });
+    return response.data;
+  },
 };
 
 export const groupApi = {
