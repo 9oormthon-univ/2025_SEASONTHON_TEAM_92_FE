@@ -184,71 +184,67 @@ export default function ReportPage() {
   // 리포트 생성 후 상세 페이지로 이동하므로 여기서는 렌더링하지 않음
 
   return (
-    <div className="w-full px-4 py-8 bg-gradient-to-b from-purple-100 to-purple-200 flex flex-col justify-center items-center min-h-screen">
-      <div className="w-full max-w-[1152px] mx-auto flex justify-start items-start">
-        <div className="w-[1152px] h-[2263.75px] max-w-[1152px] inline-flex flex-col justify-start items-start">
+    <div className="w-full px-16 py-8 bg-gradient-to-b from-purple-100 to-purple-200 flex flex-col justify-center items-center min-h-screen">
+      <div className="w-full max-w-[1280px] mx-auto flex justify-start items-start">
+        <div className="w-[1280px] max-w-[1280px] inline-flex flex-col justify-start items-start">
           
           {/* 헤더 */}
-          <div className=" pb-8 inline-flex justify-start items-start">
-            <div className="w-[1152px] h-56 inline-flex flex-col justify-start items-start">
-              <div className=" pb-2 inline-flex justify-start items-start">
-                <div className="w-[1152px] h-9 flex justify-center items-center">
-                  <div className="text-center justify-center text-violet-500 text-3xl font-normal font-['Pacifico'] leading-9">월세의 정석</div>
+          <div className="pb-12 inline-flex justify-start items-start">
+            <div className="w-[1280px] h-60 inline-flex flex-col justify-start items-start">
+              <div className="pb-3 inline-flex justify-start items-start">
+                <div className="w-[1280px] h-10 flex justify-center items-center">
+                  <div className="text-center justify-center text-purple-600 text-4xl font-normal font-['Pacifico'] leading-10">월세의 정석</div>
                 </div>
               </div>
-              <div className=" px-[544px] pb-6 inline-flex justify-start items-start">
-                <div className="w-16 h-1 bg-violet-500 rounded-full" />
+              <div className="px-[600px] pb-8 inline-flex justify-start items-start">
+                <div className="w-20 h-2 bg-purple-600 rounded-full" />
               </div>
-              <div className=" pb-2 inline-flex justify-start items-start">
-                <div className="w-[1152px] h-8 flex justify-center items-center">
-                  <div className="text-center justify-center text-gray-800 text-2xl font-bold font-['Roboto'] leading-loose">AI 협상 리포트 생성</div>
+              <div className="pb-4 inline-flex justify-start items-start">
+                <div className="w-[1280px] h-10 flex justify-center items-center">
+                  <div className="text-center justify-center text-gray-900 text-4xl font-bold font-['Roboto'] leading-10">AI 협상 리포트 생성</div>
                 </div>
               </div>
-              <div className="w-[1152px] h-6 inline-flex justify-center items-center">
-                <div className="text-center justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">당신의 진단 결과와 요구사항을 바탕으로 AI가 맞춤형 협상 전략을 생성합니다</div>
+              <div className="px-64 pb-8 inline-flex justify-start items-start">
+                <div className="w-[768px] h-8 max-w-[768px] flex justify-center items-center">
+                  <div className="text-center justify-center text-gray-700 text-xl font-normal font-['Roboto'] leading-loose">당신의 진단 결과와 요구사항를 바탕으로 AI가 맞춤형 협상 전략을 생성합니다</div>
+                </div>
               </div>
-              <div className=" pt-4 inline-flex justify-start items-start">
-                <div className="w-[1152px] h-16 flex justify-center items-start">
-                  <div className="w-52 h-16 inline-flex flex-col justify-start items-start">
-                    <div className="w-52 h-5 inline-flex justify-start items-center">
-                      <div className=" pr-2 flex justify-start items-start">
-                        <div className="w-3.5 h-5 relative flex justify-start items-center">
-                          <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                            <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-black" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="w-48 h-5 flex justify-start items-center">
-                        <div className="justify-center text-black text-sm font-normal font-['Roboto'] leading-tight">진단 점수 기반 협상 포인트 분석</div>
-                      </div>
-                    </div>
-                    <div className=" pt-1 inline-flex justify-start items-start">
-                      <div className="w-52 h-5 flex justify-start items-center">
-                        <div className=" pr-2 flex justify-start items-start">
-                          <div className="w-3.5 h-5 relative flex justify-start items-center">
-                            <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                              <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-black" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="w-36 h-5 flex justify-start items-center">
-                          <div className="justify-center text-black text-sm font-normal font-['Roboto'] leading-tight">개인화된 협상 카드 생성</div>
+              <div className="w-[1280px] h-7 inline-flex justify-center items-start">
+                <div className="w-[780.05px] h-7 flex justify-start items-start gap-6 flex-wrap content-start">
+                  <div className="w-60 h-7 flex justify-center items-center">
+                    <div className="pr-3 flex justify-start items-start">
+                      <div className="w-5 h-7 relative flex justify-center items-center">
+                        <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
+                          <div className="w-3.5 h-2.5 left-[3.35px] top-[4.98px] absolute bg-purple-600" />
                         </div>
                       </div>
                     </div>
-                    <div className=" pt-1 inline-flex justify-start items-start">
-                      <div className="w-52 h-5 flex justify-start items-center">
-                        <div className=" pr-2 flex justify-start items-start">
-                          <div className="w-3.5 h-5 relative flex justify-start items-center">
-                            <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                              <div className="w-2.5 h-2 left-[2.34px] top-[3.49px] absolute bg-black" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="w-36 h-5 flex justify-start items-center">
-                          <div className="justify-center text-black text-sm font-normal font-['Roboto'] leading-tight">단계별 협상 가이드 제공</div>
+                    <div className="w-52 h-6 flex justify-center items-center">
+                      <div className="text-center justify-center text-gray-800 text-base font-normal font-['Roboto'] leading-normal">진단 점수 기반 협상 포인트 분석</div>
+                    </div>
+                  </div>
+                  <div className="w-60 h-7 flex justify-center items-center">
+                    <div className="pr-3 flex justify-start items-start">
+                      <div className="w-5 h-7 relative flex justify-center items-center">
+                        <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
+                          <div className="w-3.5 h-2.5 left-[3.35px] top-[4.98px] absolute bg-purple-600" />
                         </div>
                       </div>
+                    </div>
+                    <div className="w-40 h-6 flex justify-center items-center">
+                      <div className="text-center justify-center text-gray-800 text-base font-normal font-['Roboto'] leading-normal">개인화된 협상 카드 생성</div>
+                    </div>
+                  </div>
+                  <div className="w-60 h-7 flex justify-center items-center">
+                    <div className="pr-3 flex justify-start items-start">
+                      <div className="w-5 h-7 relative flex justify-center items-center">
+                        <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
+                          <div className="w-3.5 h-2.5 left-[3.35px] top-[4.98px] absolute bg-purple-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-40 h-6 flex justify-center items-center">
+                      <div className="text-center justify-center text-gray-800 text-base font-normal font-['Roboto'] leading-normal">단계별 협상 가이드 제공</div>
                     </div>
                   </div>
                 </div>
@@ -257,47 +253,48 @@ export default function ReportPage() {
           </div>
 
           {/* 메인 컨텐트 카드 */}
-          <div className="w-[1152px] min-h-[931.75px] p-px bg-white rounded-2xl shadow-xl shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-violet-200 flex flex-col justify-start items-start">
-            <div className="w-[1150px] min-h-[929.75px] p-8 flex flex-col justify-start items-start">
+          <div className="w-[1280px] h-[1360.50px] p-0.5 bg-white rounded-3xl shadow-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 flex flex-col justify-start items-start overflow-hidden">
+            <div className="w-[1276px] h-[1356.50px] p-12 flex flex-col justify-start items-start">
               
               {/* 리포트 타입 선택 */}
-              <div className=" pb-8 inline-flex justify-start items-start">
-                <div className="w-[1086px] h-[458.75px] flex justify-start items-start gap-8 flex-wrap content-start">
+              <div className="pb-12 inline-flex justify-start items-start">
+                <div className="w-[1180px] h-[652.50px] flex justify-start items-start gap-10 flex-wrap content-start">
                   
                   {/* 종합 협상 리포트 카드 */}
                   <div
                     onClick={() => setSelectedReportType('comprehensive')}
-                    className={`w-[527px] h-[458.75px] p-8 rounded-xl outline outline-2 outline-offset-[-2px] inline-flex flex-col justify-start items-start cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
+                    className={`w-[570px] h-[652.50px] p-11 bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-[3px] outline-offset-[-3px] outline-purple-400 inline-flex flex-col justify-start items-start overflow-hidden cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
                       selectedReportType === 'comprehensive'
-                        ? 'bg-purple-100 outline-violet-500 shadow-lg'
-                        : 'bg-white outline-gray-300'
+                        ? 'bg-purple-100 outline-purple-500 shadow-xl'
+                        : 'bg-white outline-purple-400'
                     }`}
                   >
-                    <div className="w-[459px] h-96 flex flex-col justify-start items-start">
-                      <div className=" px-48 pb-4 inline-flex justify-start items-start">
-                        <div className="size-16 bg-purple-100 rounded-full flex justify-center items-center">
-                          <div className="w-6 h-8 relative flex justify-center items-center">
-                            <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
-                              <div className="w-4 h-5 left-[3.50px] top-[2px] absolute bg-violet-500" />
+                    <div className="w-[484px] h-[518.50px] flex flex-col justify-start items-start">
+                      <div className="px-52 pb-6 inline-flex justify-start items-start">
+                        <div className="size-20 bg-purple-100 rounded-2xl flex justify-center items-center">
+                          <div className="w-8 h-9 relative flex justify-center items-center">
+                            <div className="w-8 h-7 left-[0.01px] top-[3px] absolute overflow-hidden">
+                              <div className="size-6 left-[4.38px] top-[2.50px] absolute bg-purple-600" />
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className=" pb-3 inline-flex justify-start items-start">
-                        <div className="w-[459px] h-7 flex justify-center items-center">
-                          <div className="text-center justify-center text-gray-800 text-xl font-bold font-['Roboto'] leading-7">종합 협상 리포트</div>
+                      <div className="pb-4 inline-flex justify-start items-start">
+                        <div className="w-[484px] h-9 flex justify-center items-center">
+                          <div className="text-center justify-center text-gray-900 text-3xl font-bold font-['Roboto'] leading-9">종합 협상 리포트</div>
                         </div>
                       </div>
-                      <div className=" pb-2 inline-flex justify-start items-start">
-                        <div className="w-[459px] h-6 flex justify-center items-center">
-                          <div className="w-12 h-5 px-3 py-1 bg-emerald-500 rounded-full flex justify-center items-start">
-                            <div className="text-center justify-center text-white text-xs font-bold font-['Roboto'] leading-none">무료</div>
+                      <div className="pb-6 inline-flex justify-start items-start">
+                        <div className="w-[484px] h-6 flex justify-center items-center">
+                          <div className="w-20 h-9 px-6 py-2 bg-gray-500 rounded-full flex justify-center items-start">
+                            <div className="text-center justify-center text-white text-base font-bold font-['Roboto'] leading-normal">무료</div>
                           </div>
                         </div>
                       </div>
-                      <div className=" pb-6 inline-flex justify-start items-start">
-                        <div className="w-[459px] h-6 flex justify-center items-center">
-                          <div className="text-center justify-center text-gray-600 text-sm font-normal font-['Roboto'] leading-snug">진단 결과를 바탕으로 완전한 협상 전략과 리포트를 자동 생성</div>
+                      <div className="pb-8 inline-flex justify-start items-start">
+                        <div className="w-[484px] h-14 flex justify-center items-start flex-wrap content-start">
+                          <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">진단 결과를 바탕으로 완전한 협상 전략과</div>
+                          <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">리포트를 자동 생성합니다</div>
                         </div>
                       </div>
                       <div className="w-[459px] h-40 flex flex-col justify-start items-start">
@@ -377,37 +374,38 @@ export default function ReportPage() {
                   {/* 프리미엄 리포트 카드 */}
                   <div
                     onClick={() => setSelectedReportType('premium')}
-                    className={`w-[527px] h-[458.75px] p-8 rounded-xl outline outline-2 outline-offset-[-2px] inline-flex flex-col justify-start items-start cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
+                    className={`w-[570px] h-[652.50px] p-11 relative bg-purple-100 rounded-2xl shadow-2xl outline outline-[3px] outline-offset-[-3px] outline-purple-600 inline-flex flex-col justify-start items-start cursor-pointer transition-all duration-200 transform hover:scale-[1.01] ${
                       selectedReportType === 'premium'
-                        ? 'bg-amber-100 outline-amber-500 shadow-lg'
-                        : 'bg-white outline-gray-300'
+                        ? 'bg-purple-200 outline-purple-700 shadow-2xl'
+                        : 'bg-purple-100 outline-purple-600'
                     }`}
                   >
-                    <div className="w-[459px] h-96 flex flex-col justify-start items-start">
-                      <div className=" px-48 pb-4 inline-flex justify-start items-start">
-                        <div className="size-16 bg-amber-500 rounded-full flex justify-center items-center">
-                          <div className="w-6 h-8 relative flex justify-center items-center">
-                            <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
-                              <div className="size-5 left-[2.50px] top-[2.50px] absolute bg-white" />
+                    <div className="w-[484px] h-[566.50px] flex flex-col justify-start items-start">
+                      <div className="px-52 pb-6 inline-flex justify-start items-start">
+                        <div className="size-20 bg-purple-600 rounded-2xl flex justify-center items-center">
+                          <div className="w-8 h-9 relative flex justify-center items-center">
+                            <div className="w-8 h-7 left-[0.01px] top-[3px] absolute overflow-hidden">
+                              <div className="size-6 left-[3.12px] top-[3.12px] absolute bg-white" />
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className=" pb-3 inline-flex justify-start items-start">
-                        <div className="w-[459px] h-7 flex justify-center items-center">
-                          <div className="text-center justify-center text-gray-800 text-xl font-bold font-['Roboto'] leading-7">프리미엄 리포트</div>
+                      <div className="pb-4 inline-flex justify-start items-start">
+                        <div className="w-[484px] h-9 flex justify-center items-center">
+                          <div className="text-center justify-center text-gray-900 text-3xl font-bold font-['Roboto'] leading-9">프리미엄 리포트</div>
                         </div>
                       </div>
-                      <div className=" pb-2 inline-flex justify-start items-start">
-                        <div className="w-[459px] h-6 flex justify-center items-center">
-                          <div className="w-20 h-5 px-3 py-1 bg-amber-500 rounded-full flex justify-center items-start">
-                            <div className="text-center justify-center text-white text-xs font-bold font-['Roboto'] leading-none">유료 서비스</div>
+                      <div className="pb-6 inline-flex justify-start items-start">
+                        <div className="w-[484px] h-6 flex justify-center items-center">
+                          <div className="w-32 h-9 px-6 py-2 bg-purple-600 rounded-full flex justify-center items-start">
+                            <div className="text-center justify-center text-white text-base font-bold font-['Roboto'] leading-normal">유료 서비스</div>
                           </div>
                         </div>
                       </div>
-                      <div className=" pb-6 inline-flex justify-start items-start">
-                        <div className="w-[459px] h-6 flex justify-center items-center">
-                          <div className="text-center justify-center text-gray-600 text-sm font-normal font-['Roboto'] leading-snug">고급 AI 분석과 스마트 보조 진단으로 더욱 정교한 협상 전략 제공</div>
+                      <div className="pb-8 inline-flex justify-start items-start">
+                        <div className="w-[484px] h-14 flex justify-center items-start flex-wrap content-start">
+                          <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">고급 AI 분석과 스마트 보조 진단으로</div>
+                          <div className="text-center justify-center text-gray-700 text-lg font-normal font-['Roboto'] leading-7">더욱 정교한 협상 전략을 제공합니다</div>
                         </div>
                       </div>
                       <div className="w-[459px] h-48 flex flex-col justify-start items-start">
@@ -495,21 +493,21 @@ export default function ReportPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="w-24 h-8 left-[211.96px] top-[-10px] absolute flex flex-col justify-start items-start">
-                      <div className="w-24 h-8 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full inline-flex justify-start items-center">
-                        <div className=" pr-1 flex justify-start items-start">
-                          <div className="size-3 relative overflow-hidden">
-                            <div className="size-2.5 left-[1.25px] top-[1.25px] absolute bg-white" />
+                    <div className="w-36 h-12 left-[212.28px] top-[-13px] absolute flex flex-col justify-start items-start">
+                      <div className="w-36 h-12 px-6 py-3 bg-linear-71 from-purple-600 to-violet-600 rounded-full shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] inline-flex justify-start items-start overflow-hidden">
+                        <div className="pr-2 pt-1 flex justify-start items-start">
+                          <div className="size-4 relative overflow-hidden">
+                            <div className="w-3.5 h-3 left-[1.67px] top-[1.67px] absolute bg-white" />
                           </div>
                         </div>
-                        <div className="justify-center text-white text-xs font-bold font-['Roboto'] leading-none">PREMIUM</div>
+                        <div className="justify-center text-white text-base font-bold font-['Roboto'] leading-normal [text-shadow:_0px_10px_15px_rgb(0_0_0_/_0.10)]">PREMIUM</div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="w-[1086px] h-14 inline-flex justify-center items-start">
+              <div className="w-[1180px] h-16 inline-flex justify-center items-start">
                 <button
                   onClick={
                     selectedReportType === 'comprehensive'
@@ -517,47 +515,70 @@ export default function ReportPage() {
                       : handleGeneratePremiumReport
                   }
                   disabled={isLoading || !selectedReportType}
-                  className={`w-52 h-14 px-8 py-4 rounded-xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] flex justify-center items-center overflow-hidden transition-all duration-200 transform ${
+                  className={`w-80 h-16 px-12 py-5 rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] flex justify-center items-center overflow-hidden transition-all duration-200 transform ${
                     selectedReportType && !isLoading
                       ? (selectedReportType === 'comprehensive'
-                          ? 'bg-violet-500 hover:bg-violet-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
-                          : 'bg-amber-500 hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer')
+                          ? 'bg-purple-500 hover:bg-purple-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
+                          : 'bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer')
                       : 'bg-gray-300 cursor-not-allowed'
                   }`}
                 >
-                  <div className={`text-center justify-center text-lg font-bold font-['Roboto'] leading-7 ${
+                  <div className={`w-64 h-8 inline-flex justify-start items-center ${
                     selectedReportType && !isLoading
                       ? 'text-white'
                       : 'text-gray-500'
                   }`}>
-                    {isLoading ? '생성 중...' : 'AI 리포트 생성하기'}
+                    <div className="pr-3 flex justify-start items-start">
+                      <div className="w-6 h-8 relative flex justify-center items-center">
+                        <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
+                          <div className="size-5 left-[2.91px] top-[2.40px] absolute bg-white" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`text-center justify-center text-xl font-bold font-['Roboto'] leading-7 ${
+                      selectedReportType && !isLoading
+                        ? 'text-white'
+                        : 'text-gray-500'
+                    }`}>
+                      {isLoading ? '생성 중...' : '프리미엄 리포트 생성하기'}
+                    </div>
                   </div>
                 </button>
               </div>
 
               {/* 협상 요구사항 입력 */}
-              <div className=" pb-8 inline-flex justify-start items-start">
-                <div className="w-[1086px] h-52 inline-flex flex-col justify-start items-start">
-                  <div className=" pb-4 inline-flex justify-start items-start">
-                    <div className="w-[1086px] h-7 flex justify-start items-center">
-                      <div className="justify-center text-gray-800 text-xl font-semibold font-['Roboto'] leading-7">협상 요구사항을 입력해주세요. (선택사항)</div>
+              <div className="pb-12 inline-flex justify-start items-start">
+                <div className="w-[1180px] h-80 p-8 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start">
+                  <div className="pb-6 inline-flex justify-start items-start">
+                    <div className="w-[1112px] h-8 flex justify-start items-center">
+                      <div className="pr-3 flex justify-start items-start">
+                        <div className="size-6 relative overflow-hidden">
+                          <div className="size-5 left-[2.50px] top-[2.24px] absolute bg-purple-600" />
+                        </div>
+                      </div>
+                      <div className="justify-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">협상 요구사항을 자세히 입력해주세요</div>
                     </div>
                   </div>
-                  <div className="w-[1086px] h-32 px-4 py-3 relative bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-300 inline-flex justify-start items-start overflow-hidden">
+                  <div className="w-[1112px] h-40 px-6 py-4 relative bg-white rounded-xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex justify-start items-start overflow-hidden">
                     <textarea
                       value={reportContent}
                       onChange={(e) => setReportContent(e.target.value)}
-                      className="w-full h-full resize-none outline-none text-base font-medium font-['Inter'] leading-normal text-gray-700 placeholder-gray-400"
-                      placeholder="예: 월세가 너무 비싸서 조금 낮춰달라고 요청하고 싶어요. 주변 시세보다 20만원 정도 더 비싸고 방음도 안좋아요."
+                      className="w-[1060px] h-32 left-[26px] top-[18px] absolute justify-start text-gray-400 text-lg font-medium font-['Inter'] leading-7 resize-none outline-none placeholder-gray-400"
+                      placeholder="예: 월세가 너무 비싸서 조금 낮춰달라고 요청하고 싶어요. 주변 시세보다 20만원 정도 더 비싸고, 방음도 안 좋아서 생활에 불편함이 있습니다. 어떻게 협상해야 할지 구체적인 가이드가 필요해요."
                       maxLength={500}
                     />
                   </div>
-                  <div className=" pt-2 inline-flex justify-start items-start">
-                    <div className="w-[1086px] h-5 flex justify-end items-center">
-                      <div className={`text-right justify-center text-sm font-normal font-['Roboto'] leading-tight ${
-                        reportContent.length > 450 ? 'text-red-500' : 'text-gray-500'
-                      }`}>
-                        {reportContent.length}/500자
+                  <div className="pt-3 inline-flex justify-start items-start">
+                    <div className="w-[1112px] h-6 flex justify-between items-center">
+                      <div className="w-80 h-6 flex justify-start items-center">
+                        <div className="justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">상세할수록 더 정확한 맞춤 리포트를 받을 수 있습니다</div>
+                      </div>
+                      <div className="w-14 h-6 flex justify-start items-center">
+                        <div className={`justify-center text-base font-normal font-['Roboto'] leading-normal ${
+                          reportContent.length > 450 ? 'text-red-500' : 'text-gray-500'
+                        }`}>
+                          {reportContent.length}/500자
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -575,15 +596,15 @@ export default function ReportPage() {
                 </div>
               )}
 
-              <div className=" pt-6 inline-flex justify-start items-start">
-                <div className="w-[1086px] h-12 p-4 bg-purple-100 rounded-lg inline-flex flex-col justify-start items-start">
-                  <div className="w-[1054px] h-5 inline-flex justify-center items-center">
-                    <div className=" pr-2 flex justify-start items-start">
-                      <div className="size-3.5 relative overflow-hidden">
-                        <div className="size-3 left-[1.46px] top-[1.17px] absolute bg-violet-500" />
+              <div className="pt-8 inline-flex justify-start items-start">
+                <div className="w-[1180px] h-20 p-6 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start">
+                  <div className="w-[1128px] h-7 inline-flex justify-center items-start">
+                    <div className="pr-3 pt-1 flex justify-start items-start">
+                      <div className="size-5 relative overflow-hidden">
+                        <div className="size-4 left-[2.08px] top-[1.67px] absolute bg-purple-600" />
                       </div>
                     </div>
-                    <div className="text-center justify-center text-violet-500 text-sm font-medium font-['Roboto'] leading-tight">생성된 리포트는 임대인과 공유할 수 있는 링크로 제공됩니다</div>
+                    <div className="text-center justify-center text-purple-600 text-lg font-medium font-['Roboto'] leading-7">생성된 리포트는 임대인와 공유할 수 있는 링크로 제공됩니다</div>
                   </div>
                 </div>
               </div>
@@ -593,39 +614,41 @@ export default function ReportPage() {
           {selectedReportType === 'premium' && (
             <>
               {/* 스마트 보조 진단 기능 */}
-              <div className=" pt-8 inline-flex justify-start items-start">
-                <div className="w-[1152px] h-96 p-px bg-white rounded-2xl shadow-xl shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-amber-100 inline-flex flex-col justify-start items-start overflow-hidden">
-                  <div className="w-[1150px] h-14 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 flex flex-col justify-start items-start">
-                    <div className="w-[1102px] h-7 inline-flex justify-start items-center">
-                      <div className=" pr-2 flex justify-start items-start">
-                        <div className="w-5 h-7 relative flex justify-start items-center">
-                          <div className="size-5 left-0 top-[4px] absolute overflow-hidden">
-                            <div className="size-5 left-[0.90px] top-[0.95px] absolute bg-white" />
+              <div className="pt-12 inline-flex justify-start items-start">
+                <div className="w-[1280px] h-[616px] p-0.5 bg-white rounded-3xl shadow-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start overflow-hidden">
+                  <div className="w-[1276px] h-20 px-8 py-6 bg-linear-86 from-purple-600 to-violet-600 flex flex-col justify-start items-start">
+                    <div className="w-[1212px] h-9 inline-flex justify-start items-center">
+                      <div className="pr-3 flex justify-start items-start">
+                        <div className="w-8 h-9 relative flex justify-start items-center">
+                          <div className="w-8 h-7 left-0 top-[3px] absolute overflow-hidden">
+                            <div className="size-7 left-[1.35px] top-[1.43px] absolute bg-white" />
                           </div>
                         </div>
                       </div>
-                      <div className="justify-center text-white text-xl font-bold font-['Roboto'] leading-7">스마트 보조 진단 기능</div>
+                      <div className="justify-center text-white text-2xl font-bold font-['Roboto'] leading-loose">스마트 보조 진단 기능</div>
                     </div>
                   </div>
-                  <div className="w-[1150px] h-96 p-6 flex flex-col justify-start items-start">
-                    <div className="w-[1102px] h-60 inline-flex justify-start items-start gap-6 flex-wrap content-start">
-                      <div className="w-[539px] h-60 inline-flex flex-col justify-start items-start">
-                        <div className="w-[539px] h-16 p-3.5 bg-amber-100 rounded-lg outline outline-2 outline-offset-[-2px] outline-amber-500 inline-flex justify-start items-center">
-                          <div className=" pr-3 flex justify-start items-start">
-                            <div className="size-8 bg-amber-500 rounded-full flex justify-center items-center">
-                              <div className="w-3.5 h-5 relative flex justify-start items-center">
-                                <div className="size-3.5 left-0 top-[3px] absolute overflow-hidden">
-                                  <div className="w-2.5 h-3 left-[2.04px] top-[0.88px] absolute bg-white" />
+                  <div className="w-[1276px] h-[528px] p-8 flex flex-col justify-start items-start">
+                    <div className="w-[1212px] h-80 inline-flex justify-start items-start gap-8 flex-wrap content-start">
+                      <div className="w-[590px] h-80 inline-flex flex-col justify-start items-start">
+                        <div className="w-[590px] h-24 p-5 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-600 inline-flex justify-start items-center">
+                          <div className="pr-4 flex justify-start items-start">
+                            <div className="size-12 bg-purple-600 rounded-xl flex justify-center items-center">
+                              <div className="w-5 h-7 relative flex justify-start items-center">
+                                <div className="size-5 left-0 top-[4px] absolute overflow-hidden">
+                                  <div className="w-3.5 h-4 left-[2.92px] top-[1.25px] absolute bg-white" />
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div className="w-40 h-10 inline-flex flex-col justify-start items-start">
-                            <div className="w-40 h-6 inline-flex justify-start items-center">
-                              <div className="justify-center text-gray-800 text-base font-semibold font-['Roboto'] leading-normal">AI 상황 분석</div>
+                          <div className="w-52 h-14 inline-flex flex-col justify-start items-start">
+                            <div className="w-52 h-7 inline-flex justify-start items-center">
+                              <div className="justify-center text-gray-900 text-lg font-bold font-['Roboto'] leading-7">AI 상황 분석</div>
                             </div>
-                            <div className="w-40 h-4 inline-flex justify-start items-center">
-                              <div className="justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">복잡한 상황도 AI가 정확히 파악</div>
+                            <div className="pt-1 inline-flex justify-start items-start">
+                              <div className="w-52 h-6 flex justify-start items-center">
+                                <div className="justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">복잡한 상황도 AI가 정확히 파악</div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -736,18 +759,18 @@ export default function ReportPage() {
                         </div>
                       </div>
                     </div>
-                    <div className=" pt-6 inline-flex justify-start items-start">
-                      <div className="w-[1102px] h-14 p-4 bg-amber-100 rounded-lg inline-flex flex-col justify-start items-start">
-                        <div className="w-[1070px] h-6 inline-flex justify-center items-center">
-                          <div className=" pr-2 flex justify-start items-start">
-                            <div className="w-4 h-6 relative flex justify-start items-center">
-                              <div className="size-4 left-0 top-[4px] absolute overflow-hidden">
-                                <div className="w-3.5 h-3 left-[1.67px] top-[1.67px] absolute bg-amber-500" />
+                    <div className="pt-8 inline-flex justify-start items-start">
+                      <div className="w-[1212px] h-20 p-6 bg-purple-100 rounded-2xl outline outline-2 outline-offset-[-2px] outline-purple-400 inline-flex flex-col justify-start items-start">
+                        <div className="w-[1160px] h-8 inline-flex justify-center items-center">
+                          <div className="pr-3 flex justify-start items-start">
+                            <div className="w-6 h-8 relative flex justify-start items-center">
+                              <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
+                                <div className="size-5 left-[2.50px] top-[2.50px] absolute bg-purple-600" />
                               </div>
                             </div>
                           </div>
-                          <div className="w-96 h-5 flex justify-start items-center">
-                            <div className="justify-center text-amber-500 text-sm font-medium font-['Roboto'] leading-tight">스마트 보조 진단은 프리미엄 리포트 이용자만 사용할 수 있는 독점 기능입니다</div>
+                          <div className="w-[574.75px] h-7 flex justify-start items-center">
+                            <div className="justify-center text-purple-600 text-lg font-bold font-['Roboto'] leading-7">스마트 보조 진단은 프리미엄 리포트 이용자만 사용할 수 있는 독점 기능입니다</div>
                           </div>
                         </div>
                       </div>
@@ -759,11 +782,29 @@ export default function ReportPage() {
           )}
 
           {/* 생성될 리포트 구성 */}
-          <div className=" pt-8 inline-flex justify-start items-start">
-            <div className="w-[1152px] h-[510px] p-px bg-white rounded-2xl shadow-xl shadow-[0px_8px_10px_-6px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-violet-200 inline-flex flex-col justify-start items-start overflow-hidden">
-              <div className="w-[1150px] h-14 px-6 py-4 bg-gradient-to-r from-violet-500 to-violet-600 flex flex-col justify-start items-start">
-                <div className="w-[1102px] h-7 inline-flex justify-start items-center">
-                  <div className="justify-center text-white text-xl font-bold font-['Roboto'] leading-7">📋 생성될 리포트 구성</div>
+          <div className="pt-12 inline-flex justify-start items-start">
+            <div className="w-[1280px] h-[808px] p-8 bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-2 outline-offset-[-2px] outline-violet-200 flex flex-col justify-start items-start overflow-hidden">
+              <div className="pb-6 inline-flex justify-start items-start">
+                <div className="w-[1212px] h-16 flex justify-start items-center">
+                  <div className="pr-4 flex justify-start items-start">
+                    <div className="size-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex justify-center items-center">
+                      <div className="w-8 h-9 relative flex justify-start items-center">
+                        <div className="w-8 h-7 left-0 top-[3px] absolute overflow-hidden">
+                          <div className="size-6 left-[4.38px] top-[2.50px] absolute bg-white" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-48 h-14 inline-flex flex-col justify-start items-start">
+                    <div className="w-48 h-8 inline-flex justify-start items-center">
+                      <div className="justify-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">생성될 리포트 구성</div>
+                    </div>
+                    <div className="pt-1 inline-flex justify-start items-start">
+                      <div className="w-48 h-6 flex justify-start items-center">
+                        <div className="justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">맞춤형 협상 리포트</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="w-[1150px] h-96 p-6 flex flex-col justify-start items-start">
@@ -842,23 +883,23 @@ export default function ReportPage() {
           </div>
 
           {/* 메인으로 돌아가기 버튼 */}
-          <div className=" pt-8 inline-flex justify-start items-start">
-            <div className="w-[1152px] h-12 flex justify-center items-start">
-              <div className=" pt-3.5 flex justify-start items-start">
-                <div className="w-52 h-5 flex justify-center items-start">
+          <div className="pt-12 inline-flex justify-start items-start">
+            <div className="w-[1280px] h-14 flex justify-center items-start">
+              <div className="pt-5 flex justify-start items-start">
+                <div className="w-64 h-5 flex justify-center items-start">
                   <button
                     onClick={() => router.push('/')}
-                    className="w-52 h-12 px-8 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors inline-flex flex-col justify-start items-start"
+                    className="w-64 h-14 px-10 py-4 bg-gray-600 rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] hover:bg-gray-700 transition-colors inline-flex flex-col justify-start items-start overflow-hidden"
                   >
-                    <div className="w-36 h-6 inline-flex justify-start items-center">
-                      <div className=" pr-2 flex justify-start items-start">
-                        <div className="w-4 h-6 relative flex justify-center items-center">
-                          <div className="size-4 left-[0.01px] top-[4px] absolute overflow-hidden">
-                            <div className="size-2.5 left-[3px] top-[2.81px] absolute bg-white" />
+                    <div className="w-44 h-7 inline-flex justify-start items-center">
+                      <div className="pr-3 flex justify-start items-start">
+                        <div className="w-5 h-7 relative flex justify-center items-center">
+                          <div className="size-5 left-[0.01px] top-[4px] absolute overflow-hidden">
+                            <div className="w-3.5 h-3 left-[3.75px] top-[3.52px] absolute bg-white" />
                           </div>
                         </div>
                       </div>
-                      <div className="text-center justify-center text-white text-base font-medium font-['Roboto'] leading-normal">메인으로 돌아가기</div>
+                      <div className="text-center justify-center text-white text-lg font-bold font-['Roboto'] leading-7">메인으로 돌아가기</div>
                     </div>
                   </button>
                 </div>
