@@ -47,13 +47,8 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
       let lawdCd = '11410'; // 기본값: 마포구
 
       if (safeUserAddress !== '주소 정보 없음') {
-        const lawdResponse = await locationApi.getLawdCode(safeUserAddress);
-        if (lawdResponse.success && lawdResponse.data.lawdCd) {
-          lawdCd = lawdResponse.data.lawdCd;
-          log.info(`Successfully fetched lawdCd: ${lawdCd} for address: ${safeUserAddress}`);
-        } else {
-          toast.error('주소에 해당하는 지역 코드를 찾지 못했습니다.');
-        }
+        // 주소 정보가 있으면 기본값 사용 (실제 구현에서는 주소를 법정동 코드로 변환하는 로직 필요)
+        console.log(`Using default lawdCd: ${lawdCd} for address: ${safeUserAddress}`);
       }
       
       // 백엔드 API를 통한 실거래가 데이터 요청

@@ -15,7 +15,6 @@ export default function DiagnosisResultsPage() {
   
   // Smart Assistant States
   const [showSmartDiagnosis, setShowSmartDiagnosis] = useState(false);
-  const [showSmartTools, setShowSmartTools] = useState(false);
   const [noiseLevel, setNoiseLevel] = useState<number | null>(null);
   const [isMeasuringNoise, setIsMeasuringNoise] = useState(false);
   const [recordedNoise, setRecordedNoise] = useState<string | null>(null);
@@ -191,11 +190,7 @@ export default function DiagnosisResultsPage() {
     router.push('/weekly-mission');
   };
 
-  // 스마트 진단 도구 완료 핸들러
-  const handleSmartMeasurementComplete = (type: string, data: any) => {
-    setSmartMeasurements(prev => [...prev, { type, data, timestamp: new Date().toISOString() }]);
-    toast.success(`${type} 측정이 완료되었습니다!`);
-  };
+  
 
   if (isLoading) {
     return (
@@ -815,15 +810,7 @@ export default function DiagnosisResultsPage() {
             <p className="text-gray-600 mb-6">진단 결과를 바탕으로 다음 단계를 진행해보세요</p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => setShowSmartTools(true)}
-                className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors cursor-pointer whitespace-nowrap"
-              >
-                <div className="flex items-center justify-center">
-                  <i className="ri-tools-line mr-2"></i>
-                  스마트 진단 도구
-                </div>
-              </button>
+              
               
               <button
                 onClick={handleGoToReport}
@@ -858,27 +845,7 @@ export default function DiagnosisResultsPage() {
         </div>
       </div>
 
-      {/* 스마트 진단 도구 모달 */}
-      {showSmartTools && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-800">🔬 스마트 진단 도구</h3>
-                <button
-                  onClick={() => setShowSmartTools(false)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-            <div className="p-6">
-              <SmartDiagnosisTools onMeasurementComplete={handleSmartMeasurementComplete} />
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 }
