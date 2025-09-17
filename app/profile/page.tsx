@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { authApi } from '../../lib/api';
+import { authApi, diagnosisApi } from '../../lib/api';
 
 interface UserProfile {
   name: string;
@@ -14,6 +14,8 @@ interface UserProfile {
   contractType: string;
   residencePeriod: number;
   role: string;
+  lastDiagnosisDate?: string;
+  diagnosisScore?: number;
 }
 
 export default function ProfilePage() {
@@ -36,6 +38,19 @@ export default function ProfilePage() {
         // API에서 최신 정보 가져오기
         const profile = await authApi.getCurrentUser();
         
+        // 진단 데이터 가져오기
+        let lastDiagnosisDate = null;
+        let diagnosisScore = null;
+        try {
+          const diagnosisResult = await diagnosisApi.getResult();
+          if (diagnosisResult.success && diagnosisResult.data) {
+            lastDiagnosisDate = diagnosisResult.data.createdAt || diagnosisResult.data.date;
+            diagnosisScore = diagnosisResult.data.overallScore || diagnosisResult.data.totalScore;
+          }
+        } catch (diagnosisError) {
+          console.log('진단 데이터 없음:', diagnosisError);
+        }
+        
         setUserProfile({
           name: nickname,
           email: email,
@@ -44,7 +59,9 @@ export default function ProfilePage() {
           buildingType: buildingType || profile?.buildingType || '정보 없음',
           contractType: contractType || profile?.contractType || '정보 없음',
           residencePeriod: profile?.residencePeriod || 0,
-          role: '사용자'
+          role: '사용자',
+          lastDiagnosisDate: lastDiagnosisDate,
+          diagnosisScore: diagnosisScore
         });
 
       } catch (err: any) {
@@ -222,45 +239,71 @@ export default function ProfilePage() {
               </div>
               
               <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex justify-center items-center mr-4">
-                    <i className="ri-stethoscope-line text-purple-600 text-xl"></i>
-                  </div>
-                  <div>
-                    <h5 className="text-gray-900 font-medium text-lg">최근 진단 결과</h5>
-                    <p className="text-gray-600 text-sm">마지막 진단: 2025년 1월 17일</p>
-                  </div>
-                </div>
+                {userProfile.lastDiagnosisDate ? (
+                  <>
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-full flex justify-center items-center mr-4">
+                        <i className="ri-stethoscope-line text-purple-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <h5 className="text-gray-900 font-medium text-lg">최근 진단 결과</h5>
+                        <p className="text-gray-600 text-sm">
+                          마지막 진단: {new Date(userProfile.lastDiagnosisDate).toLocaleDateString('ko-KR')}
+                        </p>
+                      </div>
+                    </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600 mb-1">85점</div>
+                    <div className="text-2xl font-bold text-purple-600 mb-1">
+                      {userProfile.diagnosisScore ? `${userProfile.diagnosisScore}점` : '-'}
+                    </div>
                     <div className="text-sm text-gray-600">종합 점수</div>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600 mb-1">7개</div>
+                    <div className="text-2xl font-bold text-green-600 mb-1">
+                      {userProfile.lastDiagnosisDate ? '7개' : '-'}
+                    </div>
                     <div className="text-sm text-gray-600">양호 항목</div>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-orange-600 mb-1">3개</div>
+                    <div className="text-2xl font-bold text-orange-600 mb-1">
+                      {userProfile.lastDiagnosisDate ? '3개' : '-'}
+                    </div>
                     <div className="text-sm text-gray-600">개선 필요</div>
                   </div>
                 </div>
                 
-                <div className="flex space-x-3">
-                  <Link
-                    href="/diagnosis/results"
-                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center"
-                  >
-                    상세 결과 보기
-                  </Link>
-                  <Link
-                    href="/report"
-                    className="flex-1 px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors text-center"
-                  >
-                    리포트 생성
-                  </Link>
-                </div>
+                    <div className="flex space-x-3">
+                      <Link
+                        href="/diagnosis/results"
+                        className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center"
+                      >
+                        상세 결과 보기
+                      </Link>
+                      <Link
+                        href="/report"
+                        className="flex-1 px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors text-center"
+                      >
+                        리포트 생성
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex justify-center items-center mx-auto mb-4">
+                      <i className="ri-stethoscope-line text-purple-600 text-2xl"></i>
+                    </div>
+                    <h5 className="text-gray-900 font-medium text-lg mb-2">진단 내역이 없습니다</h5>
+                    <p className="text-gray-600 text-sm mb-4">첫 진단을 진행해보세요!</p>
+                    <Link
+                      href="/diagnosis"
+                      className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      진단 시작하기
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
 

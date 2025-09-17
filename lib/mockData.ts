@@ -96,10 +96,19 @@ export const mockReportData: ReportTemplate = {
       requiredDocuments: ["신분증", "소득증명서", "임대차계약서"]
     },
     {
+      title: "청년 특별 월세 지원",
+      description: "청년을 위한 특별 월세 지원금",
+      eligibility: "만 19~34세 청년",
+      link: "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00004661",
+      isEligible: true,
+      applicationDeadline: "2025.12.31",
+      requiredDocuments: ["신분증", "소득증명서", "임대차계약서", "통장사본"]
+    },
+    {
       title: "서울시 청년 월세 지원금",
       description: "서울시 거주 청년을 위한 월세 지원금",
       eligibility: "서울 거주, 만 19~34세",
-      link: "https://www.seoul.go.kr",
+      link: "https://housing.seoul.go.kr/site/main/content/sh01_060513",
       isEligible: true,
       applicationDeadline: "2025.11.30",
       requiredDocuments: ["주민등록등본", "소득증명서", "임대차계약서", "통장사본"]
@@ -271,16 +280,22 @@ export const mockFreeReportData: ReportTemplate = {
   
   policyInfo: [
     {
-      title: "청년 월세 특별지원",
-      description: "국토교통부에서 제공하는 청년 월세 지원금",
-      eligibility: "만 19~34세, 소득 기준 충족",
-      link: "https://www.molit.go.kr"
+      title: "청년 특별 월세 지원",
+      description: "청년을 위한 특별 월세 지원금",
+      eligibility: "만 19~34세 청년",
+      link: "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00004661"
     },
     {
       title: "서울시 청년 월세 지원금",
       description: "서울시 거주 청년을 위한 월세 지원금",
       eligibility: "서울 거주, 만 19~34세",
-      link: "https://www.seoul.go.kr"
+      link: "https://housing.seoul.go.kr/site/main/content/sh01_060513"
+    },
+    {
+      title: "전세보증금 반환보증 (HUG)",
+      description: "전세보증금 반환보증 서비스",
+      eligibility: "전세 계약자",
+      link: "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp"
     }
   ],
   
