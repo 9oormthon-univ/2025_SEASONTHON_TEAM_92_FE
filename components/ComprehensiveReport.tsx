@@ -646,7 +646,7 @@ export default function ComprehensiveReport({
                 
                 <TimeSeriesChart 
                   buildingType={safeContractSummary.buildingType}
-                  lawdCd="11410" // TODO: 사용자 실제 법정동코드로 변경
+                  lawdCd={extractLawdCdFromAddress(safeContractSummary.address)}
                   months={24}
                 />
               </div>
