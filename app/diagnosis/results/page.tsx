@@ -426,6 +426,9 @@ export default function DiagnosisResultsPage() {
                             <h5 className="font-semibold text-gray-800 mb-2">협상 포인트:</h5>
                             <ul className="text-sm text-gray-700 space-y-1">
                               <li>• "{categoryName} 항목에서 건물 평균({worstCategory.buildingAverage?.toFixed(1)}점)보다 {gap.toFixed(1)}점 낮은 점수를 받았습니다"</li>
+                              {categoryName === '소음' && recordedNoise && (
+                                <li>• "실제 측정 결과 {recordedNoise.split('dB')[0]}dB로, 환경부 권고 기준(주거지역 낮 시간 55dB)을 {parseInt(recordedNoise.split('dB')[0]) - 55}dB 초과합니다"</li>
+                              )}
                               <li>• "이웃 {diagnosisResult.statistics?.participantCount || 0}명의 객관적 데이터를 바탕으로 개선이 필요합니다"</li>
                               <li>• "주택임대차보호법 제20조에 따른 수선의무에 해당할 수 있습니다"</li>
                             </ul>
