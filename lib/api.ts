@@ -165,6 +165,11 @@ export const reportApi = {
     const response = await api.get(`/public/report/${publicId}`);
     return response.data;
   },
+  getPublicReport: async (publicId: string): Promise<ApiResponse<any>> => {
+    // 공개 리포트 조회 (비회원도 접근 가능)
+    const response = await api.get(`/public/report/${publicId}`);
+    return response.data;
+  },
   getComprehensiveReport: async (): Promise<ApiResponse<any>> => {
     const response = await api.get('/report/comprehensive');
     return response.data;

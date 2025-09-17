@@ -382,7 +382,7 @@ export default function DiagnosisResultsPage() {
                                         내 점수: {category.myScore}점
                                       </span>
                                       <span className="text-xs text-gray-500 ml-2">
-                                        (건물 평균 대비 -{gap.toFixed(1)}점)
+                                        (건물 평균 대비 {gap > 0 ? '-' : '+'}{Math.abs(gap).toFixed(1)}점)
                                       </span>
                                     </div>
                                   </div>
@@ -420,12 +420,12 @@ export default function DiagnosisResultsPage() {
                       return (
                         <div>
                           <p className="text-gray-700 mb-3">
-                            <strong>{categoryName}</strong> 항목에서 건물 평균 대비 <strong>{gap.toFixed(1)}점 낮은 점수</strong>를 받았습니다.
+                            <strong>{categoryName}</strong> 항목에서 건물 평균 대비 <strong>{gap > 0 ? gap.toFixed(1) + '점 낮은' : Math.abs(gap).toFixed(1) + '점 높은'} 점수</strong>를 받았습니다.
                           </p>
                           <div className="bg-white rounded-lg p-4 border border-green-100">
                             <h5 className="font-semibold text-gray-800 mb-2">협상 포인트:</h5>
                             <ul className="text-sm text-gray-700 space-y-1">
-                              <li>• "{categoryName} 항목에서 건물 평균({worstCategory.buildingAverage?.toFixed(1)}점)보다 {gap.toFixed(1)}점 낮은 점수를 받았습니다"</li>
+                              <li>• "{categoryName} 항목에서 건물 평균({worstCategory.buildingAverage?.toFixed(1)}점)보다 {gap > 0 ? gap.toFixed(1) + '점 낮은' : Math.abs(gap).toFixed(1) + '점 높은'} 점수를 받았습니다"</li>
                               {categoryName === '소음' && recordedNoise && (
                                 <li>• "실제 측정 결과 {recordedNoise.split('dB')[0]}dB로, 환경부 권고 기준(주거지역 낮 시간 55dB)을 {parseInt(recordedNoise.split('dB')[0]) - 55}dB 초과합니다"</li>
                               )}

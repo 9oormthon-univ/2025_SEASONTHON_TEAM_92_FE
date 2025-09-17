@@ -35,8 +35,8 @@ export default function ReportPage({ params }: ReportPageProps) {
             try {
               setLoading(true);
               
-              // 먼저 일반 리포트 API로 데이터를 가져온 후, reportType에 따라 처리
-              const response = await reportApi.getReport(id);
+              // 공개 리포트 API로 데이터를 가져오기 (비회원도 접근 가능)
+              const response = await reportApi.getPublicReport(id);
               
               console.log('리포트 상세 응답:', response);
               

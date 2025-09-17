@@ -144,7 +144,8 @@ export default function ComprehensiveReport({
           });
           
           // 백엔드에서 공유 URL 생성
-          const shareUrlResponse = await reportApi.generateShareUrl(initialReportId || reportData.id, finalIsPremium);
+          const reportId = initialReportId || (reportData && reportData.id) || null;
+          const shareUrlResponse = await reportApi.generateShareUrl(reportId, finalIsPremium);
           if (shareUrlResponse.success && shareUrlResponse.data?.shareUrl) {
             setShareUrl(shareUrlResponse.data.shareUrl);
           } else {
