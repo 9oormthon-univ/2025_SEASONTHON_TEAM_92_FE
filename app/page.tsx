@@ -728,7 +728,7 @@ export default function HomePage() {
                 AI가 당신을 위한 맞춤형 협상 가이드와 단계별 전략을 생성합니다
               </p>
               <div className="mt-4 text-center">
-                <Link href="/report/generate" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
+                <Link href="/report" className="text-xs text-[#9333EA] font-medium hover:opacity-80">
                   리포트 생성하기 →
                 </Link>
               </div>

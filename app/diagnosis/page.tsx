@@ -262,9 +262,19 @@ export default function DiagnosisPage() {
     <div className="min-h-screen py-8 px-4 bg-gray-50" ref={containerRef}>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-            <Link href="/">
-              <h1 className="text-3xl font-bold text-purple-600 cursor-pointer mb-2 font-['Roboto']">월세의 정석</h1>
-            </Link>
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <i className="ri-arrow-left-line mr-2"></i>
+                뒤로가기
+              </button>
+              <Link href="/">
+                <h1 className="text-3xl font-bold text-purple-600 cursor-pointer font-['Roboto']">월세의 정석</h1>
+              </Link>
+              <div className="w-20"></div> {/* 공간 확보용 */}
+            </div>
             <div className="w-16 h-1 bg-purple-600 rounded-full mx-auto mb-6"></div>
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
             <h2 className="text-2xl font-bold mb-3 text-gray-800">우리 집 종합 진단</h2>

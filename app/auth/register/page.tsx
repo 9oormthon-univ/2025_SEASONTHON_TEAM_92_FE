@@ -98,6 +98,20 @@ export default function RegisterPage() {
     setError('');
     
     try {
+      // 카카오 OAuth 회원가입으로 리다이렉트
+      window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/oauth2/authorization/kakao`;
+      
+    } catch (err) {
+      setError('소셜 회원가입 중 오류가 발생했습니다.');
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleRegister = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
       // Google OAuth 회원가입으로 리다이렉트
       window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/oauth2/authorization/google`;
       
@@ -392,11 +406,28 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Google Register */}
+                {/* Kakao Register */}
                 <div>
                   <button
                     type="button"
                     onClick={handleKakaoRegister}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center py-3 px-4 text-sm font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer transition-all bg-yellow-400 hover:bg-yellow-500 text-black"
+                  >
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 mr-3 rounded-sm bg-black flex items-center justify-center">
+                        <span className="text-yellow-400 text-xs font-bold">K</span>
+                      </div>
+                      {isLoading ? '가입 중...' : '카카오로 간편 회원가입'}
+                    </div>
+                  </button>
+                </div>
+
+                {/* Google Register */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleGoogleRegister}
                     disabled={isLoading}
                     className="w-full flex items-center justify-center py-3 px-4 border border-gray-200 text-sm font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer transition-all bg-white hover:bg-gray-50"
                   >

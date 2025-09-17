@@ -382,7 +382,17 @@ export default function ComprehensiveReport({
         
         {/* 헤더 */}
         <div className="text-center mb-12">
-          <div className="text-violet-500 text-3xl font-normal mb-4">월세의 정석</div>
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <i className="ri-arrow-left-line mr-2"></i>
+              뒤로가기
+            </button>
+            <div className="text-violet-500 text-3xl font-normal">월세의 정석</div>
+            <div className="w-20"></div> {/* 공간 확보용 */}
+          </div>
           <div className="w-16 h-1 bg-violet-500 rounded-full mx-auto mb-6"></div>
           <h1 className="text-gray-800 text-2xl md:text-3xl font-bold mb-2">생성된 협상 리포트</h1>
           <p className="text-gray-600 text-base">임대인과 공유할 수 있는 완전한 협상 리포트입니다</p>

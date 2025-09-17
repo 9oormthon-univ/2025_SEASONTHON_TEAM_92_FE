@@ -45,7 +45,7 @@ export default function MarketDataComparison({ userRent, userAddress }: MarketDa
       setIsLoading(true);
       
       // 사용자 위치 기반 법정동 코드 추출
-      let lawdCd = customLawdCd || '11410'; // 기본값: 마포구
+      let lawdCd = customLawdCd || '11410'; // 기본값: 마포구 (사용자 주소가 없을 때만 사용)
       
       if (userAddress) {
         const addressMapping: {[key: string]: string} = {
