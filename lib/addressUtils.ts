@@ -58,7 +58,9 @@ export const extractLawdCdFromAddress = async (address: string): Promise<string>
     // 카카오 주소 검색 API 호출
     const response = await fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(cleanAddress)}`, {
       headers: {
-        'Authorization': `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_API_KEY}`
+        'Authorization': `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_API_KEY}`,
+        'Content-Type': 'application/json',
+        'KA': 'sdk/1.0 os/javascript origin/web'
       }
     });
     
@@ -96,8 +98,9 @@ export const extractLawdCdFromAddress = async (address: string): Promise<string>
 
 // 카카오 API 실패 시 사용할 폴백 함수
 export const extractLawdCdFromAddressFallback = (address: string): string => {
-  // 기존 하드코딩 매핑 로직
+  // 확장된 하드코딩 매핑 로직 (서울시 + 주요 도시)
   const guMappings: { [key: string]: string } = {
+    // 서울시
     '서대문구': '11410',
     '강남구': '11680',
     '서초구': '11650',
@@ -122,7 +125,65 @@ export const extractLawdCdFromAddressFallback = (address: string): string => {
     '동작구': '11590',
     '관악구': '11620',
     '송파구': '11710',
-    '강동구': '11740'
+    '강동구': '11740',
+    
+    // 울산광역시
+    '울주군': '31170',
+    '중구': '31110',
+    '남구': '31120',
+    '동구': '31130',
+    '북구': '31140',
+    
+    // 부산광역시
+    '부산진구': '26230',
+    '해운대구': '26350',
+    '사상구': '26530',
+    '금정구': '26410',
+    '강서구': '26440',
+    '연제구': '26470',
+    '수영구': '26500',
+    '사하구': '26440',
+    '동래구': '26260',
+    '남구': '26200',
+    '북구': '26290',
+    '중구': '26110',
+    '서구': '26200',
+    '영도구': '26200',
+    '동구': '26140',
+    
+    // 대구광역시
+    '달서구': '27290',
+    '달성군': '27710',
+    '수성구': '27260',
+    '북구': '27200',
+    '서구': '27200',
+    '남구': '27200',
+    '동구': '27140',
+    '중구': '27110',
+    
+    // 인천광역시
+    '연수구': '28185',
+    '계양구': '28140',
+    '서구': '28140',
+    '미추홀구': '28177',
+    '남동구': '28140',
+    '부평구': '28140',
+    '동구': '28110',
+    '중구': '28110',
+    
+    // 광주광역시
+    '광산구': '29200',
+    '서구': '29170',
+    '북구': '29155',
+    '남구': '29140',
+    '동구': '29110',
+    
+    // 대전광역시
+    '유성구': '30200',
+    '대덕구': '30180',
+    '서구': '30170',
+    '중구': '30110',
+    '동구': '30140'
   };
   
   // 구/군 매칭 시도
