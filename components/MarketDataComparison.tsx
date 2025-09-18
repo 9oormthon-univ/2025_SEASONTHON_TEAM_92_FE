@@ -135,14 +135,6 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
 
       setMarketData(processedData);
       
-      // 데이터 소스에 따른 메시지 표시 (시연용으로 메시지 제거)
-      // if (processedMonthlyData.length > 0) {
-      //   toast.success('실거래가 데이터를 불러왔습니다.');
-      // } else {
-      //   toast('API 호출 제한으로 인해 시뮬레이션 데이터를 표시합니다.', {
-      //     icon: 'ℹ️',
-      //   });
-      // }
     } catch (err: any) {
       console.error('Market data load error:', err);
       // API 실패 시 시뮬레이션 데이터로 폴백
@@ -437,8 +429,8 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
           </div>
         )}
 
-        {/* 최근 거래 동향 - 임시 숨김 */}
-        {/* {(marketData?.transactions?.length || 0) > 0 && (
+        {/* 최근 거래 동향 */}
+        {(marketData?.transactions?.length || 0) > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-line-chart-line mr-2 text-green-600"></i>
@@ -518,7 +510,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
               }} />
             </div>
           </div>
-        )} */}
+        )}
 
         {/* 지역별 시세 비교 요약 카드 */}
         {(marketData?.monthlyRentMarket?.length || 0) > 0 && (

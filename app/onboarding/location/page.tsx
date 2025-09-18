@@ -185,7 +185,7 @@ export default function LocationVerificationPage() {
         console.error('GPS 인증 상태 업데이트 실패:', error);
       }
       
-      router.push('/onboarding/profile');
+      router.push(`/onboarding/profile?dong=${encodeURIComponent(location.district)}&lat=${location.latitude}&lon=${location.longitude}&buildingName=${encodeURIComponent(data.buildingName)}`);
     } catch (err: any) {
       console.error('Location verification error:', err);
       const errorMessage = err.response?.data?.message || err.message || '위치 인증 중 오류가 발생했습니다.';
