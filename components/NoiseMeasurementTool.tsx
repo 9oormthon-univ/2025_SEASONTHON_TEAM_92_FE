@@ -17,7 +17,7 @@ export default function NoiseMeasurementTool({ onComplete, onClose }: NoiseMeasu
   const [noiseData, setNoiseData] = useState<number[]>([]);
   const [averageNoise, setAverageNoise] = useState<number>(0);
   const [maxNoise, setMaxNoise] = useState<number>(0);
-  const [minNoise, setMinNoise] = useState<number>(100);
+  const [minNoise, setMinNoise] = useState<number>(1000);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -71,17 +71,21 @@ export default function NoiseMeasurementTool({ onComplete, onClose }: NoiseMeasu
         const rms = Math.sqrt(sum / dataArray.length);
         
         // dB 계산 - NaN과 Infinity 방지
-        let db = 0;
+        let db = 35; // 기본값
         if (rms > 0) {
           const normalizedRms = rms / 255;
-          if (normalizedRms > 0) {
-            db = 20 * Math.log10(normalizedRms);
-            // 실제 환경에 맞게 조정 (일반적으로 30-80dB 범위)
-            db = Math.max(30, Math.min(80, db + 60));
+          if (normalizedRms > 0 && !isNaN(normalizedRms) && isFinite(normalizedRms)) {
+            const logValue = Math.log10(normalizedRms);
+            if (!isNaN(logValue) && isFinite(logValue)) {
+              db = 20 * logValue;
+              // 실제 환경에 맞게 조정 (일반적으로 30-80dB 범위)
+              db = Math.max(30, Math.min(80, db + 60));
+            }
           }
         }
         
-        const adjustedDb = isNaN(db) ? 35 : db;
+        // NaN, Infinity, 음수 값 방지
+        const adjustedDb = (isNaN(db) || !isFinite(db) || db < 0) ? 35 : Math.round(db);
 
         setNoiseLevel(adjustedDb);
         setNoiseData(prev => [...prev, adjustedDb]);
@@ -136,8 +140,19 @@ export default function NoiseMeasurementTool({ onComplete, onClose }: NoiseMeasu
       clearInterval(timerRef.current);
     }
 
-    const avg = noiseData.reduce((sum, val) => sum + val, 0) / noiseData.length;
-    setAverageNoise(avg);
+    // 평균 계산 - NaN 방지
+    const validData = noiseData.filter(val => !isNaN(val) && isFinite(val) && val > 0);
+    const avg = validData.length > 0 ? validData.reduce((sum, val) => sum + val, 0) / validData.length : 35;
+    setAverageNoise(Math.round(avg));
+    
+    // 최대/최소값 재계산
+    if (validData.length > 0) {
+      setMaxNoise(Math.max(...validData));
+      setMinNoise(Math.min(...validData));
+    } else {
+      setMaxNoise(35);
+      setMinNoise(35);
+    }
 
     // 백엔드에 측정 완료 알림
     if (measurementId) {
@@ -164,7 +179,7 @@ export default function NoiseMeasurementTool({ onComplete, onClose }: NoiseMeasu
     setNoiseData([]);
     setAverageNoise(0);
     setMaxNoise(0);
-    setMinNoise(100);
+    setMinNoise(1000);
     setMeasurementId(null);
   };
 

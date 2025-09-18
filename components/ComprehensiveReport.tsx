@@ -398,7 +398,7 @@ export default function ComprehensiveReport({
 
   const conditions = safeContractSummary.conditions;
   const monthlyRentMatch = conditions.match(/월세\s*(\d+)/);
-  const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) : 0;
+  const userRent = monthlyRentMatch ? parseInt(monthlyRentMatch[1], 10) * 10000 : 0; // 만원 단위로 변환
   
   // 리포트 데이터 구조 안전성 확인 - 상세 디버깅
   console.log('=== REPORT DATA DEBUG ===');
@@ -737,7 +737,7 @@ export default function ComprehensiveReport({
                 <TimeSeriesChart 
                   buildingType={safeContractSummary.buildingType}
                   lawdCd={extractLawdCdFromAddressSync(safeContractSummary.address)}
-                  months={24}
+                  months={6}
                 />
               </div>
             )}
@@ -791,7 +791,7 @@ export default function ComprehensiveReport({
                           <tr className="border-b border-gray-100">
                             <td className="px-4 py-3 font-medium">🔊 소음</td>
                             <td className="px-4 py-3">
-                              {isNaN(currentSmartDiagnosisData.noise.value) ? '--' : currentSmartDiagnosisData.noise.value}dB
+                              {isNaN(currentSmartDiagnosisData.noise.value) || !isFinite(currentSmartDiagnosisData.noise.value) ? '35' : Math.round(currentSmartDiagnosisData.noise.value)}dB
                             </td>
                             <td className="px-4 py-3">
                               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">

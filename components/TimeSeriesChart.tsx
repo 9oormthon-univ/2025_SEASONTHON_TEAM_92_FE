@@ -29,7 +29,7 @@ interface TimeSeriesChartProps {
   months?: number;
 }
 
-export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: TimeSeriesChartProps) {
+export default function TimeSeriesChart({ buildingType, lawdCd, months = 6 }: TimeSeriesChartProps) {
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -262,8 +262,8 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: T
                 {analysis.trend === '상승' && analysis.totalChangeRate > 10 && (
                   <>
                     해당 지역 {buildingType} 월세가 {months}개월간 <span className="font-bold text-red-600">{analysis.totalChangeRate}% 상승</span>했습니다. 
-                    이는 월평균 {analysis.monthlyChangeRate}%의 가파른 상승세로, 
-                    <span className="font-bold text-purple-600"> 현재 시장이 과열 상태임을 시사합니다.</span>
+                    이는 단기간에 나타난 <span className="font-bold text-purple-600">뚜렷한 상승세</span>로, 
+                    임대료가 지속적으로 오르고 있는 추세임을 보여줍니다.
                   </>
                 )}
                 {analysis.trend === '상승' && analysis.totalChangeRate <= 10 && (
@@ -302,19 +302,19 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: T
                   <div className="flex items-start">
                     <i className="ri-number-1 text-purple-600 mr-2 mt-1"></i>
                     <span className="text-gray-700">
-                      <strong>시장 과열 근거:</strong> "{months}개월간 {analysis.totalChangeRate}% 급등으로 시장이 과열 상태입니다"
+                      <strong>객관적인 데이터로 대화 시작:</strong> "제가 알아본 바에 따르면, 이 지역 월세가 최근 {months}개월 사이에 {analysis.totalChangeRate}% 이상 오르는 등 단기간에 급등한 것으로 보입니다. 혹시 제시해주신 월세도 이러한 시장 상황이 반영된 것일까요?"
                     </span>
                   </div>
                   <div className="flex items-start">
                     <i className="ri-number-2 text-purple-600 mr-2 mt-1"></i>
                     <span className="text-gray-700">
-                      <strong>적정가 요구:</strong> "시장 안정화를 위해 {analysis.startPeriod} 수준으로 조정을 제안합니다"
+                      <strong>상호 이익이 되는 대안 제시:</strong> "물론 시세가 오른 점은 이해하지만, 급등 직전인 지난 {analysis.startPeriod} 평균가를 기준으로 합리적인 선에서 조율해주실 수 있을지 여쭙고 싶습니다. 대신 저도 2년 장기 계약을 통해 임대인분의 안정적인 수익에 기여하고 싶습니다."
                     </span>
                   </div>
                   <div className="flex items-start">
                     <i className="ri-number-3 text-purple-600 mr-2 mt-1"></i>
                     <span className="text-gray-700">
-                      <strong>장기 계약 제안:</strong> "추가 상승 방지를 위해 2년 장기계약을 제안합니다"
+                      <strong>장기적 관계 강조:</strong> "단기 시세 변동에 따르기보다, 장기적으로 좋은 관계를 유지하며 안정적으로 거주하고 싶습니다. 긍정적으로 고려해주시면 감사하겠습니다."
                     </span>
                   </div>
                 </>

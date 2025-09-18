@@ -215,10 +215,10 @@ const NegotiationGuide: React.FC<NegotiationGuideProps> = ({ userId = 'user_123'
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
               <h3 className="text-lg font-medium text-purple-900 mb-2">협상 단계</h3>
               <ul className="list-disc list-inside text-purple-800 space-y-1 text-sm">
-                <li>정중하고 전문적인 태도</li>
-                <li>구체적인 데이터 제시</li>
-                <li>상호 이익이 되는 방안 제안</li>
-                <li>서면으로 합의사항 정리</li>
+                <li>정중하고 전문적인 태도로 대화 시작</li>
+                <li>객관적인 데이터를 바탕으로 합리적 근거 제시</li>
+                <li>상호 이익이 되는 방안을 함께 모색</li>
+                <li>서면으로 합의사항을 정리하여 보관</li>
               </ul>
             </div>
           </div>
@@ -313,9 +313,10 @@ const NegotiationGuide: React.FC<NegotiationGuideProps> = ({ userId = 'user_123'
           <h3 className="text-lg font-medium text-yellow-900 mb-2">⚠️ 주의사항</h3>
           <ul className="list-disc list-inside text-yellow-800 space-y-1 text-sm">
             <li>모든 협상은 정중하고 합리적인 방식으로 진행하세요</li>
-            <li>법적 근거는 정확한 정보를 바탕으로 제시하세요</li>
+            <li>객관적 데이터와 법적 근거를 바탕으로 제시하세요</li>
             <li>서면으로 합의사항을 정리하고 보관하세요</li>
             <li>필요시 전문가(변호사, 부동산 전문가) 상담을 받으세요</li>
+            <li>임대인과의 장기적 관계를 고려하여 상호 존중하는 자세를 유지하세요</li>
           </ul>
         </div>
       </div>
