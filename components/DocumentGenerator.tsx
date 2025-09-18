@@ -23,8 +23,12 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
     address: '',
     phone: ''
   });
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
-  if (!isVisible) return null;
+  // 조건부 렌더링을 JSX에서 처리
+  if (!isVisible) {
+    return null;
+  }
 
   const documents = [
     {
@@ -409,8 +413,6 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
   };
 
 // ... (component definition)
-
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // ... (other functions)
 
