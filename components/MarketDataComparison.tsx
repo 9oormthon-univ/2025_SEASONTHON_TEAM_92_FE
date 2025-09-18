@@ -116,8 +116,8 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                 contractDate: transaction.contractDate || new Date().toISOString().split('T')[0],
                 contractType: '월세',
                 contractTerm: '2년',
-                deposit: parseFloat(transaction.deposit) || 0,
-                monthlyRent: parseFloat(transaction.monthlyRent) || 0,
+                deposit: parseFloat(transaction.deposit) * 10000 || 0, // 만원 단위를 원 단위로 변환
+                monthlyRent: parseFloat(transaction.monthlyRent) * 10000 || 0, // 만원 단위를 원 단위로 변환
                 area: parseFloat(transaction.area) || 30,
                 floor: parseInt(transaction.floor) || 1
               });
@@ -153,35 +153,61 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   const generateSimulatedMarketData = (address: string): MarketData[] => {
     const baseRent = getBaseRentByAddress(address);
     
-    // 강남/서초구 지역별 실제적인 데이터
-    const neighborhoods = address.includes('강남') || address.includes('서초') || address.includes('역삼') ? [
-      '강남구 역삼동',
-      '강남구 논현동', 
-      '강남구 삼성동',
-      '서초구 서초동',
-      '서초구 방배동',
-      '강남구 청담동'
-    ] : [
-      `${address.split(' ')[0]} 인근 지역 1`,
-      `${address.split(' ')[0]} 인근 지역 2`,
-      `${address.split(' ')[0]} 인근 지역 3`,
-      `${address.split(' ')[0]} 인근 지역 4`,
-      `${address.split(' ')[0]} 인근 지역 5`,
-      `${address.split(' ')[0]} 인근 지역 6`
-    ];
+    // 지역별 실제적인 데이터
+    let neighborhoods: string[];
+    if (address.includes('강남') || address.includes('서초') || address.includes('역삼')) {
+      neighborhoods = [
+        '강남구 역삼동',
+        '강남구 논현동', 
+        '강남구 삼성동',
+        '서초구 서초동',
+        '서초구 방배동',
+        '강남구 청담동'
+      ];
+    } else if (address.includes('울산') && address.includes('동구')) {
+      neighborhoods = [
+        '일산동',
+        '방어동',
+        '화정동',
+        '동부동',
+        '서부동',
+        '전하동'
+      ];
+    } else {
+      neighborhoods = [
+        `${address.split(' ')[0]} 인근 지역 1`,
+        `${address.split(' ')[0]} 인근 지역 2`,
+        `${address.split(' ')[0]} 인근 지역 3`,
+        `${address.split(' ')[0]} 인근 지역 4`,
+        `${address.split(' ')[0]} 인근 지역 5`,
+        `${address.split(' ')[0]} 인근 지역 6`
+      ];
+    }
 
-    // 강남/서초구 지역별 실제적인 월세 데이터
-    const gangnamRents = address.includes('강남') || address.includes('서초') || address.includes('역삼') ? [
-      1200000, // 역삼동 - 120만원
-      1100000, // 논현동 - 110만원  
-      1300000, // 삼성동 - 130만원
-      1150000, // 서초동 - 115만원
-      1000000, // 방배동 - 100만원
-      1400000  // 청담동 - 140만원
-    ] : null;
+    // 지역별 실제적인 월세 데이터
+    let regionRents: number[] | null = null;
+    if (address.includes('강남') || address.includes('서초') || address.includes('역삼')) {
+      regionRents = [
+        1200000, // 역삼동 - 120만원
+        1100000, // 논현동 - 110만원  
+        1300000, // 삼성동 - 130만원
+        1150000, // 서초동 - 115만원
+        1000000, // 방배동 - 100만원
+        1400000  // 청담동 - 140만원
+      ];
+    } else if (address.includes('울산') && address.includes('동구')) {
+      regionRents = [
+        300000, // 일산동 - 30만원
+        350000, // 방어동 - 35만원
+        400000, // 화정동 - 40만원
+        450000, // 동부동 - 45만원
+        500000, // 서부동 - 50만원
+        550000  // 전하동 - 55만원
+      ];
+    }
 
     return neighborhoods.map((neighborhood, index) => {
-      const averagePrice = gangnamRents ? gangnamRents[index] : Math.round(baseRent * (0.9 + (index * 0.05)));
+      const averagePrice = regionRents ? regionRents[index] : Math.round(baseRent * (0.9 + (index * 0.05)));
       
       return {
         neighborhood,
@@ -198,25 +224,43 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   const generateSimulatedTransactions = (address: string): TransactionData[] => {
     const baseRent = getBaseRentByAddress(address);
     
-    // 강남/서초구 실제 오피스텔/빌라명들
-    const buildings = address.includes('강남') || address.includes('서초') || address.includes('역삼') ? [
-      '역삼동 오피스텔',
-      '논현동 빌라',
-      '삼성동 오피스텔',
-      '서초동 빌라',
-      '방배동 오피스텔',
-      '청담동 빌라',
-      '역삼동 오피스텔',
-      '논현동 빌라',
-      '삼성동 오피스텔',
-      '서초동 빌라'
-    ] : [
-      `${address.split(' ')[0]} 빌라`,
-      `${address.split(' ')[0]} 빌딩`,
-      `${address.split(' ')[0]} 타워`,
-      `${address.split(' ')[0]} 센터`,
-      `${address.split(' ')[0]} 플라자`
-    ];
+    // 지역별 실제 건물명들
+    let buildings: string[];
+    if (address.includes('강남') || address.includes('서초') || address.includes('역삼')) {
+      buildings = [
+        '역삼동 오피스텔',
+        '논현동 빌라',
+        '삼성동 오피스텔',
+        '서초동 빌라',
+        '방배동 오피스텔',
+        '청담동 빌라',
+        '역삼동 오피스텔',
+        '논현동 빌라',
+        '삼성동 오피스텔',
+        '서초동 빌라'
+      ];
+    } else if (address.includes('울산') && address.includes('동구')) {
+      buildings = [
+        '일산빌라',
+        '방어빌라',
+        '화정빌라',
+        '동부빌라',
+        '서부빌라',
+        '전하빌라',
+        '일산빌라',
+        '방어빌라',
+        '화정빌라',
+        '동부빌라'
+      ];
+    } else {
+      buildings = [
+        `${address.split(' ')[0]} 빌라`,
+        `${address.split(' ')[0]} 빌딩`,
+        `${address.split(' ')[0]} 타워`,
+        `${address.split(' ')[0]} 센터`,
+        `${address.split(' ')[0]} 플라자`
+      ];
+    }
 
     return Array.from({ length: 15 }, (_, index) => {
       const building = buildings[index % buildings.length];
@@ -320,9 +364,10 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   };
 
   const formatUserRent = (price: number) => {
-    // 사용자 월세는 이미 만원 단위로 들어오므로 그대로 사용
+    // 사용자 월세는 원 단위로 들어오므로 만원 단위로 변환
     if (price === 0) return '0만원';
-    return `${price}만원`;
+    const priceInManwon = price / 10000;
+    return `${priceInManwon}만원`;
   };
 
   if (isLoading) {
