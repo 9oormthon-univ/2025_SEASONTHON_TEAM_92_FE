@@ -191,6 +191,11 @@ export const reportApi = {
     });
     return response.data;
   },
+
+  sendEmail: async (payload: { to: string; content: string }): Promise<ApiResponse<any>> => {
+    const response = await api.post('/api/report/send-email', payload);
+    return response.data;
+  },
 };
 
 export const groupApi = {

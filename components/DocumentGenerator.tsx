@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
+import { reportApi } from '../lib/api';
 
 interface DocumentGeneratorProps {
   reportData: any;
@@ -407,6 +408,12 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
     }
   };
 
+// ... (component definition)
+
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  // ... (other functions)
+
   const sendEmail = async (docType: string) => {
     // 유효성 검사
     if (!landlordEmail.trim()) {
@@ -430,7 +437,7 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
     }
 
     // 이메일 형식 검사
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
     if (!emailRegex.test(landlordEmail)) {
       toast.error('올바른 이메일 형식을 입력해주세요.');
       return;
@@ -443,42 +450,63 @@ export default function DocumentGenerator({ reportData, isVisible, onClose }: Do
       return;
     }
 
+    setIsSendingEmail(true);
     toast.loading('이메일을 발송하는 중입니다...', { id: 'email-loading' });
     
     try {
-      // 실제 구현에서는 백엔드 API를 호출하여 이메일 발송
-      // const response = await fetch('/api/send-email', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     to: landlordEmail,
-      //     subject: `${docType} 계약서`,
-      //     tenantInfo,
-      //     docType
-      //   })
-      // });
+      // 이메일 본문에 포함될 문서 내용 생성
+      const selectedDoc = documents.find(d => d.id === docType);
+      const title = selectedDoc?.title || '문서';
+      const currentDate = new Date().toLocaleDateString('ko-KR');
+      const documentContent = `
+        문서 종류: ${title}
+        작성일: ${currentDate}
+        임차인: ${tenantInfo.name || '[사용자명]'}
+        연락처: ${tenantInfo.phone || '[연락처]'}
+        주소: ${tenantInfo.address || reportData?.contractSummary?.address || '[주소]'}
+
+        --- 문서 내용 ---
+        ${getPlainTextContent(docType)} //プレーンテキストのコンテンツを取得する関数
+
+        --- 안내 ---
+        본 메일은 월세의 정석 서비스를 통해 자동 발송되었습니다.
+        문서의 세부 내용은 첨부된 PDF 파일을 확인해주시기 바랍니다. (PDF 첨부 기능은 현재 개발 중입니다.)
+      `;
+
+      const response = await reportApi.sendEmail({
+        to: landlordEmail,
+        content: documentContent,
+      });
+
+      if (response.success) {
+        toast.success('이메일이 성공적으로 발송되었습니다!', { id: 'email-loading' });
+      } else {
+        throw new Error(response.message || '이메일 발송에 실패했습니다.');
+      }
       
-      // 현재는 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast.success(
-        <div>
-          <p className="font-semibold">📧 이메일 발송 시뮬레이션 완료!</p>
-          <p className="text-sm mt-1">
-            {landlordEmail}로 {docType} 계약서 발송이 시뮬레이션되었습니다.
-          </p>
-          <p className="text-xs mt-2 text-orange-600">
-            ※ 실제 발송 기능은 준비 중입니다. 현재는 테스트용입니다.
-          </p>
-        </div>, 
-        { id: 'email-loading', duration: 5000 }
-      );
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('이메일 발송 실패:', error);
-      toast.error('이메일 발송 중 오류가 발생했습니다.', { id: 'email-loading' });
+      toast.error(error.message || '이메일 발송 중 오류가 발생했습니다.', { id: 'email-loading' });
+    } finally {
+      setIsSendingEmail(false);
     }
   };
+
+  // 이메일 본문을 위한 플레인 텍스트 내용 생성 함수
+  const getPlainTextContent = (docType: string) => {
+    switch (docType) {
+      case 'repair':
+        return `수선 요구 사항\n1. 수압 개선: 현재 수압이 정상 수준에 미달합니다.\n2. 소음 차단: 층간소음이 환경부 기준을 초과합니다.\n3. 환기 시설: 곰팡이 발생으로 인한 환기 개선이 필요합니다.`;
+      case 'content':
+        return `통지 내용\n임대차계약서상 임대인의 수선의무 불이행에 대해 정식으로 통지하며, 30일 이내 조치를 요구합니다.\n미이행 시 임대차계약 해지 및 손해배상을 청구할 수 있습니다.`;
+      case 'adjustment':
+        return `월세 조정 요청 근거\n1. 지역 평균 대비 높은 월세\n2. 시설 상태 대비 부적절한 가격\n3. 시장 동향 분석 결과`;
+      default:
+        return '문서 내용이 없습니다.';
+    }
+  }
+
+// ... (rest of the component)
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
