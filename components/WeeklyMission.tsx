@@ -8,7 +8,7 @@ interface WeeklyMissionProps {
 }
 
 export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
-  const [responses, setResponses] = useState<{[key: string]: number}>({});
+  const [responses, setResponses] = useState<{[key: string]: string | number | string[]}>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
@@ -223,7 +223,7 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
                       <div className="w-full flex justify-center items-start flex-wrap content-start">
                         {(question?.options || []).map((option, optionIndex) => {
                           const isSelected = question.type === 'multiple' 
-                            ? Array.isArray(responses[question.id]) && responses[question.id].includes(option.value)
+                            ? Array.isArray(responses[question.id]) && (responses[question.id] as string[]).includes(String(option.value))
                             : responses[question.id] === option.value;
                           
                           return (
