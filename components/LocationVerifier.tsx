@@ -27,6 +27,27 @@ export default function LocationVerifier({ currentUser, onVerificationSuccess, o
     setLocationError('');
     setLocationInfo(null);
 
+    // 시연용 강남구 역삼동 고정 위치
+    const demoCoords = { lat: 37.5008, lon: 127.0374 }; // 강남구 역삼동 좌표
+    setCoords(demoCoords);
+
+    try {
+      // 시연용 고정 데이터
+      setLocationInfo({
+        address: '서울특별시 강남구 역삼동',
+        dong: '역삼동'
+      });
+      toast.success('위치 확인: 역삼동');
+    } catch (error) {
+      console.error('주소 변환 실패:', error);
+      setLocationError('주소 변환 중 오류가 발생했습니다.');
+      toast.error('주소 변환 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+
+    // 실제 GPS 사용 시 (주석 처리)
+    /*
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
@@ -59,6 +80,7 @@ export default function LocationVerifier({ currentUser, onVerificationSuccess, o
         setIsLoading(false);
       }
     );
+    */
   };
 
   const onSubmit = async (data: FormData) => {

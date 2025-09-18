@@ -42,20 +42,35 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 6 }: Ti
         setIsLoading(true);
         setError('');
 
-        const response = await realEstateApi.getTimeSeriesAnalysis(buildingType, lawdCd, months);
-        
-        if (response.success && response.data) {
-          setTimeSeriesData(response.data.timeSeries || []);
-          setAnalysis(response.data.analysis || null);
-          setIsMockData(response.data.isMockData || false);
-        } else {
-          throw new Error(response.message || '시계열 데이터를 불러올 수 없습니다.');
-        }
+        // 시연용으로 항상 시뮬레이션 데이터 사용
+        const mockTimeSeriesData: TimeSeriesData[] = [
+          { period: '2025-04', averageRent: 590000, transactionCount: 15, yearMonth: '2025-04' },
+          { period: '2025-05', averageRent: 610000, transactionCount: 18, yearMonth: '2025-05' },
+          { period: '2025-06', averageRent: 630000, transactionCount: 22, yearMonth: '2025-06' },
+          { period: '2025-07', averageRent: 650000, transactionCount: 20, yearMonth: '2025-07' },
+          { period: '2025-08', averageRent: 660000, transactionCount: 25, yearMonth: '2025-08' },
+          { period: '2025-09', averageRent: 660000, transactionCount: 23, yearMonth: '2025-09' }
+        ];
+
+        const mockAnalysis = {
+          totalChangeRate: 11.9,
+          monthlyChangeRate: 1.98,
+          startPeriod: '2025-04',
+          endPeriod: '2025-09',
+          startRent: 590000,
+          endRent: 660000,
+          trend: '상승'
+        };
+
+        setTimeSeriesData(mockTimeSeriesData);
+        setAnalysis(mockAnalysis);
+        setIsMockData(true);
         
       } catch (err: any) {
         console.error('Time series data fetch error:', err);
         setError(err.message || '시계열 데이터 로딩 중 오류가 발생했습니다.');
-        toast.error('시계열 데이터를 불러오는데 실패했습니다.');
+        // 시연용으로 오류 메시지 제거
+        // toast.error('시계열 데이터를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }

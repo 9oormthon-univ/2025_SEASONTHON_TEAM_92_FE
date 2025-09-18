@@ -34,8 +34,18 @@ function ProfileSetupComponent() {
       setFormData(prev => ({ ...prev, dong, building: buildingName || '' }));
       setLocationData({ lat: parseFloat(lat), lon: parseFloat(lon) });
     } else {
-      // 프로필 편집인 경우 - 기존 데이터 불러오기
-      loadExistingProfile();
+      // 시연용 기본값 설정
+      setFormData(prev => ({ 
+        ...prev, 
+        dong: '서울특별시 강남구 역삼동',
+        building: '역삼동 오피스텔',
+        buildingType: '오피스텔',
+        contractType: '월세',
+        security: '1,000',
+        rent: '120',
+        maintenanceFee: '5'
+      }));
+      setLocationData({ lat: 37.5008, lon: 127.0374 }); // 강남구 역삼동 좌표
     }
   }, [searchParams, router]);
 

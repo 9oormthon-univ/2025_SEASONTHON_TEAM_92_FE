@@ -54,6 +54,22 @@ export default function LocationVerificationPage() {
     setIsGettingLocation(true);
     setError('');
 
+    // 시연용 강남구 역삼동 고정 위치
+    const demoCoords = { lat: 37.5008, lon: 127.0374 }; // 강남구 역삼동 좌표
+    const district = '서울특별시 강남구 역삼동';
+    
+    try {
+      setLocation({ district: district, latitude: demoCoords.lat, longitude: demoCoords.lon });
+      setLocationStatus('success');
+    } catch (err: any) {
+      setLocationStatus('error');
+      setError('주소 조회에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsGettingLocation(false);
+    }
+
+    // 실제 GPS 사용 시 (주석 처리)
+    /*
     if (!navigator.geolocation) {
       setError('위치 서비스가 지원되지 않는 브라우저입니다.');
       setIsGettingLocation(false);
@@ -92,6 +108,7 @@ export default function LocationVerificationPage() {
         maximumAge: 60000
       }
     );
+    */
   };
 
   const onSubmit = async (data: FormData) => {
