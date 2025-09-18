@@ -132,6 +132,10 @@ export const locationApi = {
     const response = await api.get('/api/location/preview', { params: { latitude: lat, longitude: lon } });
     return response.data;
   },
+  skipLocationVerification: async (): Promise<ApiResponse<any>> => {
+    const response = await api.post('/api/location/skip', {});
+    return response.data;
+  },
 };
 
 // ... other api objects ...

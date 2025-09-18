@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { officetelApi, villaApi, locationApi } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { extractLawdCdFromAddressSync } from '../lib/addressUtils';
+import { extractLawdCdFromAddress } from '../lib/addressUtils';
 
 interface MarketDataComparisonProps {
   userRent: number;
@@ -56,7 +56,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
       setLastFetchTime(now);
       
       // 주소에서 법정동코드 추출 (카카오 API + 폴백)
-      let lawdCd = extractLawdCdFromAddressSync(safeUserAddress);
+      let lawdCd = await extractLawdCdFromAddress(safeUserAddress);
       
       console.log(`Using lawdCd: ${lawdCd} for address: ${safeUserAddress}`);
       

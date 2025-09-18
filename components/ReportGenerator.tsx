@@ -145,7 +145,7 @@ export default function ReportGenerator({
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
         onConfirm={handlePaymentConfirm}
-        price={5000}
+        price={3900}
         itemName="프리미엄 리포트"
       />
       <div className="max-w-2xl mx-auto">

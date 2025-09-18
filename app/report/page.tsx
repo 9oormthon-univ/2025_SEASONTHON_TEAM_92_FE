@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { reportApi, diagnosisApi, smartDiagnosisApi } from '../../lib/api';
 import toast from 'react-hot-toast';
+import PaymentModal from '../../components/PaymentModal';
 // import ComprehensiveReport from '@/components/ComprehensiveReport'; // 리포트 상세 페이지에서 사용
 
 export default function ReportPage() {
@@ -19,6 +20,7 @@ export default function ReportPage() {
   const [showComprehensiveReport, setShowComprehensiveReport] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState<'comprehensive' | 'premium' | null>(null);
   const [smartDiagnosisSummary, setSmartDiagnosisSummary] = useState<any>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const router = useRouter();
 
   // 스마트 진단 종합 결과 가져오기
@@ -110,16 +112,14 @@ export default function ReportPage() {
   };
 
   const handleGeneratePremiumReport = async () => {
-    // 협상 요구사항 필수 입력 제거
-    // if (!reportContent.trim()) {
-    //   setError('협상 요구사항을 입력해주세요.');
-    //   toast.error('협상 요구사항을 입력해주세요.');
-    //   return;
-    // }
+    // 프리미엄 리포트 생성 시 결제 모달 표시
+    setShowPaymentModal(true);
+  };
 
+  const handlePaymentConfirm = async () => {
     setIsLoading(true);
     setError('');
-    setSelectedReportType('premium');
+    setShowPaymentModal(false);
 
     try {
       const jwtToken = localStorage.getItem('jwtToken');
@@ -488,6 +488,15 @@ export default function ReportPage() {
           </div>
         </div>
       </div>
+
+      {/* 결제 모달 */}
+      <PaymentModal 
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onConfirm={handlePaymentConfirm}
+        price={3900}
+        itemName="프리미엄 리포트"
+      />
     </div>
   );
 }

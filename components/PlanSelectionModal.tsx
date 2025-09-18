@@ -47,7 +47,7 @@ export default function PlanSelectionModal({
             onClick={onSelectPremium}
           >
             <h3 className="text-xl font-semibold text-blue-600 mb-4">💎 프리미엄 리포트</h3>
-            <p className="text-2xl font-bold text-blue-600 mb-4">5,000원</p>
+            <p className="text-2xl font-bold text-blue-600 mb-4">3,900원</p>
             <ul className="text-sm text-gray-600 space-y-2 text-left">
               <li>✓ **모든 기본 리포트 기능**</li>
               <li>✓ **심층 시세 분석 (유사 그룹 비교)**</li>

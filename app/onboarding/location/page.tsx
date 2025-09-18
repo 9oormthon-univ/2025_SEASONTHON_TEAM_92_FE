@@ -112,6 +112,28 @@ export default function LocationVerificationPage() {
       };
 
       await locationApi.verifyLocation(verificationData);
+      
+      // GPS 인증 완료 후 상태 업데이트
+      try {
+        const response = await fetch('/api/auth/update-profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+          },
+          body: JSON.stringify({
+            gpsVerified: true
+          })
+        });
+        
+        if (response.ok) {
+          console.log('GPS 인증 상태 업데이트 완료');
+          localStorage.setItem('gps_verified', 'true');
+        }
+      } catch (error) {
+        console.error('GPS 인증 상태 업데이트 실패:', error);
+      }
+      
       router.push('/onboarding/profile');
     } catch (err: any) {
       console.error('Location verification error:', err);
@@ -382,7 +404,16 @@ export default function LocationVerificationPage() {
                 <div className="text-center">
                   <button
                     type="button"
-                    onClick={() => router.push('/onboarding/profile')}
+                    onClick={async () => {
+                      try {
+                        // GPS 인증을 건너뛰었다는 상태를 백엔드에 업데이트
+                        await locationApi.skipLocationVerification();
+                        console.log('GPS 인증 건너뛰기 상태 업데이트 완료');
+                      } catch (error) {
+                        console.error('GPS 인증 건너뛰기 상태 업데이트 실패:', error);
+                      }
+                      router.push('/onboarding/profile');
+                    }}
                     className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer transition-colors"
                   >
                     나중에 인증하기

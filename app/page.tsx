@@ -612,17 +612,11 @@ export default function HomePage() {
             <div className="relative z-10 flex justify-center">
               <div className="relative flex items-center justify-center">
                 {/* 첨부된 3D 집 캐릭터 이미지 */}
-                <div className="relative">
-                  <img
-                    src="https://static.readdy.ai/image/2dfa5ef9c47e931f2509d723fd78fa10/ea608ef62217d53f35f9cb117a596557.png"
-                    alt="월세 진단 캐릭터"
-                    className="object-contain w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-none"
-                    style={{ 
-                      width: 'clamp(300px, 50vw, 800px)', 
-                      height: 'clamp(300px, 50vw, 780px)' 
-                    }}
-                  />
-                </div>
+                <img
+                  src="/3ce031f59273b0104d1bce74c6d0adf77246161a.png"
+                  alt="월세 진단 캐릭터"
+                  className="w-[800px] h-[870px] object-contain"
+                />
               </div>
             </div>
 
@@ -1037,9 +1031,9 @@ export default function HomePage() {
             <div className="flex justify-center">
               <div className="relative max-w-md">
                 <img
-                  src="https://readdy.ai/api/search-image?query=professional%20real%20estate%20rental%20analysis%20dashboard%20showing%20detailed%20apartment%20market%20data%20with%20charts%20graphs%20and%20statistics%2C%20modern%20business%20person%20analyzing%20rental%20contracts%20with%20tablet%20and%20documents%2C%20sophisticated%20data%20visualization%20interface%20with%20purple%20gradient%20tones%2C%20clean%20minimal%20design%20highlighting%20rental%20market%20transparency%20and%20professional%20negotiation%20tools&width=500&height=400&seq=rental-analysis-professional-purple&orientation=portrait"
+                  src="/3ce031f59273b0104d1bce74c6d0adf77246161a.png"
                   alt="데이터가 당신의 협상 무기가 됩니다"
-                  className="w-full rounded-2xl shadow-lg object-cover object-top"
+                  className="w-full rounded-2xl shadow-lg object-contain"
                 />
                 <div className="absolute top-4 right-4 bg-[#9333EA] rounded-lg px-4 py-2 shadow-md">
                   <div className="text-sm font-medium text-white">데이터가 당신의 협상 무기가 됩니다</div>
