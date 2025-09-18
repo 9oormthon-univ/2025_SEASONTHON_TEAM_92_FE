@@ -229,7 +229,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
         contractDate: contractDate.toISOString().split('T')[0],
         contractType: '월세',
         contractTerm: '2년',
-        deposit,
+        deposit: Math.round(monthlyRent * 10), // 월세의 10배 (보증금)
         monthlyRent: monthlyRent > 0 ? monthlyRent : Math.round(baseRent * (0.8 + Math.random() * 0.4)), // 월세가 0이면 재계산
         area: Math.round(20 + Math.random() * 20), // 20-40㎡
         floor: Math.floor(Math.random() * 20) + 1 // 1-20층

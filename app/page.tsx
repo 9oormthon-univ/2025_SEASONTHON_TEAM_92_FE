@@ -117,11 +117,13 @@ export default function HomePage() {
               setShowWeeklyMissionPrompt(true);
               localStorage.removeItem('diagnosis_completed');
             } else if (!userData.diagnosisCompleted) {
-              // 진단을 완료하지 않은 사용자에게 진단 프롬프트 표시 (단, 온보딩 직후가 아닌 경우)
+              // 진단을 완료하지 않은 사용자에게 진단 프롬프트 표시
               const justCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-              if (justCompletedOnboarding) {
+              const showDiagnosisPromptFlag = localStorage.getItem('show_diagnosis_prompt') === 'true';
+              if (justCompletedOnboarding || showDiagnosisPromptFlag) {
                 setShowDiagnosisPrompt(true);
                 localStorage.removeItem('onboarding_completed');
+                localStorage.removeItem('show_diagnosis_prompt');
               }
             }
             

@@ -77,9 +77,10 @@ export default function RegisterPage() {
         localStorage.setItem('userNickname', formData.name);
         localStorage.setItem('userId', loginResponse.id.toString());
         localStorage.setItem('onboarding_completed', 'true');
+        localStorage.setItem('show_diagnosis_prompt', 'true'); // 진단 프롬프트 표시 플래그
         
-        // 온보딩 페이지로 이동
-        router.push('/onboarding/location');
+        // 진단 페이지로 바로 이동 (시연용)
+        router.push('/diagnosis');
       } else {
         // 자동 로그인 실패 시 로그인 페이지로 이동
         router.push('/auth/login');

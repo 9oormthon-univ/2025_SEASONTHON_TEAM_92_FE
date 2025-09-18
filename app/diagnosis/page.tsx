@@ -49,7 +49,7 @@ export default function DiagnosisPage() {
           return;
         }
 
-        // 온보딩 완료 여부 확인 (백엔드 우선, 로컬 fallback)
+        // 온보딩 완료 여부 확인 (시연용으로 온보딩 건너뛰기)
         let onboardingCompleted = false;
         
         try {
@@ -66,11 +66,8 @@ export default function DiagnosisPage() {
           onboardingCompleted = localStorage.getItem('onboarding_completed') === 'true';
         }
         
-        if (!onboardingCompleted) {
-          console.log('온보딩 미완료 - 온보딩 페이지로 이동');
-          router.push('/onboarding/location');
-          return;
-        }
+        // 시연용: 온보딩 완료 여부와 관계없이 진단 진행 허용
+        console.log('시연용: 온보딩 상태와 관계없이 진단 진행');
 
         const response = await diagnosisApi.getQuestions();
         console.log('진단 질문 API 응답:', response);

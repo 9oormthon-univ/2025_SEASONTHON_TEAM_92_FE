@@ -3,19 +3,19 @@ import { ReportTemplate } from '@/types';
 export const mockReportData: ReportTemplate = {
   reportType: 'premium', // 프리미엄 리포트로 설정
   header: {
-    title: "망원동 ○○빌라 임대차 협상 리포트",
-    createdAt: "2025.09.08",
-    dataPeriod: "본 리포트는 최근 3개월 내 참여자 데이터와 공공 데이터를 기반으로 생성되었습니다.",
+    title: "서울특별시 강남구 역삼동 임대차 협상 리포트 💎",
+    createdAt: "2025.09.18",
+    dataPeriod: "최근 1개월",
     trustMetrics: {
-      participantCount: 15,
-      averageResponseDays: 23,
-      trustScore: 87
+      participantCount: 78,
+      averageResponseDays: 3,
+      trustScore: 74
     }
   },
   
   contractInfo: {
-    address: "서울시 마포구 망원동 123-45",
-    buildingName: "○○빌라",
+    address: "서울특별시 강남구 역삼동 123-45",
+    buildingName: "역삼빌라",
     buildingType: "빌라",
     contractType: "월세",
     deposit: 1000,
@@ -212,19 +212,19 @@ export const mockReportData: ReportTemplate = {
 export const mockFreeReportData: ReportTemplate = {
   reportType: 'free',
   header: {
-    title: "망원동 ○○빌라 기본 리포트",
-    createdAt: "2025.09.08",
-    dataPeriod: "본 리포트는 최근 1개월 내 참여자 데이터를 기반으로 생성되었습니다.",
+    title: "서울특별시 강남구 역삼동 기본 리포트",
+    createdAt: "2025.09.18",
+    dataPeriod: "최근 1개월",
     trustMetrics: {
-      participantCount: 8,
-      averageResponseDays: 15,
-      trustScore: 65
+      participantCount: 78,
+      averageResponseDays: 3,
+      trustScore: 74
     }
   },
   
   contractInfo: {
-    address: "서울시 마포구 망원동 123-45",
-    buildingName: "○○빌라",
+    address: "서울특별시 강남구 역삼동 123-45",
+    buildingName: "역삼빌라",
     buildingType: "빌라",
     contractType: "월세",
     deposit: 1000,
