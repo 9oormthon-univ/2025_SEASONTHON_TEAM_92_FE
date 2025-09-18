@@ -31,6 +31,8 @@ export default function WeeklyMissionPage() {
   const handleBackToMain = () => {
     setShowResult(false);
     setMissionData(null);
+    // 메인 페이지로 리다이렉트
+    window.location.href = '/';
   };
 
   if (showResult && missionData) {

@@ -160,7 +160,7 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 space-y-8">
         
         {/* 1. 리포트 헤더 */}
-        <section className="border-b-2 border-blue-200 pb-6">
+        <section className={`border-b-2 pb-6 ${reportData?.reportType === 'premium' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-300' : 'border-blue-200'}`}>
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-gray-900">{reportData?.header?.title || '리포트 제목'}</h1>
             {reportData?.reportType === 'premium' && (
@@ -181,16 +181,16 @@ export default function ReportTemplate({ data, reportId }: ReportTemplateProps) 
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <span className="font-semibold text-blue-800">생성일자:</span>
+            <div className={`p-3 rounded-lg ${reportData?.reportType === 'premium' ? 'bg-yellow-200' : 'bg-blue-50'}`}>
+              <span className={`font-semibold ${reportData?.reportType === 'premium' ? 'text-yellow-900' : 'text-blue-800'}`}>생성일자:</span>
               <span className="ml-2 text-gray-700">{reportData?.header?.createdAt || '알 수 없음'}</span>
             </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <span className="font-semibold text-green-800">참여 인원:</span>
+            <div className={`p-3 rounded-lg ${reportData?.reportType === 'premium' ? 'bg-yellow-200' : 'bg-green-50'}`}>
+              <span className={`font-semibold ${reportData?.reportType === 'premium' ? 'text-yellow-900' : 'text-green-800'}`}>참여 인원:</span>
               <span className="ml-2 text-gray-700">{reportData?.header?.trustMetrics?.participantCount || 0}명</span>
             </div>
-            <div className="bg-purple-50 p-3 rounded-lg">
-              <span className="font-semibold text-purple-800">신뢰도 점수:</span>
+            <div className={`p-3 rounded-lg ${reportData?.reportType === 'premium' ? 'bg-yellow-200' : 'bg-purple-50'}`}>
+              <span className={`font-semibold ${reportData?.reportType === 'premium' ? 'text-yellow-900' : 'text-purple-800'}`}>신뢰도 점수:</span>
               <span className="ml-2 text-gray-700">{reportData?.header?.trustMetrics?.trustScore || 0}/100</span>
             </div>
           </div>

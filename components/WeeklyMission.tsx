@@ -61,18 +61,29 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
   };
 
   const handleChoiceResponse = (questionId: string, value: string) => {
-    setResponses({...responses, [questionId]: parseInt(value) || 0});
+    setResponses({...responses, [questionId]: value});
   };
 
-  const handleMultipleResponse = (questionId: string, _value: string) => {
-    const current = responses[questionId] || 0;
-    setResponses({...responses, [questionId]: current + 1});
+  const handleMultipleResponse = (questionId: string, value: string) => {
+    const currentValues = responses[questionId] || [];
+    const valuesArray = Array.isArray(currentValues) ? currentValues : [];
+    
+    if (valuesArray.includes(value)) {
+      // 이미 선택된 값이면 제거
+      setResponses({...responses, [questionId]: valuesArray.filter(v => v !== value)});
+    } else {
+      // 새로운 값 추가
+      setResponses({...responses, [questionId]: [...valuesArray, value]});
+    }
   };
 
   const isFormComplete = () => {
     return mission.questions.every(q => {
       const response = responses[q.id];
-      return response !== undefined && response !== 0;
+      if (q.type === 'multiple') {
+        return Array.isArray(response) && response.length > 0;
+      }
+      return response !== undefined && response !== 0 && response !== '';
     });
   };
 
@@ -96,13 +107,15 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
   const handleBackToMain = () => {
     setShowResult(false);
     setResponses({});
+    // 메인 페이지로 리다이렉트
+    window.location.href = '/';
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">미션 결과 분석 중...</h2>
           <p className="text-gray-600">잠시만 기다려주세요</p>
         </div>
@@ -129,7 +142,7 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 flex items-center justify-center p-4">
       <div className="w-full max-w-[672px] flex flex-col justify-start items-center">
         <div className="w-full pb-8 flex flex-col items-center">
           <div className="w-full flex flex-col items-center">
@@ -208,30 +221,36 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
                     </div>
                     <div className="w-full pt-4 flex justify-center">
                       <div className="w-full flex justify-center items-start flex-wrap content-start">
-                        {(question?.options || []).map((option, optionIndex) => (
-                          <div key={optionIndex} className={`w-full mb-3 p-4 rounded-lg outline outline-2 outline-offset-[-2px] ${responses[question.id] === option.value ? 'outline-purple-500 bg-purple-50' : 'outline-gray-200'} flex flex-col justify-start items-center`}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (question.type === 'scale') {
-                                  handleScaleResponse(question.id, option.value as number);
-                                } else if (question.type === 'choice') {
-                                  handleChoiceResponse(question.id, option.value as string);
-                                } else if (question.type === 'multiple') {
-                                  handleMultipleResponse(question.id, option.value as string);
-                                }
-                              }}
-                              className="w-full h-6 flex justify-start items-center"
-                            >
-                              <div className="pr-3 flex items-center">
-                                <div className={`size-4 ${responses[question.id] === option.value ? 'bg-purple-600' : 'bg-gray-300'} ${question.type === 'multiple' ? 'rounded-xs' : 'rounded-full'}`} />
-                              </div>
-                              <div className="flex items-center">
-                                <div className="text-black text-base font-medium font-['Roboto'] leading-normal">{option.label}</div>
-                              </div>
-                            </button>
-                          </div>
-                        ))}
+                        {(question?.options || []).map((option, optionIndex) => {
+                          const isSelected = question.type === 'multiple' 
+                            ? Array.isArray(responses[question.id]) && responses[question.id].includes(option.value)
+                            : responses[question.id] === option.value;
+                          
+                          return (
+                            <div key={optionIndex} className={`w-full mb-3 p-4 rounded-lg outline outline-2 outline-offset-[-2px] ${isSelected ? 'outline-purple-500 bg-purple-50' : 'outline-gray-200'} flex flex-col justify-start items-center`}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (question.type === 'scale') {
+                                    handleScaleResponse(question.id, option.value as number);
+                                  } else if (question.type === 'choice') {
+                                    handleChoiceResponse(question.id, option.value as string);
+                                  } else if (question.type === 'multiple') {
+                                    handleMultipleResponse(question.id, option.value as string);
+                                  }
+                                }}
+                                className="w-full h-6 flex justify-start items-center"
+                              >
+                                <div className="pr-3 flex items-center">
+                                  <div className={`size-4 ${isSelected ? 'bg-purple-600' : 'bg-gray-300'} ${question.type === 'multiple' ? 'rounded-xs' : 'rounded-full'}`} />
+                                </div>
+                                <div className="flex items-center">
+                                  <div className="text-black text-base font-medium font-['Roboto'] leading-normal">{option.label}</div>
+                                </div>
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>

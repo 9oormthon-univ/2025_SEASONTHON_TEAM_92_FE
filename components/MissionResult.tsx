@@ -36,37 +36,37 @@ export default function MissionResult({
   };
 
   return (
-    <div className="size- px-64 inline-flex justify-start items-start">
-      <div className="w-[896px] h-[1217px] max-w-[896px] inline-flex flex-col justify-start items-start">
-        <div className="size- pb-8 inline-flex justify-start items-start">
-          <div className="w-[896px] h-48 inline-flex flex-col justify-start items-start">
-            <div className="size- pb-2 inline-flex justify-start items-start">
-              <div className="w-[896px] h-9 flex justify-center items-center">
-                <div className="text-center justify-center text-gray-800 text-3xl font-bold font-['Inter'] leading-9">월세의 정석</div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-[896px] flex flex-col justify-start items-center">
+        <div className="w-full pb-8 flex flex-col items-center">
+          <div className="w-full flex flex-col items-center">
+            <div className="w-full pb-2 flex justify-center">
+              <div className="h-9 flex justify-center items-center">
+                <div className="text-center text-gray-800 text-3xl font-bold font-['Inter'] leading-9">월세의 정석</div>
               </div>
             </div>
-            <div className="size- px-96 pb-6 inline-flex justify-start items-start">
+            <div className="w-full pb-6 flex justify-center">
               <div className="w-16 h-1 bg-purple-600" />
             </div>
-            <div className="self-stretch inline-flex justify-center items-start">
-              <div className="size- px-96 pb-4 flex justify-start items-start">
-                <div className="w-24 h-9 px-4 py-2 bg-purple-600 rounded-full flex justify-start items-center">
-                  <div className="text-center justify-center text-white text-sm font-medium font-['Roboto'] leading-tight">미션 완료!</div>
-                </div>
+            <div className="w-full pb-4 flex justify-center">
+              <div className="px-4 py-2 bg-purple-600 rounded-full flex items-center">
+                <div className="text-center text-white text-sm font-medium font-['Roboto'] leading-tight">미션 완료!</div>
               </div>
             </div>
-            <div className="size- pb-2 inline-flex justify-start items-start">
-              <div className="w-[896px] h-8 flex justify-center items-center">
-                <div className="text-center justify-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">방음 상태 점검 결과</div>
+            <div className="w-full pb-2 flex justify-center">
+              <div className="h-8 flex justify-center items-center">
+                <div className="text-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">주간 미션 완료 결과</div>
               </div>
             </div>
-            <div className="w-[896px] h-6 inline-flex justify-center items-center">
-              <div className="text-center justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">2025년 1주차 • 2025.09.19</div>
+            <div className="w-full flex justify-center">
+              <div className="h-6 flex justify-center items-center">
+                <div className="text-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">2025년 1주차 • 2025.09.19</div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="size- pb-8 inline-flex justify-start items-start">
-          <div className="w-[896px] h-[861px] p-px bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start overflow-hidden">
+        <div className="w-full pb-8 flex justify-center">
+          <div className="w-full bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-center overflow-hidden">
             <div className="w-[894px] h-20 pb-px border-b border-gray-200 inline-flex justify-start items-start">
               <button
                 onClick={() => setActiveTab('building')}
@@ -115,7 +115,7 @@ export default function MissionResult({
                   <div className="size- pb-4 inline-flex justify-start items-start">
                     <div className="w-[830px] h-7 flex justify-center items-center">
                       <div className="text-center justify-center text-gray-900 text-xl font-bold font-['Roboto'] leading-7">
-                        {activeTab === 'building' ? '우리 건물 방음 점수 비교' : '우리 동네 방음 점수 비교'}
+                        {activeTab === 'building' ? '우리 건물 환경 점수 비교' : '우리 동네 환경 점수 비교'}
                       </div>
                     </div>
                   </div>
@@ -132,7 +132,7 @@ export default function MissionResult({
                         </div>
                       </div>
                       <div className="w-96 h-4 inline-flex justify-center items-center">
-                        <div className={`text-center justify-center text-purple-600 text-xs font-normal font-['Roboto'] leading-none`}>{getScoreLevel(userScore)} 수준</div>
+                        <div className={`text-center justify-center text-purple-600 text-xs font-normal font-['Roboto'] leading-none`}>{getScoreLevel(userScore)} 환경</div>
                       </div>
                     </div>
                     <div className="w-96 h-32 p-6 bg-gray-50 rounded-xl inline-flex flex-col justify-start items-start">
@@ -152,7 +152,7 @@ export default function MissionResult({
                       </div>
                       <div className="w-96 h-4 inline-flex justify-center items-center">
                         <div className="text-center justify-center text-gray-600 text-xs font-normal font-['Roboto'] leading-none">
-                          {userScore < (activeTab === 'building' ? buildingAverage : neighborhoodAverage) ? '평균보다 낮음' : '평균보다 높음'}
+                          {userScore < (activeTab === 'building' ? buildingAverage : neighborhoodAverage) ? '평균보다 좋음' : '평균보다 나쁨'}
                         </div>
                       </div>
                     </div>
@@ -170,8 +170,8 @@ export default function MissionResult({
                         <div className="w-44 h-6 flex justify-center items-center">
                           <div className="text-center justify-center text-purple-600 text-base font-medium font-['Roboto'] leading-normal">
                             {activeTab === 'building' 
-                              ? `우리 건물보다 ${Math.abs(userScore - buildingAverage)}점 ${userScore < buildingAverage ? '낮습니다' : '높습니다'}`
-                              : `우리 동네보다 ${Math.abs(userScore - neighborhoodAverage)}점 ${userScore < neighborhoodAverage ? '낮습니다' : '높습니다'}`
+                              ? `우리 건물보다 ${Math.abs(userScore - buildingAverage)}점 ${userScore < buildingAverage ? '좋습니다' : '나쁩니다'}`
+                              : `우리 동네보다 ${Math.abs(userScore - neighborhoodAverage)}점 ${userScore < neighborhoodAverage ? '좋습니다' : '나쁩니다'}`
                             }
                           </div>
                         </div>
@@ -193,7 +193,7 @@ export default function MissionResult({
                         </div>
                       </div>
                       <div className="w-96 h-36 flex flex-col justify-start items-start">
-                        {['전혀 안들림', '거의 안들림', '가끔 들림', '자주 들림', '항상 들림'].map((level, index) => {
+                        {['매우 좋음', '좋음', '보통', '나쁨', '매우 나쁨'].map((level, index) => {
                           const count = activeTab === 'building' 
                             ? [2, 4, 8, 3, 1][index]
                             : [12, 23, 28, 18, 6][index];
@@ -235,8 +235,8 @@ export default function MissionResult({
                         <div className="w-60 h-5 flex justify-start items-center">
                           <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">
                             {activeTab === 'building' 
-                              ? '우리 건물은 평균보다 방음이 4점 낮습니다'
-                              : '우리 동네는 평균보다 방음이 6점 낮습니다'
+                              ? '우리 건물은 평균보다 환경이 4점 좋습니다'
+                              : '우리 동네는 평균보다 환경이 6점 좋습니다'
                             }
                           </div>
                         </div>
@@ -255,8 +255,8 @@ export default function MissionResult({
                           <div className="w-64 h-5 flex justify-start items-center">
                             <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">
                               {activeTab === 'building' 
-                                ? '18세대 중 12세대가 층간소음을 경험했습니다'
-                                : '87세대 중 58세대가 층간소음을 경험했습니다'
+                                ? '18세대 중 12세대가 환경 개선이 필요합니다'
+                                : '87세대 중 58세대가 환경 개선이 필요합니다'
                               }
                             </div>
                           </div>
@@ -274,7 +274,7 @@ export default function MissionResult({
                             </div>
                           </div>
                           <div className="w-72 h-5 flex justify-start items-center">
-                            <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">주로 저녁 시간대(18-22시) 소음이 많이 발생합니다</div>
+                            <div className="justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">주로 오후 시간대(12-18시) 환경이 좋습니다</div>
                           </div>
                         </div>
                       </div>
@@ -291,7 +291,7 @@ export default function MissionResult({
                               </div>
                             </div>
                             <div className="w-80 h-10 flex justify-start items-start flex-wrap content-start">
-                              <div className="w-80 h-10 justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">우리 동네 신축 건물들의 방음 점수가 평균 78점으로 높습니다</div>
+                              <div className="w-80 h-10 justify-center text-gray-700 text-sm font-normal font-['Roboto'] leading-tight">우리 동네 신축 건물들의 환경 점수가 평균 78점으로 높습니다</div>
                             </div>
                           </div>
                         </div>
@@ -303,14 +303,14 @@ export default function MissionResult({
               <div className="size- pt-8 inline-flex justify-start items-start">
                 <div className="w-[830px] h-24 p-6 bg-gradient-to-r from-purple-600 to-violet-600 rounded-xl inline-flex flex-col justify-start items-start">
                   <div className="w-[782px] h-14 inline-flex justify-between items-center">
-                    <div className="w-32 h-14 inline-flex flex-col justify-start items-start">
-                      <div className="size- pb-2 inline-flex justify-start items-start">
-                        <div className="w-32 h-7 flex justify-start items-center">
-                          <div className="justify-center text-white text-lg font-bold font-['Roboto'] leading-7">다음 주 미션 예고</div>
+                    <div className="flex flex-col justify-start items-start">
+                      <div className="pb-2 flex justify-start items-start">
+                        <div className="flex justify-start items-center">
+                          <div className="text-white text-lg font-bold font-['Roboto'] leading-7">다음 주 미션 예고</div>
                         </div>
                       </div>
-                      <div className="w-32 h-5 inline-flex justify-start items-center">
-                        <div className="justify-center text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">수압 및 온수 상태 점검</div>
+                      <div className="flex justify-start items-center">
+                        <div className="text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">채광 및 환기 상태 점검</div>
                       </div>
                     </div>
                     <div className="w-14 h-12 inline-flex flex-col justify-start items-start">
@@ -351,7 +351,7 @@ export default function MissionResult({
         <div className="size- pt-6 inline-flex justify-start items-start">
           <div className="w-[896px] h-5 inline-flex flex-col justify-start items-start">
             <div className="w-[896px] h-5 inline-flex justify-center items-center">
-              <div className="text-center justify-center text-gray-500 text-sm font-normal font-['Roboto'] leading-tight">매주 미션에 참여하여 더 정확한 이웃 비교 데이터를 받아보세요!</div>
+              <div className="text-center justify-center text-gray-500 text-sm font-normal font-['Roboto'] leading-tight">매주 미션에 참여하여 더 정확한 환경 분석 데이터를 받아보세요!</div>
             </div>
           </div>
         </div>

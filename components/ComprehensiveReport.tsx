@@ -535,11 +535,11 @@ export default function ComprehensiveReport({
         {/* 메인 카드 */}
         <div className="pdf-container bg-white rounded-2xl shadow-xl border border-violet-200 overflow-hidden">
           
-          {/* 1. 리포트 헤더 - 보라색 배경 */}
-          <section className="bg-gradient-to-r from-purple-900 to-purple-800 text-white p-6 md:p-8">
+          {/* 1. 리포트 헤더 - 프리미엄일 때 노란색 배경, 일반일 때 보라색 배경 */}
+          <section className={`${isPremium ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 text-gray-800' : 'bg-gradient-to-r from-purple-900 to-purple-800 text-white'} p-6 md:p-8`}>
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i className="ri-file-chart-line text-4xl text-white"></i>
+              <div className={`w-20 h-20 ${isPremium ? 'bg-gray-800/20' : 'bg-white/20'} rounded-full flex items-center justify-center mx-auto mb-6`}>
+                <i className={`ri-file-chart-line text-4xl ${isPremium ? 'text-gray-800' : 'text-white'}`}></i>
               </div>
               <h1 className="text-2xl md:text-4xl font-bold mb-4">
                 {safeContractSummary.address} 임대차 협상 리포트
@@ -557,29 +557,29 @@ export default function ComprehensiveReport({
                 </div>
               </div>
               
-              <p className="text-white/80 text-sm max-w-2xl mx-auto mb-8">{reportData?.header?.dataPeriod || '데이터 기간 정보가 없습니다.'}</p>
+              <p className={`${isPremium ? 'text-gray-700' : 'text-white/80'} text-sm max-w-2xl mx-auto mb-8`}>{reportData?.header?.dataPeriod || '데이터 기간 정보가 없습니다.'}</p>
             </div>
             
             {/* 데이터 신뢰도 */}
-            <div className="bg-white/10 rounded-2xl backdrop-blur-sm p-6">
+            <div className={`${isPremium ? 'bg-gray-800/10' : 'bg-white/10'} rounded-2xl backdrop-blur-sm p-6`}>
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center mb-2">
-                  <i className="ri-shield-check-line text-white text-xl mr-2"></i>
-                  <h2 className="text-white text-xl font-bold">데이터 신뢰도</h2>
+                  <i className={`ri-shield-check-line ${isPremium ? 'text-gray-800' : 'text-white'} text-xl mr-2`}></i>
+                  <h2 className={`${isPremium ? 'text-gray-800' : 'text-white'} text-xl font-bold`}>데이터 신뢰도</h2>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div>
                   <div className="text-3xl font-bold mb-2">{reportData?.header?.participantCount || 0}명</div>
-                  <div className="text-white/80 text-sm">참여 인원 수</div>
+                  <div className={`${isPremium ? 'text-gray-700' : 'text-white/80'} text-sm`}>참여 인원 수</div>
                 </div>
-                <div className="border-l border-r border-white/30 px-4">
+                <div className={`border-l border-r ${isPremium ? 'border-gray-600/30' : 'border-white/30'} px-4`}>
                   <div className="text-3xl font-bold mb-2">{reportData?.header?.dataRecency || '알 수 없음'}</div>
-                  <div className="text-white/80 text-sm">평균 응답 시점</div>
+                  <div className={`${isPremium ? 'text-gray-700' : 'text-white/80'} text-sm`}>평균 응답 시점</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold mb-2">{reportData?.header?.reliabilityScore || 0}/100</div>
-                  <div className="text-white/80 text-sm">신뢰도 점수</div>
+                  <div className={`${isPremium ? 'text-gray-700' : 'text-white/80'} text-sm`}>신뢰도 점수</div>
                 </div>
               </div>
             </div>
