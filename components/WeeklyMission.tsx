@@ -129,87 +129,87 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
   }
 
   return (
-    <div className="size- px-96 inline-flex justify-start items-start">
-      <div className="w-[672px] h-[1583px] max-w-[672px] inline-flex flex-col justify-start items-start">
-        <div className="size- pb-8 inline-flex justify-start items-start">
-          <div className="w-[672px] h-48 inline-flex flex-col justify-start items-start">
-            <div className="size- pb-2 inline-flex justify-start items-start">
-              <div className="w-[672px] h-9 flex justify-center items-center">
-                <div className="text-center justify-center text-black text-3xl font-bold font-['Inter'] leading-9">월세의 정석</div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-[672px] flex flex-col justify-start items-center">
+        <div className="w-full pb-8 flex flex-col items-center">
+          <div className="w-full flex flex-col items-center">
+            <div className="w-full pb-2 flex justify-center">
+              <div className="h-9 flex justify-center items-center">
+                <div className="text-center text-black text-3xl font-bold font-['Inter'] leading-9">월세의 정석</div>
               </div>
             </div>
-            <div className="size- px-72 pb-6 inline-flex justify-start items-start">
+            <div className="w-full pb-6 flex justify-center">
               <div className="w-16 h-1 bg-purple-600" />
             </div>
-            <div className="self-stretch inline-flex justify-center items-start">
-              <div className="size- px-60 pb-4 flex justify-start items-start">
-                <div className="w-48 h-9 px-4 py-2 bg-purple-600 rounded-full flex justify-start items-center">
-                  <div className="size- pr-2 flex justify-start items-start">
-                    <div className="w-3.5 h-5 relative flex justify-center items-center">
-                      <div className="size-3.5 left-[0.01px] top-[3px] absolute overflow-hidden">
-                        <div className="size-3 left-[1.46px] top-[1.17px] absolute bg-white" />
-                      </div>
+            <div className="w-full pb-4 flex justify-center">
+              <div className="px-4 py-2 bg-purple-600 rounded-full flex items-center">
+                <div className="pr-2 flex items-center">
+                  <div className="w-3.5 h-5 relative flex justify-center items-center">
+                    <div className="size-3.5 left-[0.01px] top-[3px] absolute overflow-hidden">
+                      <div className="size-3 left-[1.46px] top-[1.17px] absolute bg-white" />
                     </div>
                   </div>
-                  <div className="text-center justify-center text-white text-sm font-medium font-['Roboto'] leading-tight">{mission.week} 주간 미션</div>
                 </div>
+                <div className="text-center text-white text-sm font-medium font-['Roboto'] leading-tight">{mission.week} 주간 미션</div>
               </div>
             </div>
-            <div className="size- pb-2 inline-flex justify-start items-start">
-              <div className="w-[672px] h-8 flex justify-center items-center">
-                <div className="text-center justify-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">{mission.theme}</div>
+            <div className="w-full pb-2 flex justify-center">
+              <div className="h-8 flex justify-center items-center">
+                <div className="text-center text-gray-900 text-2xl font-bold font-['Roboto'] leading-loose">{mission.theme}</div>
               </div>
             </div>
-            <div className="w-[672px] h-6 inline-flex justify-center items-center">
-              <div className="text-center justify-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">{mission.description}</div>
+            <div className="w-full flex justify-center">
+              <div className="h-6 flex justify-center items-center">
+                <div className="text-center text-gray-600 text-base font-normal font-['Roboto'] leading-normal">{mission.description}</div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="w-[672px] h-[1319px] p-px bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start overflow-hidden">
-          <div className="w-[670px] h-28 p-6 bg-gradient-to-r from-purple-600 to-violet-600 flex flex-col justify-start items-start">
-            <div className="w-[622px] h-16 inline-flex justify-start items-center">
-              <div className="size- pr-4 flex justify-start items-start">
+        <div className="w-full bg-white rounded-2xl shadow-lg shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-center overflow-hidden">
+          <div className="w-full p-6 bg-gradient-to-r from-purple-600 to-violet-600 flex flex-col justify-start items-center">
+            <div className="w-full h-16 flex justify-center items-center">
+              <div className="pr-4 flex items-center">
                 <div className="size-12 bg-white/20 rounded-full flex justify-center items-center">
-                  <div className="w-6 h-8 relative flex justify-start items-center">
+                  <div className="w-6 h-8 relative flex justify-center items-center">
                     <div className="size-6 left-0 top-[4px] absolute overflow-hidden">
                       <div className="size-4 left-[4px] top-[3.56px] absolute bg-white" />
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="w-56 h-16 inline-flex flex-col justify-start items-start">
-                <div className="w-56 h-7 inline-flex justify-start items-center">
-                  <div className="justify-center text-white text-lg font-bold font-['Roboto'] leading-7">미션 완료 보상</div>
+              <div className="flex flex-col justify-center items-start">
+                <div className="h-7 flex items-center">
+                  <div className="text-white text-lg font-bold font-['Roboto'] leading-7">미션 완료 보상</div>
                 </div>
-                <div className="w-56 h-10 flex flex-col justify-start items-start">
-                  <div className="w-56 h-5 inline-flex justify-start items-center">
-                    <div className="justify-center text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">참여 시간: 단 2분</div>
+                <div className="flex flex-col justify-start items-start">
+                  <div className="h-5 flex items-center">
+                    <div className="text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">참여 시간: 단 2분</div>
                   </div>
-                  <div className="w-56 h-5 inline-flex justify-start items-center">
-                    <div className="justify-center text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">즉시 보상: {mission.reward}</div>
+                  <div className="h-5 flex items-center">
+                    <div className="text-purple-100 text-sm font-normal font-['Roboto'] leading-tight">즉시 보상: {mission.reward}</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="w-[670px] h-[1201px] p-8 flex flex-col justify-start items-start">
-            <div className="w-[606px] h-[1024px] flex flex-col justify-start items-start">
+          <div className="w-full p-8 flex flex-col justify-start items-center">
+            <div className="w-full flex flex-col justify-start items-center">
               <form onSubmit={handleSubmit}>
                 {(mission?.questions || []).map((question, index) => (
-                  <div key={question.id} className="w-[606px] h-96 flex flex-col justify-start items-start">
-                    <div className="size- pb-4 inline-flex justify-start items-start">
-                      <div className="w-[606px] h-7 inline-flex flex-col justify-start items-start">
-                        <div className="size- pb-4 inline-flex justify-start items-start">
-                          <div className="w-[606px] h-7 flex justify-start items-center">
-                            <div className="justify-center text-gray-800 text-lg font-semibold font-['Roboto'] leading-7">{index + 1}. {question.text}</div>
+                  <div key={question.id} className="w-full mb-8 flex flex-col justify-start items-center">
+                    <div className="w-full pb-4 flex justify-center">
+                      <div className="w-full flex flex-col justify-start items-center">
+                        <div className="w-full pb-4 flex justify-center">
+                          <div className="w-full flex justify-center items-center">
+                            <div className="text-center text-gray-800 text-lg font-semibold font-['Roboto'] leading-7">{index + 1}. {question.text}</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="size- pt-4 inline-flex justify-start items-start">
-                      <div className="w-[606px] h-80 flex justify-start items-start flex-wrap content-start">
+                    <div className="w-full pt-4 flex justify-center">
+                      <div className="w-full flex justify-center items-start flex-wrap content-start">
                         {(question?.options || []).map((option, optionIndex) => (
-                          <div key={optionIndex} className={`w-[606px] h-14 p-4 rounded-lg outline outline-2 outline-offset-[-2px] ${responses[question.id] === option.value ? 'outline-purple-500 bg-purple-50' : 'outline-gray-200'} inline-flex flex-col justify-start items-start ${optionIndex > 0 ? 'pt-3' : ''}`}>
+                          <div key={optionIndex} className={`w-full mb-3 p-4 rounded-lg outline outline-2 outline-offset-[-2px] ${responses[question.id] === option.value ? 'outline-purple-500 bg-purple-50' : 'outline-gray-200'} flex flex-col justify-start items-center`}>
                             <button
                               type="button"
                               onClick={() => {
@@ -221,13 +221,13 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
                                   handleMultipleResponse(question.id, option.value as string);
                                 }
                               }}
-                              className="w-[570px] h-6 inline-flex justify-start items-center"
+                              className="w-full h-6 flex justify-start items-center"
                             >
-                              <div className="size- pr-3 flex justify-start items-start">
+                              <div className="pr-3 flex items-center">
                                 <div className={`size-4 ${responses[question.id] === option.value ? 'bg-purple-600' : 'bg-gray-300'} ${question.type === 'multiple' ? 'rounded-xs' : 'rounded-full'}`} />
                               </div>
-                              <div className="w-20 h-6 flex justify-start items-center">
-                                <div className="justify-center text-black text-base font-medium font-['Roboto'] leading-normal">{option.label}</div>
+                              <div className="flex items-center">
+                                <div className="text-black text-base font-medium font-['Roboto'] leading-normal">{option.label}</div>
                               </div>
                             </button>
                           </div>
@@ -236,14 +236,14 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
                     </div>
                   </div>
                 ))}
-                <div className="size- pt-8 inline-flex justify-start items-start">
-                  <div className="w-[606px] h-20 pt-6 border-t border-gray-100 flex justify-start items-start">
+                <div className="w-full pt-8 flex justify-center">
+                  <div className="w-full pt-6 border-t border-gray-100 flex justify-center">
                     <button
                       type="submit"
                       disabled={!isFormComplete()}
-                      className={`w-[606px] h-14 px-6 py-4 ${isFormComplete() ? 'bg-purple-600' : 'opacity-50 bg-purple-600'} rounded-xl flex justify-center items-center`}
+                      className={`w-full h-14 px-6 py-4 ${isFormComplete() ? 'bg-purple-600' : 'opacity-50 bg-purple-600'} rounded-xl flex justify-center items-center`}
                     >
-                      <div className={`${isFormComplete() ? 'opacity-100' : 'opacity-50'} text-center justify-center text-white text-base font-semibold font-['Roboto'] leading-normal`}>미션 완료하고 결과 보기</div>
+                      <div className={`${isFormComplete() ? 'opacity-100' : 'opacity-50'} text-center text-white text-base font-semibold font-['Roboto'] leading-normal`}>미션 완료하고 결과 보기</div>
                     </button>
                   </div>
                 </div>
@@ -251,10 +251,10 @@ export default function WeeklyMission({ onComplete }: WeeklyMissionProps) {
             </div>
           </div>
         </div>
-        <div className="size- pt-6 inline-flex justify-start items-start">
-          <div className="w-[672px] h-5 inline-flex flex-col justify-start items-start">
-            <div className="w-[672px] h-5 inline-flex justify-center items-center">
-              <div className="text-center justify-center text-gray-500 text-sm font-normal font-['Roboto'] leading-tight">주간 미션 참여로 더 정확한 이웃 비교 데이터를 받아보세요!</div>
+        <div className="w-full pt-6 flex justify-center">
+          <div className="w-full flex flex-col justify-start items-center">
+            <div className="w-full flex justify-center items-center">
+              <div className="text-center text-gray-500 text-sm font-normal font-['Roboto'] leading-tight">주간 미션 참여로 더 정확한 이웃 비교 데이터를 받아보세요!</div>
             </div>
           </div>
         </div>
