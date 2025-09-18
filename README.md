@@ -1,128 +1,86 @@
-# 월세의 정석 - 프론트엔드
 
-월세 공동협약 네트워크 서비스의 프론트엔드 애플리케이션입니다.
+# 월세의 정석 (The Art of Monthly Rent)
 
-## 🚀 기술 스택
+> 데이터 기반 분석으로 임차인의 협상력을 강화하는 월세 협상 솔루션
 
-- **Framework**: Next.js 15.3.2
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: React Hooks
-- **HTTP Client**: Axios
-- **UI Components**: Custom Components with Remix Icons
-
-## 📋 주요 기능
-
-- ✅ 회원가입/로그인 (JWT 인증)
-- ✅ 위치 기반 실거주 인증 (GPS → 주소 변환)
-- ✅ 거주 환경 진단 시스템 (10개 카테고리)
-- ✅ 맞춤형 협상 리포트 생성
-- ✅ 주간 미션 시스템
-- ✅ 정책 정보 조회
-- ✅ 공공 데이터 연동 (오피스텔 실거래가)
-- ✅ 분쟁 해결 기관 정보
-
-## 🛠️ 개발 환경 설정
-
-### 1. 의존성 설치
-
-```bash
-npm install
-```
-
-### 2. 환경 변수 설정
-
-`.env.local` 파일을 생성하고 다음 내용을 추가하세요:
-
-```env
-# API 기본 URL 설정
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
-
-# 백엔드 서버 설정
-# 로컬 개발: http://localhost:8080
-# 프로덕션: https://2025seasonthonteam92be-production.up.railway.app
-```
-
-### 3. 개발 서버 실행
-
-```bash
-npm run dev
-```
-
-애플리케이션이 [http://localhost:3000](http://localhost:3000)에서 실행됩니다.
-
-## 🔧 백엔드 연동
-
-### API 엔드포인트
-
-- **회원 관리**: `/member/*`
-- **진단 시스템**: `/api/v1/diagnosis/*`
-- **리포트**: `/report/*`
-- **주간 미션**: `/mission/weekly/*`
-- **정책 정보**: `/api/policy/*`
-- **공공 데이터**: `/api/officetel/*`
-
-### 인증
-
-JWT 토큰을 사용한 인증 시스템이 구현되어 있습니다.
-
-- 로그인 시 JWT 토큰을 localStorage에 저장
-- API 요청 시 Authorization 헤더에 토큰 자동 추가
-- 토큰 만료 시 자동 로그아웃 및 로그인 페이지 리다이렉트
-
-## 📁 프로젝트 구조
-
-```
-frontend-backup/
-├── app/                    # Next.js App Router 페이지
-│   ├── auth/              # 인증 관련 페이지
-│   ├── report/            # 리포트 생성
-│   ├── diagnosis/         # 진단 시스템
-│   ├── weekly-mission/    # 주간 미션
-│   └── ...
-├── components/            # 재사용 가능한 컴포넌트
-├── lib/                   # 유틸리티 및 API 클라이언트
-├── types/                 # TypeScript 타입 정의
-└── ...
-```
-
-## 🎯 주요 수정 사항
-
-### API 연동 개선
-- 환경별 API URL 설정 수정
-- 하드코딩된 URL 제거
-- 백엔드 응답 구조에 맞는 데이터 처리
-
-### 인증 시스템 개선
-- JWT 토큰 처리 로직 수정
-- 자동 로그아웃 및 리다이렉트 로직 개선
-- 사용자 상태 관리 개선
-
-### 에러 처리 개선
-- 네트워크 에러 처리
-- 서버 에러 처리
-- 사용자 친화적 에러 메시지
-
-## 🚀 배포
-
-### 프로덕션 빌드
-
-```bash
-npm run build
-```
-
-### 환경 변수 설정
-
-프로덕션 환경에서는 다음 환경 변수를 설정하세요:
-
-```env
-NEXT_PUBLIC_API_BASE_URL=https://2025seasonthonteam92be-production.up.railway.app
-```
-
-## 📞 지원
-
-문제가 발생하거나 질문이 있으시면 개발팀에 문의해주세요.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-repo%2Fhouse-rent-frontend)
 
 ---
 
-**월세의 정석** - 공정한 월세를 위한 스마트한 협상 플랫폼
+## 🧐 1. 문제 정의 (기획)
+
+부동산 임대차 시장, 특히 월세 계약에서는 임대인과 임차인 간의 정보 비대칭 문제가 심각합니다. 임차인은 자신이 계약하려는 매물의 적정 가격을 알기 어렵고, 주변 시세나 시설 상태에 대한 객관적인 데이터 없이 불리한 협상을 진행하는 경우가 많습니다.
+
+'월세의 정석'은 이러한 문제를 해결하기 위해 탄생했습니다. 흩어져 있는 공공 데이터와 집단지성 데이터를 한곳에 모아 분석하고, 누구나 쉽게 이해할 수 있는 '종합 협상 리포트'를 제공하여 임차인이 동등한 위치에서 합리적인 협상을 할 수 있도록 돕습니다.
+
+## ✨ 2. 핵심 기능 (Features)
+
+- **📊 종합 협상 리포트:** 주변 시세, 거주 환경 만족도, 협상 전략, 법적 문서까지 한 번에 제공하는 All-in-One 리포트
+- **📈 실시간 시세 분석:** 국토교통부 실거래가 API를 기반으로 주변 동네 및 유사 조건의 매물과 월세를 객관적으로 비교 분석
+- **📱 스마트 진단 도구:** 스마트폰 센서(소음, 수평계 등)를 활용해 현재 거주 환경을 객관적인 데이터로 측정
+- **📝 데이터 기반 협상 카드:** 리포트 데이터를 분석하여, 사용자에게 가장 유리한 협상 포인트를 찾아 맞춤형 협상 스크립트 제공
+- **📄 법적 문서 자동 생성:** 수선요구서, 내용증명 등 상황에 맞는 법적 문서를 자동으로 작성하고, PDF/Word 다운로드 및 이메일 발송 지원
+
+## 🛠️ 3. 기술 스택 (Tech Stack)
+
+- **Framework:** Next.js (React)
+- **Language:** TypeScript
+- **Deployment:** Vercel
+- **Styling:** Tailwind CSS, shadcn/ui
+- **State Management:** React Hooks (useState, useEffect, useContext)
+- **Data Fetching:** Axios
+- **Charts:** Recharts
+- **Document Generation:** `jspdf`, `html2canvas`, `docx`
+
+## 🚀 4. 실행 방법 (Getting Started)
+
+**※ 사전 요구사항:** 이 프로젝트는 백엔드 서버에 의존적입니다. 실행 전, [백엔드 저장소](https://github.com/your-repo/2025_SEASONTHON_TEAM_92_BE)가 먼저 실행되어야 합니다.
+
+```bash
+# 1. 프로젝트 클론
+git clone https://github.com/your-repo/house-rent-frontend.git
+cd house-rent-frontend
+
+# 2. 의존성 설치
+npm install
+
+# 3. 환경 변수 파일 생성
+# .env.example 파일을 복사하여 .env.local 파일을 생성합니다.
+cp .env.example .env.local
+```
+
+`.env.local` 파일 안에 백엔드 서버 주소를 입력해주세요.
+```
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+```bash
+# 4. 개발 서버 실행
+npm run dev
+```
+브라우저에서 `http://localhost:3000`으로 접속하세요.
+
+## 🏗️ 5. 기술 설계 및 아키텍처 (Architecture)
+
+본 프로젝트는 심사 기준의 '기술 구현' 항목을 충족시키기 위해 다음과 같은 점들을 중점적으로 고려하여 설계되었습니다.
+
+### 1. 기술적 설계 및 아키텍처
+- **컴포넌트 기반 아키텍처:** 기능별로 컴포넌트(`MarketDataComparison`, `DocumentGenerator` 등)를 명확히 분리하여 재사용성과 유지보수성을 극대화했습니다.
+- **중앙화된 API 관리:** 모든 외부 API 요청은 `lib/api.ts`의 `axios` 인스턴스를 통해 중앙에서 관리됩니다. 이를 통해 향후 API 스펙 변경이나 인증 방식 수정에 유연하게 대응할 수 있습니다.
+- **확장성을 고려한 설계:** Next.js의 App Router를 기반으로 설계하여, 향후 페이지 추가 및 기능 확장이 용이합니다. 또한, Vercel 플랫폼을 통해 손쉬운 배포 및 CI/CD 파이프라인을 구축했습니다.
+
+### 2. 구현 품질 및 완성도
+- **가독성 및 모듈화:** `lib` 폴더에 API, 주소 변환 등 핵심 유틸리티 함수를 모듈화하여 코드의 응집도를 높였습니다. 또한, TypeScript를 적극적으로 활용하여 타입 안정성을 확보하고 코드 가독성을 향상시켰습니다.
+- **유지보수성:** 상태 관리 로직은 각 컴포넌트와 커스텀 훅에 집중시키고, UI는 `shadcn/ui` 기반의 재사용 가능한 컴포넌트로 구성하여 수정 및 개선이 용이하도록 설계했습니다.
+
+### 3. 안정성 및 운영 고려사항
+- **전역 에러 핸들링:** `axios` 인터셉터를 사용하여 모든 API 요청/응답을 전역적으로 관리합니다. 특히 401(인증 만료), 500(서버 오류) 등의 에러 발생 시, 사용자에게 `react-hot-toast`를 통해 상황에 맞는 메시지를 보여주고 자동 로그아웃 등의 후속 조치를 수행합니다.
+- **보안 고려사항:** 이메일 발송, 데이터베이스 접근 등 모든 민감한 작업은 백엔드 API를 통해서만 처리되도록 구현했습니다. 프론트엔드에는 API Key나 비밀번호 등 어떠한 민감 정보도 저장하거나 노출하지 않습니다.
+- **디버깅 용이성:** 주요 API 요청/응답 및 데이터 흐름에 `console.log`를 적절히 사용하여, 개발 및 운영 단계에서 문제 발생 시 원인을 빠르게 파악할 수 있도록 했습니다.
+
+## 🗺️ 6. 서비스 고도화 로드맵 (Roadmap)
+
+- **대화형 협상 가이드:** 사용자의 선택에 따라 맞춤형 협상 시나리오와 스크립트를 제공하는 대화형 가이드 기능 도입
+- **지원 건물 유형 확대:** 현재 빌라, 오피스텔 위주에서 아파트, 단독주택 등 모든 주거 형태의 실거래가 데이터를 조회할 수 있도록 API 연동 확대
+- **문서 기능 고도화:** 생성된 법적 문서에 전자 서명 기능을 추가하고, 우체국의 등기우편 발송 서비스와 연동하여 원클릭 발송 기능 구현
+- **커뮤니티 기능:** 같은 건물/동네 임차인들 간에 정보를 교류하고, 집단으로 임대인과 협상할 수 있는 커뮤니티 기능 추가
