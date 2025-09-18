@@ -80,9 +80,9 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
       }
 
       // API 응답 데이터 처리 (에러 체크 포함)
-      const monthlyData = monthlyRes?.success && !monthlyRes?.error?.includes('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR') ? monthlyRes.data : [];
-      const jeonseData = jeonseRes?.success && !jeonseRes?.error?.includes('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR') ? jeonseRes.data : [];
-      const transactionData = transactionsRes?.success && !transactionsRes?.error?.includes('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR') ? transactionsRes.data : [];
+      const monthlyData = monthlyRes?.success ? monthlyRes.data : [];
+      const jeonseData = jeonseRes?.success ? jeonseRes.data : [];
+      const transactionData = transactionsRes?.success ? transactionsRes.data : [];
 
       // 백엔드 데이터를 프론트엔드 형식으로 변환
       const processedMonthlyData = monthlyData.map((item: any) => ({
