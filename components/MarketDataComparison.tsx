@@ -426,8 +426,8 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
           </div>
         )}
 
-        {/* 최근 거래 동향 */}
-        {(marketData?.transactions?.length || 0) > 0 && (
+        {/* 최근 거래 동향 - 임시 숨김 */}
+        {/* {(marketData?.transactions?.length || 0) > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <i className="ri-line-chart-line mr-2 text-green-600"></i>
@@ -507,7 +507,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
               }} />
             </div>
           </div>
-        )}
+        )} */}
 
         {/* 지역별 시세 비교 요약 카드 */}
         {(marketData?.monthlyRentMarket?.length || 0) > 0 && (
