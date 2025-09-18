@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { officetelApi, villaApi, locationApi } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { extractLawdCdFromAddressSync } from '../lib/addressUtils';
 
 interface MarketDataComparisonProps {
   userRent: number;
@@ -40,13 +41,22 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
     transactions: TransactionData[];
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastFetchTime, setLastFetchTime] = useState<number>(0);
 
   const loadMarketData = async () => {
+    // 5분 이내에 이미 호출했다면 중복 호출 방지
+    const now = Date.now();
+    if (now - lastFetchTime < 5 * 60 * 1000 && marketData) {
+      console.log('🚫 API 호출 중복 방지: 5분 이내 재호출 차단');
+      return;
+    }
+
     try {
       setIsLoading(true);
+      setLastFetchTime(now);
       
-      // 주소에서 법정동코드 추출 (간단한 매핑)
-      let lawdCd = extractLawdCdFromAddress(safeUserAddress);
+      // 주소에서 법정동코드 추출 (카카오 API + 폴백)
+      let lawdCd = extractLawdCdFromAddressSync(safeUserAddress);
       
       console.log(`Using lawdCd: ${lawdCd} for address: ${safeUserAddress}`);
       
@@ -61,18 +71,18 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
           villaApi.getTransactions(lawdCd)
         ]);
       } else {
-        // 오피스텔 API 호출 (기본값)
+        // 빌라 API 호출 (기본값)
         [monthlyRes, jeonseRes, transactionsRes] = await Promise.all([
-          officetelApi.getMonthlyRentMarket(lawdCd),
-          officetelApi.getJeonseMarket(lawdCd),
-          officetelApi.getTransactions(lawdCd)
+          villaApi.getMonthlyRentMarket(lawdCd),
+          villaApi.getJeonseMarket(lawdCd),
+          villaApi.getTransactions(lawdCd)
         ]);
       }
 
-      // API 응답 데이터 처리
-      const monthlyData = monthlyRes?.success ? monthlyRes.data : [];
-      const jeonseData = jeonseRes?.success ? jeonseRes.data : [];
-      const transactionData = transactionsRes?.success ? transactionsRes.data : [];
+      // API 응답 데이터 처리 (에러 체크 포함)
+      const monthlyData = monthlyRes?.success && !monthlyRes?.error?.includes('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR') ? monthlyRes.data : [];
+      const jeonseData = jeonseRes?.success && !jeonseRes?.error?.includes('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR') ? jeonseRes.data : [];
+      const transactionData = transactionsRes?.success && !transactionsRes?.error?.includes('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR') ? transactionsRes.data : [];
 
       // 백엔드 데이터를 프론트엔드 형식으로 변환
       const processedMonthlyData = monthlyData.map((item: any) => ({
@@ -113,7 +123,15 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
       };
 
       setMarketData(processedData);
-      toast.success('시세 데이터를 불러왔습니다.');
+      
+      // 데이터 소스에 따른 메시지 표시
+      if (processedMonthlyData.length > 0) {
+        toast.success('실거래가 데이터를 불러왔습니다.');
+      } else {
+        toast('API 호출 제한으로 인해 시뮬레이션 데이터를 표시합니다.', {
+          icon: 'ℹ️',
+        });
+      }
     } catch (err: any) {
       console.error('Market data load error:', err);
       // API 실패 시 시뮬레이션 데이터로 폴백
@@ -122,103 +140,11 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
         jeonseMarket: [],
         transactions: generateSimulatedTransactions(safeUserAddress)
       });
-      toast.error('실거래가 데이터를 불러오는데 실패했습니다. 시뮬레이션 데이터를 표시합니다.');
     } finally {
       setIsLoading(false);
     }
   };
   
-  // 주소에서 법정동코드 추출 (백엔드와 동일한 로직)
-  const extractLawdCdFromAddress = (address: string): string => {
-    if (!address || address === '주소 정보 없음') {
-      return '11410'; // 기본값: 서대문구
-    }
-    
-    const cleanAddress = address.trim();
-    console.log('프론트엔드 주소에서 법정동코드 추출 시도:', cleanAddress);
-    
-    // 동명 매칭 (정확한 매칭 우선)
-    const dongMappings: { [key: string]: string } = {
-      '미근동': '1141010100',
-      '창천동': '1141010200',
-      '충정로2가': '1141010300',
-      '홍제동': '1141010400',
-      '남가좌동': '1141010500',
-      '합동': '1141010600',
-      '역삼동': '1168010100',
-      '개포동': '1168010200',
-      '청담동': '1168010300',
-      '삼성동': '1168010400',
-      '대치동': '1168010500',
-      '논현동': '1168010600',
-      '서초동': '1165010100',
-      '방배동': '1165010200',
-      '잠원동': '1165010300',
-      '반포동': '1165010400',
-      '내곡동': '1165010500',
-      '양재동': '1165010600',
-      '공덕동': '1144010100',
-      '아현동': '1144010200',
-      '도화동': '1144010300',
-      '용강동': '1144010400',
-      '대흥동': '1144010500',
-      '염리동': '1144010600',
-      '후암동': '1117010100',
-      '용산동': '1117010200',
-      '남영동': '1117010300',
-      '청파동': '1117010400',
-      '원효로동': '1117010500',
-      '이촌동': '1117010600'
-    };
-    
-    // 1. 동명 매칭 시도
-    for (const [dongName, lawdCd] of Object.entries(dongMappings)) {
-      if (cleanAddress.includes(dongName)) {
-        console.log('동명 매칭 성공:', dongName, '->', lawdCd);
-        return lawdCd;
-      }
-    }
-    
-    // 2. 구명 매칭 시도
-    const guMappings: { [key: string]: string } = {
-      '강남구': '11680',
-      '강동구': '11740',
-      '강북구': '11305',
-      '강서구': '11500',
-      '관악구': '11620',
-      '광진구': '11215',
-      '구로구': '11530',
-      '금천구': '11545',
-      '노원구': '11350',
-      '도봉구': '11320',
-      '동대문구': '11230',
-      '동작구': '11590',
-      '마포구': '11440',
-      '서대문구': '11410',
-      '서초구': '11650',
-      '성동구': '11200',
-      '성북구': '11290',
-      '송파구': '11710',
-      '양천구': '11470',
-      '영등포구': '11560',
-      '용산구': '11170',
-      '은평구': '11380',
-      '종로구': '11110',
-      '중구': '11140',
-      '중랑구': '11260'
-    };
-    
-    for (const [guName, lawdCd] of Object.entries(guMappings)) {
-      if (cleanAddress.includes(guName)) {
-        console.log('구명 매칭 성공:', guName, '->', lawdCd);
-        return lawdCd;
-      }
-    }
-    
-    // 3. 매칭 실패 시 기본값 반환
-    console.warn('주소 매칭 실패, 기본값 반환:', cleanAddress);
-    return '11410'; // 기본값: 서대문구
-  };
 
   // 시뮬레이션 시장 데이터 생성
   const generateSimulatedMarketData = (address: string): MarketData[] => {
@@ -233,15 +159,15 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
     ];
 
     return neighborhoods.map((neighborhood, index) => {
-      const variation = 0.8 + (index * 0.1); // 0.8 ~ 1.3 배
+      const variation = 0.9 + (index * 0.05); // 0.9 ~ 1.15 배 (더 현실적인 범위)
       const averagePrice = Math.round(baseRent * variation);
       
       return {
         neighborhood,
         averagePrice,
-        minPrice: Math.round(averagePrice * 0.8),
-        maxPrice: Math.round(averagePrice * 1.2),
-        transactionCount: Math.floor(Math.random() * 20) + 5, // 5-25건
+        minPrice: Math.round(averagePrice * 0.85),
+        maxPrice: Math.round(averagePrice * 1.15),
+        transactionCount: Math.floor(Math.random() * 15) + 10, // 10-25건
         pricePerSquareMeter: Math.round(averagePrice / 30) // 30㎡ 기준
       };
     });
@@ -251,7 +177,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   const generateSimulatedTransactions = (address: string): TransactionData[] => {
     const baseRent = getBaseRentByAddress(address);
     const buildings = [
-      `${address.split(' ')[0]} 오피스텔`,
+      `${address.split(' ')[0]} 빌라`,
       `${address.split(' ')[0]} 빌딩`,
       `${address.split(' ')[0]} 타워`,
       `${address.split(' ')[0]} 센터`,
@@ -260,9 +186,9 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
 
     return Array.from({ length: 15 }, (_, index) => {
       const building = buildings[index % buildings.length];
-      const variation = 0.7 + Math.random() * 0.6; // 0.7 ~ 1.3 배
+      const variation = 0.8 + Math.random() * 0.4; // 0.8 ~ 1.2 배
       const monthlyRent = Math.round(baseRent * variation);
-      const deposit = Math.round(monthlyRent * 50); // 월세의 50배
+      const deposit = Math.round(monthlyRent * 10); // 월세의 10배 (보증금)
       
       const now = new Date();
       const contractDate = new Date(now.getTime() - Math.random() * 90 * 24 * 60 * 60 * 1000); // 최근 90일 내
@@ -288,6 +214,8 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
       return 900000; // 90만원
     } else if (address.includes('송파') || address.includes('강동')) {
       return 800000; // 80만원
+    } else if (address.includes('울산')) {
+      return 500000; // 50만원
     } else {
       return 700000; // 70만원
     }
@@ -344,14 +272,19 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   };
 
   useEffect(() => {
-    loadMarketData();
+    // 이미 데이터가 있거나 로딩 중이면 중복 호출 방지
+    if (!marketData && !isLoading && safeUserAddress) {
+      loadMarketData();
+    }
   }, [safeUserAddress]);
 
   const formatPrice = (price: number) => {
-    if (price >= 10000) {
-      return `${(price / 10000).toFixed(1)}억원`;
+    if (price >= 100000000) { // 1억 이상일 때만 억원 단위 사용
+      return `${(price / 100000000).toFixed(1)}억원`;
+    } else if (price >= 10000) { // 1만 이상일 때는 만원 단위
+      return `${(price / 10000).toFixed(1)}만원`;
     }
-    return `${price.toLocaleString()}만원`;
+    return `${price.toLocaleString()}원`;
   };
 
   if (isLoading) {
@@ -382,12 +315,14 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   }
 
   return (
-    <section className="bg-green-50 rounded-lg p-6">
+    <section className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">객관적 지표 (국토부 실거래가 기반)</h2>
         <div className="flex flex-col items-end">
           <button
-            onClick={() => loadMarketData()}
+            onClick={() => {
+              setLastFetchTime(0); // 캐싱 무시하고 강제 갱신
+              loadMarketData();
+            }}
             disabled={isLoading}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
           >

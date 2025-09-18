@@ -11,6 +11,7 @@ import DocumentGenerator from './DocumentGenerator';
 import SmartDiagnosisModal from './SmartDiagnosisModal';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { extractLawdCdFromAddressSync } from '../lib/addressUtils';
 
 // 주소에서 법정동코드 추출 함수
 const extractLawdCdFromAddress = (address: string): string => {
@@ -634,13 +635,12 @@ export default function ComprehensiveReport({
             </div>
           </section>
 
-          {/* 3. 주관적 지표 */}
+          {/* 3. 거주 환경 종합 점수 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">주관적 지표 (커뮤니티 데이터 기반)</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">거주 환경 종합 점수</h2>
             
             {/* 종합 점수 차트 */}
             <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 mb-8">
-              <h3 className="text-xl font-bold text-gray-800 text-center mb-6">거주 환경 종합 점수</h3>
               <div className="h-64 mb-4" style={{ width: '100%', height: '256px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={safeBarChartData}>
@@ -685,7 +685,6 @@ export default function ComprehensiveReport({
 
             {/* 레이더 차트 */}
             <div className="bg-white rounded-2xl border-2 border-violet-200 p-6">
-              <h3 className="text-xl font-bold text-gray-800 text-center mb-6">카테고리별 상세 분석</h3>
               <div className="h-80" style={{ width: '100%', height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart data={safeRadarChartData}>
@@ -715,7 +714,7 @@ export default function ComprehensiveReport({
 
           {/* 4. 시세 분석 */}
           <section className="p-6 md:p-8 border-b border-purple-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">시세 분석</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">시세 분석 (국토부 실거래가 기반)</h2>
             <MarketDataComparison 
               userRent={userRent} 
               userAddress={safeContractSummary.address} 
@@ -729,7 +728,7 @@ export default function ComprehensiveReport({
                   <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
                     <i className="ri-crown-line text-white"></i>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800">📈 시장 트렌드 분석 (프리미엄 전용)</h3>
+                  <h3 className="text-xl font-bold text-gray-800">월세 추이 분석</h3>
                   <div className="ml-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                     PREMIUM
                   </div>
@@ -737,7 +736,7 @@ export default function ComprehensiveReport({
                 
                 <TimeSeriesChart 
                   buildingType={safeContractSummary.buildingType}
-                  lawdCd={extractLawdCdFromAddress(safeContractSummary.address)}
+                  lawdCd={extractLawdCdFromAddressSync(safeContractSummary.address)}
                   months={24}
                 />
               </div>
@@ -752,7 +751,7 @@ export default function ComprehensiveReport({
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
                     <i className="ri-crown-line text-white"></i>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-800">🔬 스마트 진단 종합 분석</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">스마트 진단 종합 분석</h2>
                   <div className="ml-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                     PREMIUM
                   </div>

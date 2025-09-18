@@ -132,7 +132,7 @@ export default function TimeSeriesChart({ buildingType, lawdCd, months = 24 }: T
             <i className="ri-line-chart-line text-2xl text-white"></i>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-800">📈 {months}개월 월세 추이 분석</h3>
+            <h3 className="text-xl font-bold text-gray-800">월세 추이 분석</h3>
             <p className="text-gray-600 text-sm">{buildingType} • {analysis?.startPeriod} ~ {analysis?.endPeriod}</p>
           </div>
         </div>
