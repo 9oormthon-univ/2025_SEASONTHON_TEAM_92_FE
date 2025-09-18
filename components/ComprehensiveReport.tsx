@@ -543,7 +543,11 @@ export default function ComprehensiveReport({
               </div>
               <h1 className="text-2xl md:text-4xl font-bold mb-4">
                 {safeContractSummary.address} 임대차 협상 리포트
-                {isPremium && ' 💎'}
+                {isPremium && (
+                  <span className="ml-2 px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-bold rounded-full align-middle shadow-lg">
+                    PREMIUM
+                  </span>
+                )}
               </h1>
               
               <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-6 text-sm">
