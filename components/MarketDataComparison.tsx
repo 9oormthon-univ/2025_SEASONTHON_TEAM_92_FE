@@ -313,11 +313,16 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   }, [safeUserAddress]);
 
   const formatPrice = (price: number) => {
-    // 백엔드에서 이미 만원 단위로 변환해서 보내주므로 그대로 사용
-    if (price >= 10000) { // 1만 이상일 때는 만원 단위
-      return `${price.toFixed(1)}만원`;
-    }
-    return `${price.toFixed(1)}만원`; // 모든 금액을 만원 단위로 표시
+    // 백엔드에서 원 단위로 데이터가 오므로 만원 단위로 변환
+    if (price === 0) return '0.0만원';
+    const priceInManwon = price / 10000;
+    return `${priceInManwon.toFixed(1)}만원`;
+  };
+
+  const formatUserRent = (price: number) => {
+    // 사용자 월세는 이미 만원 단위로 들어오므로 그대로 사용
+    if (price === 0) return '0만원';
+    return `${price}만원`;
   };
 
   if (isLoading) {
@@ -378,8 +383,9 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {(marketData?.monthlyRentMarket || []).slice(0, 6).map((market: MarketData, index: number) => {
                 const averageRent = market.averagePrice || 0;
-                const difference = userRent - averageRent;
-                const percentDiff = averageRent > 0 ? ((difference / averageRent) * 100) : 0;
+                const averageRentInManwon = averageRent / 10000; // 원 단위를 만원 단위로 변환
+                const difference = userRent - averageRentInManwon;
+                const percentDiff = averageRentInManwon > 0 ? ((difference / averageRentInManwon) * 100) : 0;
                 
                 return (
                   <div key={index} className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
@@ -394,13 +400,13 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                       <div className="flex justify-between">
                         <span className="text-gray-600">내 월세:</span>
                         <span className="font-semibold">
-                          {formatPrice(userRent)}
+                          {formatUserRent(userRent)}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">차이:</span>
                         <span className={`font-semibold ${difference < 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {difference < 0 ? '-' : '+'}{formatPrice(Math.abs(difference))}
+                          {difference < 0 ? '-' : '+'}{formatUserRent(Math.abs(difference))}
                           ({percentDiff > 0 ? '+' : ''}{percentDiff.toFixed(1)}%)
                         </span>
                       </div>
@@ -450,7 +456,8 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                 <tbody className="bg-white divide-y divide-gray-200">
                   {(marketData?.transactions || []).slice(0, 10).map((transaction: TransactionData, index: number) => {
                     const transactionRent = transaction.monthlyRent || 0;
-                    const difference = userRent - transactionRent;
+                    const transactionRentInManwon = transactionRent / 10000; // 원 단위를 만원 단위로 변환
+                    const difference = userRent - transactionRentInManwon;
                     
                     return (
                       <tr key={index} className="hover:bg-gray-50">
@@ -466,7 +473,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                         <td className="px-4 py-3 text-sm">
                           {transactionRent > 0 ? (
                             <span className={`font-medium ${difference < 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {difference < 0 ? '-' : '+'}{formatPrice(Math.abs(difference))}
+                              {difference < 0 ? '-' : '+'}{formatUserRent(Math.abs(difference))}
                             </span>
                           ) : (
                             <span className="text-gray-400">-</span>
@@ -491,19 +498,20 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                   
                   const totalRent = allMarketData.reduce((sum, market) => sum + market.averagePrice, 0);
                   const avgMarketRent = totalRent / allMarketData.length;
+                  const avgMarketRentInManwon = avgMarketRent / 10000; // 원 단위를 만원 단위로 변환
                   
                   if (avgMarketRent === 0) return "시세 정보가 부족합니다.";
                   
-                  const difference = userRent - avgMarketRent;
-                  const percentDiff = avgMarketRent > 0 ? (difference / avgMarketRent) * 100 : 0;
+                  const difference = userRent - avgMarketRentInManwon;
+                  const percentDiff = avgMarketRentInManwon > 0 ? (difference / avgMarketRentInManwon) * 100 : 0;
                   const transactionCount = marketData?.transactions?.length || 0;
                   
                   if (percentDiff > 15) {
-                    return `최근 거래 ${transactionCount}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${percentDiff.toFixed(1)}% 높습니다 (${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-red-600">임대료 인하 협상의 강력한 근거가 될 수 있습니다.</strong>`;
+                    return `최근 거래 ${transactionCount}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${percentDiff.toFixed(1)}% 높습니다 (${formatUserRent(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-red-600">임대료 인하 협상의 강력한 근거가 될 수 있습니다.</strong>`;
                   } else if (percentDiff < -10) {
-                    return `최근 거래 ${transactionCount}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${Math.abs(percentDiff).toFixed(1)}% 낮습니다 (${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-green-600">현재 합리적인 수준으로 계약되어 있습니다.</strong>`;
+                    return `최근 거래 ${transactionCount}건 분석 결과, 회원님의 월세가 동네 평균보다 <strong>${Math.abs(percentDiff).toFixed(1)}% 낮습니다 (${formatUserRent(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-green-600">현재 합리적인 수준으로 계약되어 있습니다.</strong>`;
                   } else {
-                    return `최근 거래 ${transactionCount}건 분석 결과, 회원님의 월세가 동네 평균과 비슷한 수준입니다 <strong>(차이: ${percentDiff.toFixed(1)}%, ${formatPrice(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-blue-600">현재 적정 수준이지만 다른 조건 개선을 요구할 수 있습니다.</strong>`;
+                    return `최근 거래 ${transactionCount}건 분석 결과, 회원님의 월세가 동네 평균과 비슷한 수준입니다 <strong>(차이: ${percentDiff.toFixed(1)}%, ${formatUserRent(userRent)} vs ${formatPrice(avgMarketRent)})</strong>. → <strong class="text-blue-600">현재 적정 수준이지만 다른 조건 개선을 요구할 수 있습니다.</strong>`;
                   }
                 })()
               }} />
@@ -521,8 +529,9 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(marketData?.monthlyRentMarket || []).slice(0, 4).map((market: MarketData, index: number) => {
                 const averageRent = market.averagePrice || 0;
-                const difference = userRent - averageRent;
-                const percentDiff = averageRent > 0 ? ((difference / averageRent) * 100) : 0;
+                const averageRentInManwon = averageRent / 10000; // 원 단위를 만원 단위로 변환
+                const difference = userRent - averageRentInManwon;
+                const percentDiff = averageRentInManwon > 0 ? ((difference / averageRentInManwon) * 100) : 0;
                 const isNegotiationPoint = Math.abs(percentDiff) > 10;
                 
                 return (
@@ -540,7 +549,7 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                       </span>
                     </div>
                     <div className="text-sm text-gray-600">
-                      {formatPrice(userRent)} vs {formatPrice(averageRent)}
+                      {formatUserRent(userRent)} vs {formatPrice(averageRent)}
                     </div>
                     {isNegotiationPoint && (
                       <div className={`mt-2 text-xs font-medium ${
@@ -566,8 +575,9 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
                   
                   const totalRent = allMarketData.reduce((sum, market) => sum + market.averagePrice, 0);
                   const avgMarketRent = totalRent / allMarketData.length;
-                  const difference = userRent - avgMarketRent;
-                  const percentDiff = avgMarketRent > 0 ? (difference / avgMarketRent) * 100 : 0;
+                  const avgMarketRentInManwon = avgMarketRent / 10000; // 원 단위를 만원 단위로 변환
+                  const difference = userRent - avgMarketRentInManwon;
+                  const percentDiff = avgMarketRentInManwon > 0 ? (difference / avgMarketRentInManwon) * 100 : 0;
                   
                   if (percentDiff > 15) {
                     return `🎯 <strong>강력한 협상 근거:</strong> 동네 평균 대비 ${percentDiff.toFixed(1)}% 높은 월세로 임대료 인하 요구가 가능합니다.<br/>
