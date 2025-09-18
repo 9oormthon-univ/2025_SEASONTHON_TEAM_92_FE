@@ -313,12 +313,11 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
   }, [safeUserAddress]);
 
   const formatPrice = (price: number) => {
-    if (price >= 100000000) { // 1억 이상일 때만 억원 단위 사용
-      return `${(price / 100000000).toFixed(1)}억원`;
-    } else if (price >= 10000) { // 1만 이상일 때는 만원 단위
-      return `${(price / 10000).toFixed(1)}만원`;
+    // 백엔드에서 이미 만원 단위로 변환해서 보내주므로 그대로 사용
+    if (price >= 10000) { // 1만 이상일 때는 만원 단위
+      return `${price.toFixed(1)}만원`;
     }
-    return `${price.toLocaleString()}원`;
+    return `${price.toFixed(1)}만원`; // 모든 금액을 만원 단위로 표시
   };
 
   if (isLoading) {
