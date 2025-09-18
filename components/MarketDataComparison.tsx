@@ -59,19 +59,22 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
       let lawdCd = await extractLawdCdFromAddress(safeUserAddress);
       
       console.log(`Using lawdCd: ${lawdCd} for address: ${safeUserAddress}`);
+      console.log(`Building type: ${buildingType}`);
       
       // 건물 유형에 따라 적절한 API 호출
       let monthlyRes, jeonseRes, transactionsRes;
       
-      if (buildingType && (buildingType.includes('빌라') || buildingType.includes('다세대'))) {
-        // 빌라 API 호출
+      if (buildingType && (buildingType.includes('오피스텔') || buildingType.includes('officetel'))) {
+        // 오피스텔 API 호출
+        console.log('🏢 오피스텔 API 호출');
         [monthlyRes, jeonseRes, transactionsRes] = await Promise.all([
-          villaApi.getMonthlyRentMarket(lawdCd),
-          villaApi.getJeonseMarket(lawdCd),
-          villaApi.getTransactions(lawdCd)
+          officetelApi.getMonthlyRentMarket(lawdCd),
+          officetelApi.getJeonseMarket(lawdCd),
+          officetelApi.getTransactions(lawdCd)
         ]);
       } else {
         // 빌라 API 호출 (기본값)
+        console.log('🏠 빌라 API 호출');
         [monthlyRes, jeonseRes, transactionsRes] = await Promise.all([
           villaApi.getMonthlyRentMarket(lawdCd),
           villaApi.getJeonseMarket(lawdCd),
@@ -83,6 +86,14 @@ export default function MarketDataComparison({ userRent, userAddress, buildingTy
       const monthlyData = monthlyRes?.success ? monthlyRes.data : [];
       const jeonseData = jeonseRes?.success ? jeonseRes.data : [];
       const transactionData = transactionsRes?.success ? transactionsRes.data : [];
+      
+      console.log('📊 API 응답 데이터:', {
+        monthlyDataCount: monthlyData.length,
+        jeonseDataCount: jeonseData.length,
+        transactionDataCount: Array.isArray(transactionData) ? transactionData.length : Object.keys(transactionData).length,
+        monthlyData: monthlyData.slice(0, 2), // 처음 2개만 로그
+        lawdCd
+      });
 
       // 백엔드 데이터를 프론트엔드 형식으로 변환
       const processedMonthlyData = monthlyData.map((item: any) => ({
