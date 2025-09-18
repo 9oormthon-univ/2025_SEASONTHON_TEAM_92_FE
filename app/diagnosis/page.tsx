@@ -239,7 +239,7 @@ export default function DiagnosisPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-20 w-20 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold mb-3 text-gray-900">진단 질문을 불러오는 중...</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900">진단 질문을 불러오는 중...</h2>
           <p className="text-gray-600">잠시만 기다려주세요.</p>
         </div>
       </div>
@@ -251,7 +251,7 @@ export default function DiagnosisPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-20 w-20 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold mb-3 text-gray-900">진단 결과 분석 중...</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900">진단 결과 분석 중...</h2>
           <p className="mb-4 text-gray-600">이웃들과 비교 분석을 진행하고 있습니다</p>
         </div>
       </div>
@@ -271,12 +271,12 @@ export default function DiagnosisPage() {
                 뒤로가기
               </button>
               <Link href="/">
-                <h1 className="text-3xl font-bold text-purple-600 cursor-pointer font-['Roboto']">월세의 정석</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-purple-600 cursor-pointer font-['Roboto']">월세의 정석</h1>
               </Link>
               <div className="w-20"></div> {/* 공간 확보용 */}
             </div>
             <div className="w-16 h-1 bg-purple-600 rounded-full mx-auto mb-6"></div>
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
             <h2 className="text-2xl font-bold mb-3 text-gray-800">우리 집 종합 진단</h2>
             <p className="mb-4 text-gray-600">거주 환경을 평가하여 이웃들과 비교 분석해드립니다</p>
             

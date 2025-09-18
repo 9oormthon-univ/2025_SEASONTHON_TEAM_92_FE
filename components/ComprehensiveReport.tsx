@@ -478,7 +478,7 @@ export default function ComprehensiveReport({
         }
       `}</style>
 
-      <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
+      <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6 md:space-y-8">
         
         {/* 헤더 */}
         <div className="text-center mb-12">
@@ -494,13 +494,13 @@ export default function ComprehensiveReport({
             <div className="w-20"></div> {/* 공간 확보용 */}
           </div>
           <div className="w-16 h-1 bg-violet-500 rounded-full mx-auto mb-6"></div>
-          <h1 className="text-gray-800 text-2xl md:text-3xl font-bold mb-2">생성된 협상 리포트</h1>
+          <h1 className="text-gray-800 text-xl sm:text-2xl md:text-3xl font-bold mb-2">생성된 협상 리포트</h1>
           <p className="text-gray-600 text-base">임대인과 공유할 수 있는 완전한 협상 리포트입니다</p>
         </div>
 
         {/* 공유 버튼 */}
         <div className="no-print flex justify-center mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button onClick={copyShareUrl} className="bg-gradient-to-r from-[#9333EA] to-[#C084FC] text-white px-6 py-3 rounded-xl hover:from-[#7C3AED] hover:to-[#A855F7] transition-all flex items-center justify-center shadow-lg">
               <i className="ri-share-line mr-2"></i> 링크 공유
             </button>

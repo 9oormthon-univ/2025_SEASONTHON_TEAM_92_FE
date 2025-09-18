@@ -83,4 +83,23 @@
     font-family: var(--font-ibm-plex), var(--font-inter), 'IBM Plex Sans KR', monospace;
     font-feature-settings: 'tnum' 1; /* 숫자 고정폭 */
   }
+  
+  /* 터치 인터랙션 최적화 */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* 모바일에서 스크롤 최적화 */
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 모바일에서 텍스트 선택 방지 */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }

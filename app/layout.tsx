@@ -36,6 +36,13 @@ export const metadata: Metadata = {
   description: "AI 분석과 그룹 협상으로 합리적인 월세를 만들어가는 20대를 위한 스마트한 월세 협상 플랫폼",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

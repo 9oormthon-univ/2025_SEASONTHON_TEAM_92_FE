@@ -16,6 +16,7 @@ export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // 스크롤 이벤트 처리 (API 호출과 분리)
   useEffect(() => {
@@ -48,8 +49,14 @@ export default function HomePage() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const userMenuElement = document.getElementById('user-menu');
+      const mobileMenuElement = document.getElementById('mobile-menu');
+      
       if (userMenuElement && !userMenuElement.contains(event.target as Node)) {
         setShowUserMenu(false);
+      }
+      
+      if (mobileMenuElement && !mobileMenuElement.contains(event.target as Node)) {
+        setShowMobileMenu(false);
       }
     };
 
@@ -342,11 +349,12 @@ export default function HomePage() {
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#9333EA]">
                   <i className="ri-home-line text-white text-xl"></i>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 font-display">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 font-display whitespace-nowrap">
                   월세의 정석
                 </h1>
               </div>
             </div>
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <a
                 href="#features"
@@ -369,13 +377,25 @@ export default function HomePage() {
                 사용법
               </a>
             </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-3 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="메뉴 열기"
+              >
+                <i className={`ri-menu-line text-2xl text-gray-700 ${showMobileMenu ? 'hidden' : 'block'}`}></i>
+                <i className={`ri-close-line text-2xl text-gray-700 ${showMobileMenu ? 'block' : 'hidden'}`}></i>
+              </button>
+            </div>
             <div className="flex items-center space-x-4">
               {isLoggedIn ? (
                 <div className="flex items-center space-x-4">
                   <div className="relative" id="user-menu">
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all cursor-pointer hover:opacity-80 bg-[#9333EA]"
+                      className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg transition-all cursor-pointer hover:opacity-80 bg-[#9333EA]"
                     >
                       <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white">
                         <span className="text-[#9333EA] text-sm font-bold">
@@ -383,9 +403,14 @@ export default function HomePage() {
                         </span>
                       </div>
                       <span
-                        className="font-medium text-white"
+                        className="font-medium text-white hidden sm:block"
                       >
-                        {userName} 님
+                        {userName.length > 6 ? `${userName.substring(0, 6)}...` : userName} 님
+                      </span>
+                      <span
+                        className="font-medium text-white sm:hidden"
+                      >
+                        {userName.charAt(0).toUpperCase()}님
                       </span>
                       <i
                         className={`ri-arrow-down-s-line ${showUserMenu ? 'rotate-180' : ''} transition-transform text-white`}
@@ -445,12 +470,63 @@ export default function HomePage() {
         </div>
         {/* Header와 Main 사이 구분선 */}
         <div className="w-full h-px bg-[#9333EA]"></div>
+
+        {/* Mobile Menu Dropdown */}
+        {showMobileMenu && (
+          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg" id="mobile-menu">
+            <div className="px-4 py-4 space-y-4">
+              <a
+                href="#features"
+                onClick={() => setShowMobileMenu(false)}
+                className="block py-4 px-4 rounded-lg font-medium transition-colors hover:bg-gray-100 text-gray-700 min-h-[44px] flex items-center"
+              >
+                기능
+              </a>
+              <Link
+                href="/diagnosis"
+                onClick={() => setShowMobileMenu(false)}
+                className="block py-4 px-4 rounded-lg font-medium transition-colors hover:bg-gray-100 text-gray-700 min-h-[44px] flex items-center"
+              >
+                스마트 진단
+              </Link>
+              <a
+                href="#usage"
+                onClick={() => setShowMobileMenu(false)}
+                className="block py-4 px-4 rounded-lg font-medium transition-colors hover:bg-gray-100 text-gray-700 min-h-[44px] flex items-center"
+              >
+                사용법
+              </a>
+              
+              {/* Mobile Auth Buttons */}
+              {!isLoggedIn && (
+                <>
+                  <div className="border-t border-gray-200 pt-4 mt-4">
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setShowMobileMenu(false)}
+                      className="block py-4 px-4 rounded-lg font-medium transition-colors hover:bg-gray-100 text-gray-700 mb-2 min-h-[44px] flex items-center"
+                    >
+                      로그인
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      onClick={() => setShowMobileMenu(false)}
+                      className="block py-4 px-4 rounded-lg font-medium transition-colors bg-[#9333EA] text-white text-center min-h-[44px] flex items-center justify-center"
+                    >
+                      회원가입
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center bg-white relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div className="text-left">
               <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 bg-purple-50 text-[#9333EA] border border-purple-200">
                 <i className="ri-shield-check-line mr-2 text-[#9333EA]"></i>
@@ -464,14 +540,14 @@ export default function HomePage() {
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-black mb-10 leading-[1.8] text-gray-900 font-display">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 md:mb-10 leading-tight md:leading-[1.8] text-gray-900 font-display">
                 혹시 나만<br />
                 <span className="text-[#9333EA]">월세를 비싸게</span><br />
                 내고 있나요?
               </h1>
 
-              <p className="text-xl mb-12 leading-relaxed text-gray-600">
-                AI 분석과 그룹 협상으로 합리적인 월세를 만들어가는<br />
+              <p className="text-lg sm:text-xl mb-8 md:mb-12 leading-relaxed text-gray-600">
+                AI 분석과 그룹 협상으로 합리적인 월세를 만들어가는<br className="hidden sm:block" />
                 <span className="font-semibold text-[#9333EA]">20대를 위한 스마트한 월세 협상 플랫폼</span>
               </p>
 
@@ -480,7 +556,7 @@ export default function HomePage() {
                   <>
                     <Link
                       href="/auth/register"
-                      className="px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#7C3AED] transition-all whitespace-nowrap cursor-pointer text-center bg-[#9333EA] text-white shadow-lg"
+                      className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold hover:bg-[#7C3AED] transition-all whitespace-nowrap cursor-pointer text-center bg-[#9333EA] text-white shadow-lg"
                       style={{
                         fontFamily:
                           'Pretendard, -apple-system, BlinkMacSystemFile, system-ui, Roboto, "Helvetica Neue", "Segue UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segue UI Emoji", "Segue UI Symbol", sans-serif',
@@ -490,7 +566,7 @@ export default function HomePage() {
                     </Link>
                     <Link
                       href="/diagnosis"
-                      className="border-2 border-[#9333EA] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-purple-50 transition-all whitespace-nowrap cursor-pointer text-[#9333EA]"
+                      className="border-2 border-[#9333EA] px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold hover:bg-purple-50 transition-all whitespace-nowrap cursor-pointer text-[#9333EA]"
                       style={{
                         fontFamily:
                           'Pretendard, -apple-system, BlinkMacSystemFile, system-ui, Roboto, "Helvetica Neue", "Segue UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segue UI Emoji", "Segue UI Symbol", sans-serif',
@@ -532,16 +608,19 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Updated image block with larger dimensions */}
-            <div className="hidden lg:block relative z-10">
-              <div className="relative flex items-center justify-center h-full">
+            {/* 캐릭터 이미지 - 반응형으로 표시 */}
+            <div className="relative z-10 flex justify-center">
+              <div className="relative flex items-center justify-center">
                 {/* 첨부된 3D 집 캐릭터 이미지 */}
                 <div className="relative">
                   <img
                     src="https://static.readdy.ai/image/2dfa5ef9c47e931f2509d723fd78fa10/ea608ef62217d53f35f9cb117a596557.png"
                     alt="월세 진단 캐릭터"
-                    className="object-contain"
-                    style={{ width: '800px', height: '780px' }}
+                    className="object-contain w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-none"
+                    style={{ 
+                      width: 'clamp(300px, 50vw, 800px)', 
+                      height: 'clamp(300px, 50vw, 780px)' 
+                    }}
                   />
                 </div>
               </div>
@@ -688,7 +767,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* 주간 미션 */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F0E1FD] hover:shadow-md transition-shadow cursor-pointer">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto bg-[#F0E1FD]">
@@ -764,7 +843,7 @@ export default function HomePage() {
             <p className="text-xl text-black">월세의 정석으로 성공적인 협상을 경험한 이웃들의 이야기</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {/* 후기 1 */}
             <div className="bg-white rounded-2xl shadow-lg border border-[#C99AF3] p-8 hover:shadow-xl transition-shadow">
               <div className="flex items-center mb-6">
@@ -845,7 +924,7 @@ export default function HomePage() {
           </div>
 
           {/* 통계 정보 */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             <div className="text-center">
               <div className="text-3xl font-bold text-[#9333EA] mb-2">1,247</div>
               <div className="text-sm text-black">성공적인 협상</div>
@@ -876,7 +955,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <div className="text-center">
               <div className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-6 bg-[#9333EA] text-white">
                 1
@@ -919,7 +998,7 @@ export default function HomePage() {
       {/* Problem Statement Section */}
       <section className="py-20 bg-[#F0E1FD]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
             <div>
               <h2 className="text-4xl font-bold mb-6 text-black leading-tight">
                 깜깜이 월세 계약,
