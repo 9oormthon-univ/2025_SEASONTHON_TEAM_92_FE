@@ -27,22 +27,51 @@ export default function LocationVerifier({ currentUser, onVerificationSuccess, o
     setLocationError('');
     setLocationInfo(null);
 
-    // 시연용 강남구 역삼동 고정 위치
-    const demoCoords = { lat: 37.5008, lon: 127.0374 }; // 강남구 역삼동 좌표
-    setCoords(demoCoords);
-
     try {
-      // 시연용 고정 데이터
-      setLocationInfo({
-        address: '서울특별시 강남구 역삼동',
-        dong: '역삼동'
-      });
-      toast.success('위치 확인: 역삼동');
-    } catch (error) {
-      console.error('주소 변환 실패:', error);
-      setLocationError('주소 변환 중 오류가 발생했습니다.');
-      toast.error('주소 변환 중 오류가 발생했습니다.');
-    } finally {
+      if (!navigator.geolocation) {
+        throw new Error('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setCoords({ lat: latitude, lon: longitude });
+          
+          try {
+            // 좌표를 주소로 변환
+            const response = await fetch(`/api/vworld-proxy?coords=${longitude},${latitude}`);
+            const data = await response.json();
+            
+            if (data.success && data.address) {
+              setLocationInfo({
+                address: data.address,
+                dong: data.address.split(' ').pop() || ''
+              });
+              toast.success(`위치 확인: ${data.address}`);
+            } else {
+              throw new Error('주소 변환에 실패했습니다.');
+            }
+          } catch (err: any) {
+            setLocationError('주소 조회에 실패했습니다. 다시 시도해주세요.');
+            toast.error('주소 조회에 실패했습니다.');
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        (error) => {
+          setLocationError('위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인해주세요.');
+          toast.error('위치 정보를 가져올 수 없습니다.');
+          setIsLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000
+        }
+      );
+    } catch (err: any) {
+      setLocationError('위치 서비스에 접근할 수 없습니다.');
+      toast.error('위치 서비스에 접근할 수 없습니다.');
       setIsLoading(false);
     }
 
